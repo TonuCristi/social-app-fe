@@ -45,7 +45,7 @@ const router = createBrowserRouter([
           },
           {
             path: "/profile/changeEmail",
-            element: <div>Change email test</div>,
+            element: <div>Change email</div>,
           },
           {
             path: "/profile/editProfile",
