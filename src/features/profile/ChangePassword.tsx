@@ -4,11 +4,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
+import Message from "../../ui/Message";
 
 import { AuthApi } from "../../api/AuthApi";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-import Message from "../../ui/Message";
 
 const StyledChangePassword = styled.div`
   display: flex;
@@ -40,7 +40,7 @@ type Inputs = {
 };
 
 export default function ChangePassword() {
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit, reset } = useForm<Inputs>();
   const { user } = useAppSelector(selectCurrentUser);
   const [message, setMessage] = useState<{ text: string; isSuccess: boolean }>({
     text: "",
@@ -48,9 +48,11 @@ export default function ChangePassword() {
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
     AuthApi.changePassword(data, user.id)
-      .then((res) => setMessage({ text: res.message, isSuccess: true }))
+      .then((res) => {
+        setMessage({ text: res.message, isSuccess: true });
+        reset();
+      })
       .catch((err) =>
         setMessage({ text: err.response.data.error, isSuccess: false })
       );

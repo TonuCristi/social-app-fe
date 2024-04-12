@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import {
+  UserEditRequest,
   UserLoginRequest,
   UserResponse,
   UserSignupRequest,
@@ -35,5 +36,15 @@ export const AuthApi = {
     return api
       .put(`${BASE_URL}/changePassword/${id}`, passwords)
       .then(({ data }: AxiosResponse<{ message: string }>) => data);
+  },
+  changeEmail(email: string, id: string) {
+    return api
+      .put(`${BASE_URL}/changeEmail/${id}`, { email })
+      .then(({ data }: AxiosResponse<UserResponse>) => data);
+  },
+  editUser(user: UserEditRequest, id: string) {
+    return api
+      .put(`${BASE_URL}/updateUser/${id}`, user)
+      .then(({ data }: AxiosResponse<UserResponse>) => data);
   },
 };

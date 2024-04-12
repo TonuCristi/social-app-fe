@@ -27,3 +27,8 @@ export type UserLoginRequest = User<
   Omit,
   "id" | "createdAt" | "name" | "birth_date" | "avatar" | "description"
 >;
+
+export type UserEditRequest = User<
+  Omit,
+  "id" | "email" | "password" | "createdAt"
+>;

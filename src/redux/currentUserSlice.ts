@@ -1,17 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  birth_date: string;
-  avatar: string;
-  description: string;
-  createdAt: string;
-};
+import { User } from "../lib/types";
 
 type UserState = {
   isLoading: boolean;

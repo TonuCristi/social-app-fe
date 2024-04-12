@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import styled, { css } from "styled-components";
 
 type Variant = "profile" | "postStats" | "auth" | "post" | "floatPost";
@@ -111,11 +111,11 @@ const StyledButton = styled.button<{ $variant: Variant }>`
   ${(props) => variants[props.$variant]}
 `;
 
-type Props = {
-  children: ReactNode;
+type Props = DetailedHTMLProps<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> & {
   variant: Variant;
-  disabled?: boolean;
-  onClick?: () => void;
 };
 
 export default function Button({
