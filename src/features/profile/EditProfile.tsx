@@ -29,6 +29,16 @@ const Form = styled.form`
   gap: 1.2rem;
 `;
 
+const Textarea = styled.textarea`
+  border: none;
+  background: none;
+  outline: none;
+  background-color: var(--color-zinc-800);
+  padding: 1.2rem;
+  border-radius: 1.1rem;
+  color: var(--color-zinc-100);
+`;
+
 const ButtonWrapper = styled.div`
   margin-top: 1.2rem;
   width: 100%;
@@ -45,7 +55,7 @@ export default function EditProfile() {
   const {
     user: { id, name, avatar, birth_date, description },
   } = useAppSelector(selectCurrentUser);
-  const { register, handleSubmit, reset } = useForm<Inputs>({
+  const { register, handleSubmit } = useForm<Inputs>({
     defaultValues: {
       name,
       avatar,
@@ -68,17 +78,13 @@ export default function EditProfile() {
   };
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
     AuthApi.editUser(data, id)
       .then((res) => {
-        console.log(res);
-        // const user = mapUser(res);
-        // dispatch(fetchUser(user));
-        // setMessage({ text: "User edited!", isSuccess: true });
-        // reset();
+        const user = mapUser(res);
+        dispatch(fetchUser(user));
+        setMessage({ text: "User edited!", isSuccess: true });
       })
       .catch((err) => {
-        console.log(err);
         setMessage({ text: err.response.data.error, isSuccess: false });
       });
   };
@@ -108,20 +114,18 @@ export default function EditProfile() {
           {...register("avatar")}
         />
 
-        <Input
-          variant="auth"
-          type="text"
-          placeholder="Description"
-          {...register("description")}
-        />
+        <Textarea placeholder="Description" {...register("description")} />
+
         <ButtonWrapper>
           <Button variant="auth">Update</Button>
         </ButtonWrapper>
       </Form>
 
-      <Message variant={message.isSuccess ? "regular" : "error"}>
-        {message.text}
-      </Message>
+      {message.text && (
+        <Message variant={message.isSuccess ? "regular" : "error"}>
+          {message.text}
+        </Message>
+      )}
     </StyledEditProfile>
   );
 }

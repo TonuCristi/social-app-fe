@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { NavLink } from "react-router-dom";
 
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
@@ -31,6 +32,10 @@ const Container = styled.div`
   width: 100%;
 `;
 
+const HomeLink = styled(NavLink)`
+  text-decoration: none;
+`;
+
 export default function Navbar({
   variant,
   opacity,
@@ -41,7 +46,9 @@ export default function Navbar({
   return (
     <StyledNavbar $variant={variant} $opacity={opacity}>
       <Container>
-        <Logo />
+        <HomeLink to="/">
+          <Logo />
+        </HomeLink>
         <Search />
       </Container>
 

@@ -86,9 +86,11 @@ export default function ChangePassword() {
         </ButtonWrapper>
       </Form>
 
-      <Message variant={message.isSuccess ? "regular" : "error"}>
-        {message.text}
-      </Message>
+      {message.text && (
+        <Message variant={message.isSuccess ? "regular" : "error"}>
+          {message.text}
+        </Message>
+      )}
     </StyledChangePassword>
   );
 }

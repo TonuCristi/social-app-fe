@@ -29,12 +29,14 @@ const StyledProfile = styled.div`
   grid-template-columns: 25fr 75fr;
   width: 70%;
   margin: 0 auto;
+  border: 1px solid var(--color-zinc-500);
+  border-top: 1px solid transparent;
 `;
 
 const ProfileNav = styled.nav`
   border-right: 1px solid var(--color-zinc-500);
   padding: 2.4rem;
-  height: max(100vh, 100%);
+  /* height: max(100vh, 100%); */
 `;
 
 const Title = styled.h1`
