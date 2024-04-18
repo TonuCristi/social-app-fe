@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { createClient } from "@supabase/supabase-js";
 
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
@@ -10,6 +11,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { UserResponse } from "../../lib/types";
 import { AuthApi } from "../../api/AuthApi";
 import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
+import { HiMiniPhoto } from "react-icons/hi2";
 
 const StyledEditProfile = styled.div`
   display: flex;
@@ -27,6 +29,30 @@ const Form = styled.form`
   flex-direction: column;
   align-items: center;
   gap: 1.2rem;
+`;
+
+const Container = styled.div`
+  align-self: center;
+`;
+
+const FileInputLabel = styled.label`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const FileInput = styled.input`
+  display: none;
+`;
+
+const PhotoIcon = styled(HiMiniPhoto)`
+  color: var(--color-zinc-500);
+  font-size: 2.4rem;
+  transition: all 0.2s;
+
+  &:hover {
+    color: var(--color-sky-500);
+  }
 `;
 
 const Textarea = styled.textarea`
@@ -78,10 +104,36 @@ export default function EditProfile() {
   };
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log(data.avatar[0]);
+    const supabase = createClient(
+      "https://bgkxchokxutqxvteescl.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJna3hjaG9reHV0cXh2dGVlc2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM0NjUzMTgsImV4cCI6MjAyOTA0MTMxOH0.kTUwTjBo06TYKUAAn4LpSJCmXqnFOVeApGCLihbUwKA"
+    );
+
+    async function uploadFile(file) {
+      const { data, error } = await supabase.storage
+        .from("imgs")
+        .upload(`${id}`, file);
+      if (error) {
+        setMessage({
+          text: "Something went wrong with uploading the avatar",
+          isSuccess: false,
+        });
+      } else {
+        return `https://bgkxchokxutqxvteescl.supabase.co/storage/v1/object/public/imgs/${data.path}`;
+      }
+    }
+
+    let photo: string = "";
+    uploadFile(data.avatar[0]).then((res) => {
+      if (res) photo = res;
+      else photo = "";
+    });
+
     AuthApi.editUser(data, id)
       .then((res) => {
         const user = mapUser(res);
-        dispatch(fetchUser(user));
+        dispatch(fetchUser({ ...user, avatar: photo }));
         setMessage({ text: "User edited!", isSuccess: true });
       })
       .catch((err) => {
@@ -107,12 +159,24 @@ export default function EditProfile() {
           {...register("birth_date")}
         />
 
-        <Input
+        {/* <Input
           variant="auth"
           type="text"
           placeholder="Avatar"
           {...register("avatar")}
-        />
+        /> */}
+
+        <Container>
+          <FileInputLabel htmlFor="file">
+            <PhotoIcon />
+          </FileInputLabel>
+          <FileInput
+            type="file"
+            id="file"
+            accept="image/png, image/jpeg"
+            {...register("avatar")}
+          />
+        </Container>
 
         <Textarea placeholder="Description" {...register("description")} />
 

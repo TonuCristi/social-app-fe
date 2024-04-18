@@ -36,7 +36,6 @@ const StyledProfile = styled.div`
 const ProfileNav = styled.nav`
   border-right: 1px solid var(--color-zinc-500);
   padding: 2.4rem;
-  /* height: max(100vh, 100%); */
 `;
 
 const Title = styled.h1`

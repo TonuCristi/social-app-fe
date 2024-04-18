@@ -12,7 +12,7 @@ import { fetchUser, selectCurrentUser } from "../redux/currentUserSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 
 const StyledRootLayout = styled.div`
-  /* height: 100vh; */
+  height: 100vh;
 `;
 
 const Main = styled.main``;
