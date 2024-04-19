@@ -5,20 +5,20 @@ import Navlink from "../ui/Navlink";
 
 const links = [
   {
-    to: "profile",
+    to: "",
     end: true,
     text: "Profile",
   },
   {
-    to: "profile/changePassword",
+    to: "/changePassword",
     text: "Change password",
   },
   {
-    to: "profile/changeEmail",
+    to: "/changeEmail",
     text: "Change email",
   },
   {
-    to: "profile/editProfile",
+    to: "/editProfile",
     text: "Edit profile",
   },
 ];
@@ -31,6 +31,7 @@ const StyledProfile = styled.div`
   margin: 0 auto;
   border: 1px solid var(--color-zinc-500);
   border-top: 1px solid transparent;
+  height: 100%;
 `;
 
 const ProfileNav = styled.nav`
@@ -77,7 +78,7 @@ export default function Profile() {
         <Title>Profile</Title>
         <NavLinks>
           {links.map(({ to, end, text }) => (
-            <Navlink key={to} to={`/${to}`} end={end}>
+            <Navlink key={to} to={`/profile${to}`} end={end}>
               {({ isActive }) => <NavItem $isActive={isActive}>{text}</NavItem>}
             </Navlink>
           ))}

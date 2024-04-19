@@ -6,7 +6,7 @@ import NavLinks from "./NavLinks";
 import Profile from "./ProfileBadge";
 import Search from "../features/search/Search";
 
-const StyledNavbar = styled.header<{ $variant: string; $opacity: string }>`
+const StyledNavbar = styled.header`
   width: 100%;
   padding: 1.2rem 2.4rem;
   display: grid;
@@ -17,8 +17,7 @@ const StyledNavbar = styled.header<{ $variant: string; $opacity: string }>`
   background-color: rgba(9, 9, 11, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  position: ${(props) => props.$variant};
-  opacity: ${(props) => props.$opacity};
+  position: sticky;
   top: 0;
   left: 0;
   z-index: 999;
@@ -36,15 +35,9 @@ const HomeLink = styled(NavLink)`
   text-decoration: none;
 `;
 
-export default function Navbar({
-  variant,
-  opacity,
-}: {
-  variant: string;
-  opacity: string;
-}) {
+export default function Navbar() {
   return (
-    <StyledNavbar $variant={variant} $opacity={opacity}>
+    <StyledNavbar>
       <Container>
         <HomeLink to="/">
           <Logo />

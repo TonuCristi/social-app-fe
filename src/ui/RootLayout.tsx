@@ -11,11 +11,17 @@ import { UserResponse } from "../lib/types";
 import { fetchUser, selectCurrentUser } from "../redux/currentUserSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 
-const StyledRootLayout = styled.div`
-  height: 100vh;
+const StyledRootLayout = styled.div``;
+
+const Container = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
-const Main = styled.main``;
+const Main = styled.main`
+  height: 100%;
+`;
 
 export default function RootLayout() {
   const { isLoading, error } = useAppSelector(selectCurrentUser);
@@ -46,12 +52,13 @@ export default function RootLayout() {
 
   return (
     <StyledRootLayout>
-      <Navbar variant="relative" opacity="0" />
-      <Navbar variant="fixed" opacity="1" />
+      <Container>
+        <Navbar />
 
-      <Main>
-        <Outlet />
-      </Main>
+        <Main>
+          <Outlet />
+        </Main>
+      </Container>
     </StyledRootLayout>
   );
 }
