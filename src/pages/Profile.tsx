@@ -14,10 +14,6 @@ const links = [
     text: "Change password",
   },
   {
-    to: "/changeEmail",
-    text: "Change email",
-  },
-  {
     to: "/editProfile",
     text: "Edit profile",
   },

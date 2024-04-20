@@ -10,7 +10,6 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import ProfileInfo from "./features/profile/ProfileInfo";
 import ChangePassword from "./features/profile/ChangePassword";
-import ChangeEmail from "./features/profile/ChangeEmail";
 import EditProfile from "./features/profile/EditProfile";
 
 import GlobalStyle from "./styles/GlobalStyle";
@@ -44,10 +43,6 @@ const router = createBrowserRouter([
           {
             path: "/profile/changePassword",
             element: <ChangePassword />,
-          },
-          {
-            path: "/profile/changeEmail",
-            element: <ChangeEmail />,
           },
           {
             path: "/profile/editProfile",

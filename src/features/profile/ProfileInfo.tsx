@@ -40,8 +40,6 @@ const Description = styled.p`
   line-height: 1.6;
 `;
 
-// const Posts = styled.div``;
-
 export default function ProfileInfo() {
   const {
     user: { name, email, description, birth_date, avatar, createdAt },
@@ -66,6 +64,7 @@ export default function ProfileInfo() {
           </Field>
         </Info>
       </Container>
+
       <Description>
         <FieldName>Description:</FieldName>
         {description}

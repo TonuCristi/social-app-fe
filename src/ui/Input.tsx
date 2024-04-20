@@ -5,9 +5,10 @@ import {
   ReactNode,
 } from "react";
 import styled, { css } from "styled-components";
+
 import Button from "./Button";
 
-type Variant = "search" | "auth" | "post";
+export type Variant = "search" | "auth" | "post";
 
 const variants = {
   search: css`
