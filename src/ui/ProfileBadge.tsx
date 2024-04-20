@@ -10,6 +10,8 @@ import { useLogout } from "../hooks/useLogout";
 import { selectCurrentUser } from "../redux/currentUserSlice";
 import { useAppSelector } from "../redux/hooks";
 import { useClickOutside } from "../hooks/useClickOutside";
+import { createPortal } from "react-dom";
+import ConfirmationModal from "./ConfirmationModal";
 
 const StyledProfileBadge = styled.div`
   justify-self: end;
@@ -68,9 +70,10 @@ const DropdownLink = styled(NavLink)`
 
 export default function ProfileBadge() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { logout } = useLogout();
   const { user } = useAppSelector(selectCurrentUser);
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   useClickOutside(containerRef, () => setIsOpen(false));
 
   return (
@@ -86,7 +89,17 @@ export default function ProfileBadge() {
           <DropdownItem>Profile</DropdownItem>
         </DropdownLink>
 
-        <DropdownItem onClick={() => logout()}>Log out</DropdownItem>
+        <DropdownItem onClick={() => setIsModalOpen(true)}>
+          Log out
+        </DropdownItem>
+        {isModalOpen &&
+          createPortal(
+            <ConfirmationModal
+              onConfirm={() => logout()}
+              onClose={() => setIsModalOpen(false)}
+            />,
+            document.body
+          )}
       </Dropdown>
     </StyledProfileBadge>
   );

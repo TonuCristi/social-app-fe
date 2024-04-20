@@ -1,5 +1,11 @@
-import { DetailedHTMLProps, forwardRef, InputHTMLAttributes } from "react";
+import {
+  DetailedHTMLProps,
+  forwardRef,
+  InputHTMLAttributes,
+  ReactNode,
+} from "react";
 import styled, { css } from "styled-components";
+import Button from "./Button";
 
 type Variant = "search" | "auth" | "post";
 
@@ -20,8 +26,9 @@ const variants = {
   auth: css`
     background-color: var(--color-zinc-800);
     padding: 1.2rem;
-    border-radius: 1.1rem;
     color: var(--color-zinc-100);
+    border-radius: 1.1rem;
+    width: 100%;
 
     &[type="date"] {
       width: 100%;
@@ -49,6 +56,12 @@ const variants = {
   `,
 };
 
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+`;
+
 const StyledInput = styled.input<{ $variant: Variant }>`
   border: none;
   background: none;
@@ -62,21 +75,25 @@ type Props = DetailedHTMLProps<
   HTMLInputElement
 > & {
   variant: Variant;
+  rightIcon?: ReactNode;
 };
 
 const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { type, placeholder, variant, onClick, ...props },
+  { type, placeholder, variant, onClick, rightIcon, ...props },
   ref
 ) {
   return (
-    <StyledInput
-      ref={ref}
-      type={type}
-      placeholder={placeholder}
-      $variant={variant}
-      {...props}
-      onClick={onClick}
-    />
+    <Container>
+      <StyledInput
+        ref={ref}
+        type={type}
+        placeholder={placeholder}
+        $variant={variant}
+        {...props}
+        onClick={onClick}
+      />
+      {rightIcon && <Button variant="icon">{rightIcon}</Button>}
+    </Container>
   );
 });
 

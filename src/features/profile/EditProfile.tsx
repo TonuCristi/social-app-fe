@@ -3,14 +3,15 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import Input from "../../ui/Input";
-import Button from "../../ui/Button";
 import Message from "../../ui/Message";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { UserResponse } from "../../lib/types";
 import { AuthApi } from "../../api/AuthApi";
 import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
-import { HiMiniPhoto } from "react-icons/hi2";
+import { HiMiniPhoto, HiMiniPencilSquare } from "react-icons/hi2";
+import { ref, uploadBytes } from "firebase/storage";
+import { fb } from "../../config/firebase";
 
 const StyledEditProfile = styled.div`
   display: flex;
@@ -23,35 +24,49 @@ const Title = styled.h2`
   font-size: 2rem;
 `;
 
-const Form = styled.form`
+const Inputs = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.2rem;
 `;
 
-const Container = styled.div`
-  align-self: center;
-`;
-
 const FileInputLabel = styled.label`
   display: flex;
   align-items: center;
+  gap: 1.2rem;
+  width: 100%;
   cursor: pointer;
 `;
 
-const FileInput = styled.input`
+const LabelText = styled.p`
+  background-color: var(--color-zinc-800);
+  padding: 1.2rem;
+  border-radius: 1.1rem;
+  width: 100%;
+`;
+
+const FileInputWrapper = styled.div`
   display: none;
 `;
 
-const PhotoIcon = styled(HiMiniPhoto)`
-  color: var(--color-zinc-500);
-  font-size: 2.4rem;
-  transition: all 0.2s;
+const IconWrapper = styled.div`
+  background-color: var(--color-zinc-800);
+  color: var(--color-zinc-100);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  padding: 0.6rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+`;
 
-  &:hover {
-    color: var(--color-sky-500);
-  }
+const TextareaContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
 `;
 
 const Textarea = styled.textarea`
@@ -62,10 +77,6 @@ const Textarea = styled.textarea`
   padding: 1.2rem;
   border-radius: 1.1rem;
   color: var(--color-zinc-100);
-`;
-
-const ButtonWrapper = styled.div`
-  margin-top: 1.2rem;
   width: 100%;
 `;
 
@@ -102,28 +113,40 @@ export default function EditProfile() {
   };
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
+    const imgType = data.avatar[0].type.split("/")[1];
 
-    AuthApi.editUser(data, id)
-      .then((res) => {
-        const user = mapUser(res);
-        console.log(user);
-        dispatch(fetchUser(user));
-        setMessage({ text: "User edited!", isSuccess: true });
-      })
-      .catch((err) => {
-        setMessage({ text: err.response.data.error, isSuccess: false });
-      });
+    const storageRef = ref(fb, `avatars/${id}.${imgType}`);
+    uploadBytes(storageRef, data.avatar[0]).then((snapshot) => {
+      AuthApi.editUser(
+        {
+          ...data,
+          avatar: `https://firebasestorage.googleapis.com/v0/b/social-app-f30ba.appspot.com/o/avatars%2F${id}.${imgType}?alt=media`,
+        },
+        id
+      )
+        .then((res) => {
+          const user = mapUser(res);
+          console.log(user);
+          dispatch(fetchUser(user));
+          setMessage({ text: "User edited!", isSuccess: true });
+        })
+        .catch((err) => {
+          setMessage({ text: err.response.data.error, isSuccess: false });
+        });
+      console.log(snapshot);
+      console.log("Uploaded a blob or file!");
+    });
   };
 
   return (
     <StyledEditProfile>
       <Title>Change Email</Title>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Inputs>
         <Input
           variant="auth"
           type="text"
           placeholder="Name"
+          rightIcon={<HiMiniPencilSquare />}
           {...register("name")}
         />
 
@@ -131,27 +154,33 @@ export default function EditProfile() {
           variant="auth"
           type="text"
           placeholder="Birth date"
+          rightIcon={<HiMiniPencilSquare />}
           {...register("birth_date")}
         />
 
-        <Container>
-          <FileInputLabel htmlFor="file">
-            <PhotoIcon />
-          </FileInputLabel>
-          <FileInput
+        <FileInputLabel htmlFor="file">
+          <LabelText>Upload a photo</LabelText>
+          <IconWrapper>
+            <HiMiniPhoto />
+          </IconWrapper>
+        </FileInputLabel>
+        <FileInputWrapper>
+          <Input
+            variant="auth"
             type="file"
             id="file"
             accept="image/png, image/jpeg"
             {...register("avatar")}
           />
-        </Container>
+        </FileInputWrapper>
 
-        <Textarea placeholder="Description" {...register("description")} />
-
-        <ButtonWrapper>
-          <Button variant="auth">Update</Button>
-        </ButtonWrapper>
-      </Form>
+        <TextareaContainer>
+          <Textarea placeholder="Description" {...register("description")} />
+          <IconWrapper>
+            <HiMiniPencilSquare />
+          </IconWrapper>
+        </TextareaContainer>
+      </Inputs>
 
       {message.text && (
         <Message variant={message.isSuccess ? "regular" : "error"}>

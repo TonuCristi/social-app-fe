@@ -30,7 +30,6 @@ export default function Authentication() {
     AuthApi.signup(user)
       .then((res) => {
         localStorage.setItem("token", res);
-        addToken(res);
         dispatch(addToken(res));
       })
       .catch((err) => dispatch(loadError(err.response.data.error)));

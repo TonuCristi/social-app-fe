@@ -85,10 +85,7 @@ export default function AddPostForm() {
   return (
     <StyledAddPostForm onSubmit={handleSubmit(onSubmit)}>
       <ProfileLink to="/profile">
-        <Avatar
-          src="https://images.pexels.com/photos/2380794/pexels-photo-2380794.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-          variant="postForm"
-        />
+        <Avatar src={user.avatar} variant="postForm" />
       </ProfileLink>
       <Input
         type="text"

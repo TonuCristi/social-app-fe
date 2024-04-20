@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import styled, { css } from "styled-components";
 
-type Variant = "profile" | "postStats" | "auth" | "post" | "floatPost";
+type Variant = "profile" | "postStats" | "auth" | "post" | "floatPost" | "icon";
 
 const variants = {
   profile: css`
@@ -100,6 +100,17 @@ const variants = {
     &:hover {
       background-color: var(--color-sky-600);
     }
+  `,
+  icon: css`
+    background-color: var(--color-zinc-800);
+    color: var(--color-zinc-100);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    padding: 0.6rem;
+    font-size: 1.8rem;
+    cursor: pointer;
   `,
 };
 
