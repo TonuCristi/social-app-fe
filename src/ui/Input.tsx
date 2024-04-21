@@ -61,6 +61,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   gap: 1.2rem;
+  width: 100%;
 `;
 
 const StyledInput = styled.input<{ $variant: Variant }>`
@@ -93,7 +94,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         {...props}
         onClick={onClick}
       />
-      {rightIcon && <Button variant="icon">{rightIcon}</Button>}
+      {rightIcon && <Button>{rightIcon}</Button>}
     </Container>
   );
 });

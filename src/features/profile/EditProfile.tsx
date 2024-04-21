@@ -1,14 +1,14 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Message from "../../ui/Message";
 import ChangeField from "./ChangeField";
+import ChangeDescription from "./ChangeDescription";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { UserResponse } from "../../lib/types";
 import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
-import { HiMiniPencilSquare } from "react-icons/hi2";
 import { AuthApi } from "../../api/AuthApi";
 
 const StyledEditProfile = styled.div`
@@ -22,41 +22,11 @@ const Title = styled.h2`
   font-size: 2rem;
 `;
 
-const Inputs = styled.div`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.2rem;
-`;
-
-const IconWrapper = styled.div`
-  background-color: var(--color-zinc-800);
-  color: var(--color-zinc-100);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 100%;
-  padding: 0.6rem;
-  font-size: 1.8rem;
-  cursor: pointer;
-`;
-
-const TextareaContainer = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-`;
-
-const Textarea = styled.textarea`
-  border: none;
-  background: none;
-  outline: none;
-  background-color: var(--color-zinc-800);
-  padding: 1.2rem;
-  border-radius: 1.1rem;
-  color: var(--color-zinc-100);
-  width: 100%;
 `;
 
 type Inputs = {
@@ -71,7 +41,7 @@ export default function EditProfile() {
     user: { id, name, email, birth_date, description },
   } = useAppSelector(selectCurrentUser);
 
-  const { register, reset, watch } = useForm<Inputs>({
+  const { register, watch } = useForm<Inputs>({
     defaultValues: {
       name,
       email,
@@ -95,29 +65,80 @@ export default function EditProfile() {
     return { id, ...rest };
   };
 
-  function handleChangeEmail(email: string) {
-    AuthApi.changeEmail(email, id)
+  function handleChangeEmail(
+    value: string,
+    setIsOpen: Dispatch<SetStateAction<boolean>>
+  ) {
+    AuthApi.changeEmail(value, id)
       .then((res) => {
-        const user = mapUser(res);
+        const user = mapUser(res.user);
         dispatch(fetchUser(user));
-        setMessage({ text: "Email changed!", isSuccess: true });
+        setMessage({ text: res.message, isSuccess: true });
       })
       .catch((err) => {
-        console.log(err);
         setMessage({ text: err.response.data.error, isSuccess: false });
-      });
+      })
+      .finally(() => setIsOpen(false));
+  }
+
+  function handleChangeUsername(
+    value: string,
+    setIsOpen: Dispatch<SetStateAction<boolean>>
+  ) {
+    AuthApi.changeUsername(value, id)
+      .then((res) => {
+        const user = mapUser(res.user);
+        dispatch(fetchUser(user));
+        setMessage({ text: res.message, isSuccess: true });
+      })
+      .catch((err) => {
+        setMessage({ text: err.response.data.error, isSuccess: false });
+      })
+      .finally(() => setIsOpen(false));
+  }
+
+  function handleChangeBirthdate(
+    value: string,
+    setIsOpen: Dispatch<SetStateAction<boolean>>
+  ) {
+    AuthApi.changeBirthdate(value, id)
+      .then((res) => {
+        const user = mapUser(res.user);
+        dispatch(fetchUser(user));
+        setMessage({ text: res.message, isSuccess: true });
+      })
+      .catch((err) => {
+        setMessage({ text: err.response.data.error, isSuccess: false });
+      })
+      .finally(() => setIsOpen(false));
+  }
+
+  function handleChangeDescription(
+    value: string,
+    setIsOpen: Dispatch<SetStateAction<boolean>>
+  ) {
+    AuthApi.changeDescription(value, id)
+      .then((res) => {
+        const user = mapUser(res.user);
+        dispatch(fetchUser(user));
+        setMessage({ text: res.message, isSuccess: true });
+      })
+      .catch((err) => {
+        setMessage({ text: err.response.data.error, isSuccess: false });
+      })
+      .finally(() => setIsOpen(false));
   }
 
   return (
     <StyledEditProfile>
       <Title>Edit profile</Title>
-      <Inputs>
+      <Form onSubmit={(e) => e.preventDefault()}>
         <ChangeField
           variant="auth"
           type="text"
           placeholder="Name"
           newValue={watch("name")}
-          onChangeValue={handleChangeEmail}
+          onChangeValue={handleChangeUsername}
           {...register("name")}
         />
 
@@ -135,17 +156,16 @@ export default function EditProfile() {
           type="text"
           placeholder="Birth date"
           newValue={watch("birth_date")}
-          onChangeValue={handleChangeEmail}
+          onChangeValue={handleChangeBirthdate}
           {...register("birth_date")}
         />
 
-        <TextareaContainer>
-          <Textarea placeholder="Description" {...register("description")} />
-          <IconWrapper>
-            <HiMiniPencilSquare />
-          </IconWrapper>
-        </TextareaContainer>
-      </Inputs>
+        <ChangeDescription
+          newValue={watch("description")}
+          onChangeValue={handleChangeDescription}
+          {...register("description")}
+        />
+      </Form>
 
       {message.text && (
         <Message variant={message.isSuccess ? "regular" : "error"}>

@@ -1,7 +1,13 @@
 import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import styled, { css } from "styled-components";
 
-type Variant = "profile" | "postStats" | "auth" | "post" | "floatPost" | "icon";
+type Variant =
+  | "profile"
+  | "postStats"
+  | "auth"
+  | "post"
+  | "floatPost"
+  | "empty";
 
 const variants = {
   profile: css`
@@ -17,13 +23,10 @@ const variants = {
     position: relative;
     z-index: 0;
     color: var(--color-zinc-100);
-    background: none;
-    border: none;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 0.4rem;
-    cursor: pointer;
     transition: all 0.2s;
 
     & div::before {
@@ -101,17 +104,7 @@ const variants = {
       background-color: var(--color-sky-600);
     }
   `,
-  icon: css`
-    background-color: var(--color-zinc-800);
-    color: var(--color-zinc-100);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 100%;
-    padding: 0.6rem;
-    font-size: 1.8rem;
-    cursor: pointer;
-  `,
+  empty: css``,
 };
 
 const StyledButton = styled.button<{ $variant: Variant }>`
@@ -126,12 +119,12 @@ type Props = DetailedHTMLProps<
   ButtonHTMLAttributes<HTMLButtonElement>,
   HTMLButtonElement
 > & {
-  variant: Variant;
+  variant?: Variant;
 };
 
 export default function Button({
   children,
-  variant,
+  variant = "empty",
   disabled,
   onClick,
 }: Props) {

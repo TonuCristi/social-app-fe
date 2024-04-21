@@ -1,10 +1,9 @@
 import styled from "styled-components";
 
-import Avatar from "../../ui/Avatar";
+import UploadAvatar from "./UploadAvatar";
 
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-// import Post from "../posts/Post";
 
 const StyledProfileInfo = styled.div`
   color: var(--color-zinc-100);
@@ -48,7 +47,8 @@ export default function ProfileInfo() {
   return (
     <StyledProfileInfo>
       <Container>
-        <Avatar src={avatar} variant="profile" />
+        <UploadAvatar avatar={avatar} />
+
         <Info>
           <Name>{name}</Name>
           <Field>

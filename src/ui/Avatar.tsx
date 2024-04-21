@@ -1,3 +1,4 @@
+import { DetailedHTMLProps, ImgHTMLAttributes } from "react";
 import styled, { css } from "styled-components";
 
 type Variant = "profileBadge" | "post" | "postForm" | "profile";
@@ -31,8 +32,10 @@ const NoAvatar = styled.div<{ $variant: Variant }>`
   ${(props) => variants[props.$variant]}
 `;
 
-type Props = {
-  src: string;
+type Props = DetailedHTMLProps<
+  ImgHTMLAttributes<HTMLImageElement>,
+  HTMLImageElement
+> & {
   name?: string;
   variant: Variant;
 };

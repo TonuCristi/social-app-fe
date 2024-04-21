@@ -1,6 +1,5 @@
 import { AxiosResponse } from "axios";
 import {
-  UserEditRequest,
   UserLoginRequest,
   UserResponse,
   UserSignupRequest,
@@ -40,11 +39,33 @@ export const AuthApi = {
   changeEmail(email: string, id: string) {
     return api
       .put(`${BASE_URL}/changeEmail/${id}`, { email })
-      .then(({ data }: AxiosResponse<UserResponse>) => data);
+      .then(
+        ({ data }: AxiosResponse<{ user: UserResponse; message: string }>) =>
+          data
+      );
   },
-  editUser(user: UserEditRequest, id: string) {
+  changeUsername(name: string, id: string) {
     return api
-      .put(`${BASE_URL}/updateUser/${id}`, user)
-      .then(({ data }: AxiosResponse<UserResponse>) => data);
+      .put(`${BASE_URL}/changeUsername/${id}`, { name })
+      .then(
+        ({ data }: AxiosResponse<{ user: UserResponse; message: string }>) =>
+          data
+      );
+  },
+  changeBirthdate(birth_date: string, id: string) {
+    return api
+      .put(`${BASE_URL}/changeBirthdate/${id}`, { birth_date })
+      .then(
+        ({ data }: AxiosResponse<{ user: UserResponse; message: string }>) =>
+          data
+      );
+  },
+  changeDescription(description: string, id: string) {
+    return api
+      .put(`${BASE_URL}/changeDescription/${id}`, { description })
+      .then(
+        ({ data }: AxiosResponse<{ user: UserResponse; message: string }>) =>
+          data
+      );
   },
 };

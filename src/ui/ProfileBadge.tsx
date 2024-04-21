@@ -79,7 +79,7 @@ export default function ProfileBadge() {
   return (
     <StyledProfileBadge ref={containerRef}>
       <Button variant="profile" onClick={() => setIsOpen((prev) => !prev)}>
-        <Avatar src={user.avatar} variant="profileBadge" />
+        <Avatar src={user.avatar} name={user.name} variant="profileBadge" />
         <Name>{user.name}</Name>
         <Icon />
       </Button>
