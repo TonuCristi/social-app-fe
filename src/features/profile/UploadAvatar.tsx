@@ -1,107 +1,76 @@
 import styled from "styled-components";
 import { createPortal } from "react-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import Overlay from "../../ui/Overlay";
-import Button from "../../ui/Button";
 import Avatar from "../../ui/Avatar";
+import UploadAvatarModal from "./UploadAvatarModal";
 
-import { HiMiniPlusSmall } from "react-icons/hi2";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { selectCurrentUser } from "../../redux/currentUserSlice";
+import { useAppSelector } from "../../redux/hooks";
+import { HiMiniArrowPath } from "react-icons/hi2";
 
-const Modal = styled.form`
-  border: 3px solid var(--color-sky-500);
-  border-radius: 1.1rem;
-  padding: 2.4rem;
-  color: #fff;
-  width: 20%;
-  display: flex;
-  flex-direction: column;
-  gap: 2.4rem;
-`;
+const Button = styled.button`
+  border: 5px solid var(--color-sky-500);
+  background: none;
+  cursor: pointer;
 
-const Uploader = styled.label`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
-  background-color: var(--color-zinc-700);
-  border-radius: 1.1rem;
+  border-radius: 100%;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-zinc-300);
+    border-radius: 100%;
+    opacity: 0;
+    transition: all 0.2s;
+  }
+
+  &:hover::before {
+    opacity: 0.5;
+  }
+
+  &:hover svg {
+    opacity: 1;
+  }
 `;
 
-const FileInput = styled.input`
-  display: none;
+const Icon = styled(HiMiniArrowPath)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3.2rem;
+  color: var(--color-zinc-950);
+  opacity: 0;
+  transition: all 0.2s;
 `;
 
-const Icon = styled(HiMiniPlusSmall)`
-  font-size: 4.8rem;
-  stroke-width: 0.1rem;
-`;
-
-const Buttons = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 2.4rem;
-`;
-
-const Image = styled.img`
-  /* border-radius: 100%; */
-  max-width: 100%;
-  align-self: center;
-`;
-
-type Props = {
-  avatar: string;
-};
-
-type Inputs = {
-  avatar: FileList;
-};
-
-export default function UploadAvatar({ avatar }: Props) {
+export default function UploadAvatar() {
+  const {
+    user: { avatar },
+  } = useAppSelector(selectCurrentUser);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { register, handleSubmit } = useForm<Inputs>();
-  const [url, setUrl] = useState<string>("");
-  // const inputRef = useRef(null);
 
   useEffect(() => {}, []);
-
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const url = URL.createObjectURL(data.avatar[0]);
-    setUrl(url);
-    console.log(url);
-  };
 
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
         <Avatar src={avatar} variant="profile" />
+        <Icon />
       </Button>
 
       {isOpen &&
         createPortal(
-          <Overlay>
-            <Modal onSubmit={handleSubmit(onSubmit)}>
-              <Uploader htmlFor="avatar">
-                Upload a photo <Icon />
-              </Uploader>
-              <FileInput
-                id="avatar"
-                type="file"
-                accept="image/png, image/jpeg"
-                {...register("avatar")}
-              />
-
-              <Image src={url || avatar} />
-
-              <Buttons>
-                <Button variant="auth">Upload</Button>
-                <Button variant="auth" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </Button>
-              </Buttons>
-            </Modal>
-          </Overlay>,
+          <UploadAvatarModal setIsOpen={setIsOpen} />,
           document.body
         )}
     </>

@@ -41,13 +41,13 @@ const Description = styled.p`
 
 export default function ProfileInfo() {
   const {
-    user: { name, email, description, birth_date, avatar, createdAt },
+    user: { name, email, description, birth_date, createdAt },
   } = useAppSelector(selectCurrentUser);
 
   return (
     <StyledProfileInfo>
       <Container>
-        <UploadAvatar avatar={avatar} />
+        <UploadAvatar />
 
         <Info>
           <Name>{name}</Name>
