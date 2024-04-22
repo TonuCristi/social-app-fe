@@ -89,13 +89,9 @@ export default function UploadAvatar() {
       const deleteImgType = new URL(avatar).pathname.split(".").reverse()[0];
       const avatarRef = ref(fb, `avatars/${id}.${deleteImgType}`);
 
-      await deleteObject(avatarRef)
-        .then(() => {
-          console.log("Deleted!");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      await deleteObject(avatarRef).catch(() => {
+        setMessage({ text: "Something went wrong!", isSuccess: false });
+      });
     }
 
     // Upload new avatar
@@ -107,9 +103,7 @@ export default function UploadAvatar() {
 
     uploadAvatar.on(
       "state_changed",
-      (snapshot) => {
-        console.log(snapshot);
-      },
+      () => {},
       () => {
         setMessage({ text: "Something went wrong!", isSuccess: false });
       },
