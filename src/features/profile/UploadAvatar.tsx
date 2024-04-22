@@ -1,13 +1,22 @@
 import styled from "styled-components";
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import Avatar from "../../ui/Avatar";
 import UploadAvatarModal from "./UploadAvatarModal";
 
-import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { useAppSelector } from "../../redux/hooks";
+import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { HiMiniArrowPath } from "react-icons/hi2";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { fb } from "../../config/firebase";
+import { AuthApi } from "../../api/AuthApi";
+import { mapUser } from "../../utils/mapUser";
 
 const Button = styled.button`
   border: 5px solid var(--color-sky-500);
@@ -55,11 +64,71 @@ const Icon = styled(HiMiniArrowPath)`
 
 export default function UploadAvatar() {
   const {
-    user: { avatar },
+    user: { id, avatar },
   } = useAppSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<{
+    text: string;
+    isSuccess: boolean;
+  }>({
+    text: "",
+    isSuccess: false,
+  });
 
-  useEffect(() => {}, []);
+  async function handleUpload(files: FileList) {
+    if (!files[0]) {
+      return setMessage({
+        text: "You should upload a photo!",
+        isSuccess: false,
+      });
+    }
+
+    // Delete the current avatar
+    if (avatar) {
+      const deleteImgType = new URL(avatar).pathname.split(".").reverse()[0];
+      const avatarRef = ref(fb, `avatars/${id}.${deleteImgType}`);
+
+      await deleteObject(avatarRef)
+        .then(() => {
+          console.log("Deleted!");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
+    // Upload new avatar
+    const imgType = files[0].type.split("/")[1];
+    const storageRef = ref(fb, `avatars/${id}.${imgType}`);
+    const uploadAvatar = uploadBytesResumable(storageRef, files[0], {
+      contentType: `image/${imgType}`,
+    });
+
+    uploadAvatar.on(
+      "state_changed",
+      (snapshot) => {
+        console.log(snapshot);
+      },
+      () => {
+        setMessage({ text: "Something went wrong!", isSuccess: false });
+      },
+      () => {
+        getDownloadURL(uploadAvatar.snapshot.ref).then((downloadURL) => {
+          AuthApi.changeAvatar(downloadURL, id)
+            .then((res) => {
+              const user = mapUser(res.user);
+              dispatch(fetchUser(user));
+              setMessage({ text: res.message, isSuccess: true });
+            })
+            .catch((err) => {
+              setMessage({ text: err.response.data.error, isSuccess: false });
+            })
+            .finally(() => setIsOpen(false));
+        });
+      }
+    );
+  }
 
   return (
     <>
@@ -70,7 +139,11 @@ export default function UploadAvatar() {
 
       {isOpen &&
         createPortal(
-          <UploadAvatarModal setIsOpen={setIsOpen} />,
+          <UploadAvatarModal
+            setIsOpen={setIsOpen}
+            onUpload={handleUpload}
+            message={message}
+          />,
           document.body
         )}
     </>

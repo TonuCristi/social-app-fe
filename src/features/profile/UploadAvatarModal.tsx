@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 
 import Overlay from "../../ui/Overlay";
 import Button from "../../ui/Button";
+import Message from "../../ui/Message";
 
 import { HiMiniPlusSmall } from "react-icons/hi2";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
@@ -56,13 +57,22 @@ const Image = styled.img`
 
 type Props = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  onUpload: (files: FileList) => void;
+  message: {
+    text: string;
+    isSuccess: boolean;
+  };
 };
 
 type Inputs = {
   avatar: FileList;
 };
 
-export default function UploadAvatarModal({ setIsOpen }: Props) {
+export default function UploadAvatarModal({
+  setIsOpen,
+  onUpload,
+  message,
+}: Props) {
   const {
     user: { avatar },
   } = useAppSelector(selectCurrentUser);
@@ -87,14 +97,30 @@ export default function UploadAvatarModal({ setIsOpen }: Props) {
           {...register("avatar")}
         />
 
-        <Image src={createBlob(watch("avatar")) || avatar} />
+        <Image
+          src={createBlob(watch("avatar")) || avatar}
+          onClick={(e) => console.log(e)}
+        />
 
         <Buttons>
-          <Button variant="auth">Upload</Button>
+          <Button
+            variant="auth"
+            onClick={() => {
+              onUpload(watch("avatar"));
+            }}
+          >
+            Upload
+          </Button>
           <Button variant="auth" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
         </Buttons>
+
+        {message.text && (
+          <Message variant={message.isSuccess ? "regular" : "error"}>
+            {message.text}
+          </Message>
+        )}
       </Modal>
     </Overlay>
   );

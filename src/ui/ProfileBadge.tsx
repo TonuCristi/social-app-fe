@@ -1,17 +1,17 @@
 import { useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { HiMiniChevronDown } from "react-icons/hi2";
+import { createPortal } from "react-dom";
 import styled from "styled-components";
 
 import Button from "./Button";
 import Avatar from "./Avatar";
+import ConfirmationModal from "./ConfirmationModal";
 
 import { useLogout } from "../hooks/useLogout";
 import { selectCurrentUser } from "../redux/currentUserSlice";
 import { useAppSelector } from "../redux/hooks";
 import { useClickOutside } from "../hooks/useClickOutside";
-import { createPortal } from "react-dom";
-import ConfirmationModal from "./ConfirmationModal";
+import { HiMiniChevronDown } from "react-icons/hi2";
 
 const StyledProfileBadge = styled.div`
   justify-self: end;
@@ -72,15 +72,17 @@ export default function ProfileBadge() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { logout } = useLogout();
-  const { user } = useAppSelector(selectCurrentUser);
+  const {
+    user: { name, avatar },
+  } = useAppSelector(selectCurrentUser);
   const containerRef = useRef<HTMLDivElement>(null);
   useClickOutside(containerRef, () => setIsOpen(false));
 
   return (
     <StyledProfileBadge ref={containerRef}>
       <Button variant="profile" onClick={() => setIsOpen((prev) => !prev)}>
-        <Avatar src={user.avatar} name={user.name} variant="profileBadge" />
-        <Name>{user.name}</Name>
+        <Avatar src={avatar} name={name} variant="profileBadge" />
+        <Name>{name}</Name>
         <Icon />
       </Button>
 

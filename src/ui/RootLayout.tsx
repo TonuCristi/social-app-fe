@@ -7,9 +7,9 @@ import Loader from "./Loader";
 import LoaderWrapper from "./LoaderWrapper";
 
 import { AuthApi } from "../api/AuthApi";
-import { UserResponse } from "../lib/types";
 import { fetchUser, selectCurrentUser } from "../redux/currentUserSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { mapUser } from "../utils/mapUser";
 
 const StyledRootLayout = styled.div``;
 
@@ -26,14 +26,6 @@ const Main = styled.main`
 export default function RootLayout() {
   const { isLoading, error } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
-
-  const mapUser = (user: UserResponse) => {
-    const { _id: id, ...rest } = user;
-    return {
-      id,
-      ...rest,
-    };
-  };
 
   useEffect(() => {
     AuthApi.getUser()

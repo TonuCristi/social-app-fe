@@ -68,4 +68,12 @@ export const AuthApi = {
           data
       );
   },
+  changeAvatar(avatar: string, id: string) {
+    return api
+      .put(`${BASE_URL}/changeAvatar/${id}`, { avatar })
+      .then(
+        ({ data }: AxiosResponse<{ user: UserResponse; message: string }>) =>
+          data
+      );
+  },
 };

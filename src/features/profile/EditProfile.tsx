@@ -7,9 +7,9 @@ import ChangeField from "./ChangeField";
 import ChangeDescription from "./ChangeDescription";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { UserResponse } from "../../lib/types";
 import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
 import { AuthApi } from "../../api/AuthApi";
+import { mapUser } from "../../utils/mapUser";
 
 const StyledEditProfile = styled.div`
   display: flex;
@@ -59,11 +59,6 @@ export default function EditProfile() {
     text: "",
     isSuccess: false,
   });
-
-  const mapUser = (user: UserResponse) => {
-    const { _id: id, ...rest } = user;
-    return { id, ...rest };
-  };
 
   function handleChangeEmail(
     value: string,
