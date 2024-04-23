@@ -14,7 +14,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { fb } from "../../config/firebase";
+import { fb } from "../../firebase/firebase";
 import { AuthApi } from "../../api/AuthApi";
 import { mapUser } from "../../utils/mapUser";
 
@@ -76,8 +76,8 @@ export default function UploadAvatar() {
     isSuccess: false,
   });
 
-  async function handleUpload(files: FileList) {
-    if (!files[0]) {
+  async function handleUpload(file: Blob | null) {
+    if (!file) {
       return setMessage({
         text: "You should upload a photo!",
         isSuccess: false,
@@ -95,9 +95,9 @@ export default function UploadAvatar() {
     }
 
     // Upload new avatar
-    const imgType = files[0].type.split("/")[1];
+    const imgType = file.type.split("/")[1];
     const storageRef = ref(fb, `avatars/${id}.${imgType}`);
-    const uploadAvatar = uploadBytesResumable(storageRef, files[0], {
+    const uploadAvatar = uploadBytesResumable(storageRef, file, {
       contentType: `image/${imgType}`,
     });
 
@@ -113,12 +113,13 @@ export default function UploadAvatar() {
             .then((res) => {
               const user = mapUser(res.user);
               dispatch(fetchUser(user));
-              setMessage({ text: res.message, isSuccess: true });
             })
             .catch((err) => {
               setMessage({ text: err.response.data.error, isSuccess: false });
             })
-            .finally(() => setIsOpen(false));
+            .finally(() => {
+              setIsOpen(false);
+            });
         });
       }
     );
@@ -126,7 +127,12 @@ export default function UploadAvatar() {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>
+      <Button
+        onClick={() => {
+          setMessage({ text: "", isSuccess: false });
+          setIsOpen(true);
+        }}
+      >
         <Avatar src={avatar} variant="profile" />
         <Icon />
       </Button>
