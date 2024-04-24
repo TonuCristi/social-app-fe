@@ -68,6 +68,7 @@ export default function UploadAvatar() {
   } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<{
     text: string;
     isSuccess: boolean;
@@ -76,13 +77,22 @@ export default function UploadAvatar() {
     isSuccess: false,
   });
 
-  async function handleUpload(file: Blob | null) {
-    if (!file) {
+  async function handleUpload(file: Blob | null, image: string | undefined) {
+    if (!image) {
       return setMessage({
         text: "You should upload a photo!",
         isSuccess: false,
       });
     }
+
+    if (!file) {
+      return setMessage({
+        text: "You should crop the photo!",
+        isSuccess: false,
+      });
+    }
+
+    setIsLoading(true);
 
     // Delete the current avatar
     if (avatar) {
@@ -91,6 +101,7 @@ export default function UploadAvatar() {
 
       await deleteObject(avatarRef).catch(() => {
         setMessage({ text: "Something went wrong!", isSuccess: false });
+        setIsLoading(false);
       });
     }
 
@@ -106,6 +117,7 @@ export default function UploadAvatar() {
       () => {},
       () => {
         setMessage({ text: "Something went wrong!", isSuccess: false });
+        setIsLoading(false);
       },
       () => {
         getDownloadURL(uploadAvatar.snapshot.ref).then((downloadURL) => {
@@ -119,6 +131,7 @@ export default function UploadAvatar() {
             })
             .finally(() => {
               setIsOpen(false);
+              setIsLoading(false);
             });
         });
       }
@@ -143,6 +156,8 @@ export default function UploadAvatar() {
             setIsOpen={setIsOpen}
             onUpload={handleUpload}
             message={message}
+            setMessage={setMessage}
+            isLoading={isLoading}
           />,
           document.body
         )}

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 
 import Overlay from "../../ui/Overlay";
 import Button from "../../ui/Button";
@@ -60,16 +60,26 @@ const ButtonWrapper = styled.div`
 
 type Props = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  onUpload: (file: Blob | null) => void;
+  onUpload: (file: Blob | null, image: string | undefined) => void;
   message: {
     text: string;
     isSuccess: boolean;
   };
+  setMessage: Dispatch<
+    SetStateAction<{
+      text: string;
+      isSuccess: boolean;
+    }>
+  >;
+  isLoading: boolean;
 };
 
 type Crop = {
   x: number;
   y: number;
+};
+
+type CropSizes = Crop & {
   width: number;
   height: number;
 };
@@ -78,18 +88,21 @@ export default function UploadAvatarModal({
   setIsOpen,
   onUpload,
   message,
+  setMessage,
+  isLoading,
 }: Props) {
-  const [image, setImage] = useState<string | null>();
+  const [image, setImage] = useState<string | undefined>();
 
-  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [crop, setCrop] = useState<Crop>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1);
   const [blob, setBlob] = useState<Blob | null>(null);
-  const [cropSizes, setCropSizes] = useState<Crop>({
+  const [cropSizes, setCropSizes] = useState<CropSizes>({
     x: 0,
     y: 0,
     width: 0,
     height: 0,
   });
+  const isCropped = useRef<boolean>(false);
 
   const createBlob = (files: FileList | null) => {
     if (files && files[0]) {
@@ -97,9 +110,8 @@ export default function UploadAvatarModal({
     }
   };
 
-  const onCropComplete = (croppedArea: Crop, croppedAreaPixels: Crop) => {
+  const onCropComplete = (croppedArea: Crop, croppedAreaPixels: CropSizes) => {
     setCropSizes(croppedAreaPixels);
-    console.log(croppedArea);
   };
 
   function cropImage() {
@@ -126,7 +138,11 @@ export default function UploadAvatarModal({
         cropSizes.width,
         cropSizes.height
       );
-      canvas.toBlob((blob) => setBlob(blob));
+      canvas.toBlob((blob) => {
+        setBlob(blob);
+        isCropped.current = true;
+        setMessage({ text: "Image cropped!", isSuccess: true });
+      });
     };
   }
 
@@ -166,13 +182,18 @@ export default function UploadAvatarModal({
         <Buttons>
           <Button
             variant="auth"
+            disabled={isLoading}
             onClick={() => {
-              onUpload(blob);
+              onUpload(blob, image);
             }}
           >
             Upload
           </Button>
-          <Button variant="auth" onClick={() => setIsOpen(false)}>
+          <Button
+            variant="auth"
+            disabled={isLoading}
+            onClick={() => setIsOpen(false)}
+          >
             Cancel
           </Button>
         </Buttons>

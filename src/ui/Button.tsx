@@ -64,6 +64,11 @@ const variants = {
     &:hover {
       background-color: var(--color-sky-600);
     }
+
+    &:disabled {
+      background-color: var(--color-sky-600);
+      cursor: not-allowed;
+    }
   `,
   post: css`
     display: flex;
