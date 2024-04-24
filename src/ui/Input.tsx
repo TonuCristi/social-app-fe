@@ -54,6 +54,13 @@ const variants = {
     &::placeholder {
       color: var(--color-zinc-500);
     }
+
+    @media (width <= 1023px) {
+      & {
+        padding: 1rem;
+        font-size: 1.4rem;
+      }
+    }
   `,
 };
 

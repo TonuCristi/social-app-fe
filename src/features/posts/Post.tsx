@@ -7,8 +7,7 @@ import Avatar from "../../ui/Avatar";
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
-  width: 40%;
-  margin: 0 auto;
+  width: 80%;
   border-radius: 1.1rem;
   padding: 1.6rem;
 
@@ -16,6 +15,48 @@ const StyledPost = styled.div`
   grid-template-columns: auto 1fr;
   grid-template-rows: auto auto 1fr auto;
   column-gap: 1.6rem;
+
+  @media (width >= 1535px) {
+    & {
+      width: 70%;
+    }
+  }
+
+  @media (width >= 1835px) {
+    & {
+      width: 50%;
+    }
+  }
+
+  @media (width >= 2535px) {
+    & {
+      width: 70rem;
+    }
+  }
+
+  @media (width <= 1279px) {
+    & {
+      width: 85%;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      width: 90%;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 95%;
+    }
+  }
+
+  @media (width <= 639px) {
+    & {
+      width: 100%;
+    }
+  }
 `;
 
 const ProfileLink = styled(NavLink)`
@@ -26,15 +67,34 @@ const Info = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  @media (width <= 1279px) {
+    & {
+      height: 80%;
+      align-self: center;
+    }
+  }
 `;
 
 const Name = styled.h4`
   color: var(--color-zinc-100);
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
+  }
 `;
 
 const PostTime = styled.span`
   font-size: 1.4rem;
   color: var(--color-zinc-100);
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.2rem;
+    }
+  }
 `;
 
 const Description = styled.pre`
@@ -42,6 +102,12 @@ const Description = styled.pre`
   margin: 1.6rem 0 1.2rem;
   grid-column: 2;
   grid-row: 2;
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
+  }
 `;
 
 const Image = styled.img`

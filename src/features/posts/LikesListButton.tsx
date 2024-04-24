@@ -1,21 +1,27 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { HiMiniChartBar } from "react-icons/hi2";
+import styled from "styled-components";
 
 import Button from "../../ui/Button";
 import Overlay from "../../ui/Overlay";
 import LikesList from "./LikesList";
-import styled from "styled-components";
-
-const Icon = styled(HiMiniChartBar)`
-  font-size: 2rem;
-`;
 
 const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+`;
+
+const Icon = styled(HiMiniChartBar)`
+  font-size: 2rem;
+
+  @media (width <= 1023px) {
+    & {
+      font-size: 1.6rem;
+    }
+  }
 `;
 
 export default function LikesListButton() {

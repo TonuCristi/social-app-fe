@@ -13,7 +13,15 @@ const variants = {
     height: 4rem;
   `,
   postForm: css`
-    max-width: 100%;
+    width: 4rem;
+    height: 4rem;
+
+    @media (width <= 1023px) {
+      & {
+        width: 3rem;
+        height: 3rem;
+      }
+    }
   `,
   profile: css`
     width: 15rem;

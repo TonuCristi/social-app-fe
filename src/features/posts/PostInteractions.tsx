@@ -56,10 +56,22 @@ const Button = styled.button<{ $variant: string }>`
 
 const LikeIcon = styled(HiMiniHeart)`
   font-size: 2rem;
+
+  @media (width <= 1023px) {
+    & {
+      font-size: 1.6rem;
+    }
+  }
 `;
 
 const CommentIcon = styled(HiMiniChatBubbleOvalLeft)`
   font-size: 2rem;
+
+  @media (width <= 1023px) {
+    & {
+      font-size: 1.6rem;
+    }
+  }
 `;
 
 const IconWrapper = styled.div`

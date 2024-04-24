@@ -32,6 +32,12 @@ const StyledNavLinks = styled.ul`
   display: flex;
   align-items: center;
   gap: 2.4rem;
+
+  @media (width <= 1023px) {
+    & {
+      gap: 1.6rem;
+    }
+  }
 `;
 
 const NavItem = styled.li<{ $isActive?: boolean }>`

@@ -110,7 +110,7 @@ export default function UploadAvatarModal({
     }
   };
 
-  const onCropComplete = (croppedArea: Crop, croppedAreaPixels: CropSizes) => {
+  const onCropComplete = (_: Crop, croppedAreaPixels: CropSizes) => {
     setCropSizes(croppedAreaPixels);
   };
 
@@ -174,7 +174,7 @@ export default function UploadAvatarModal({
         )}
 
         <ButtonWrapper>
-          <Button variant="auth" onClick={cropImage}>
+          <Button variant="auth" disabled={isLoading} onClick={cropImage}>
             Crop
           </Button>
         </ButtonWrapper>

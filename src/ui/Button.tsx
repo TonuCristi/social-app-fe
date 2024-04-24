@@ -6,7 +6,7 @@ type Variant =
   | "postStats"
   | "auth"
   | "post"
-  | "floatPost"
+  // | "floatPost"
   | "empty";
 
 const variants = {
@@ -89,26 +89,39 @@ const variants = {
       background-color: var(--color-sky-700);
       cursor: default;
     }
-  `,
-  floatPost: css`
-    position: fixed;
-    top: 90%;
-    left: 10%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color-sky-500);
-    color: var(--color-zinc-100);
-    padding: 1.2rem 1.6rem;
-    border-radius: 2.3rem;
-    font-weight: 500;
-    transition: all 0.2s;
-    width: 10%;
 
-    &:hover {
-      background-color: var(--color-sky-600);
+    @media (width <= 1279px) {
+      & {
+        padding: 1rem 1.4rem;
+        font-size: 1.4rem;
+      }
+    }
+
+    @media (width <= 767px) {
+      & {
+        padding: 0.8rem 1.4rem;
+      }
     }
   `,
+  // floatPost: css`
+  //   position: fixed;
+  //   top: 90%;
+  //   left: 10%;
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+  //   background-color: var(--color-sky-500);
+  //   color: var(--color-zinc-100);
+  //   padding: 1.2rem 1.6rem;
+  //   border-radius: 2.3rem;
+  //   font-weight: 500;
+  //   transition: all 0.2s;
+  //   width: 10%;
+
+  //   &:hover {
+  //     background-color: var(--color-sky-600);
+  //   }
+  // `,
   empty: css``,
 };
 

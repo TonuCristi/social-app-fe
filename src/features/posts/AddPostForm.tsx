@@ -6,19 +6,43 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
+import Avatar from "../../ui/Avatar";
 
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-import Avatar from "../../ui/Avatar";
 
 const StyledAddPostForm = styled.form`
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
-  width: 50%;
-  margin: 0 auto;
+  width: 100%;
   padding: 1.6rem;
   display: flex;
   gap: 1.6rem;
   border-radius: 1.1rem;
+
+  @media (width >= 1835px) {
+    & {
+      width: 60%;
+    }
+  }
+
+  @media (width <= 1279px) {
+    & {
+      padding: 1.4rem;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      padding: 1.2rem;
+      gap: 1.2rem;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      padding: 1rem;
+    }
+  }
 `;
 
 const ProfileLink = styled(NavLink)`
@@ -28,11 +52,6 @@ const ProfileLink = styled(NavLink)`
   justify-content: center;
   align-items: center;
 `;
-
-// const Avatar = styled.img`
-//   max-width: 100%;
-//   border-radius: 100%;
-// `;
 
 const Container = styled.div`
   align-self: center;
