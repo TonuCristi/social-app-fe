@@ -45,9 +45,7 @@ export default function Navbar() {
         <Search />
       </Container>
 
-      <nav>
-        <NavLinks />
-      </nav>
+      <NavLinks />
 
       <Profile />
     </StyledNavbar>

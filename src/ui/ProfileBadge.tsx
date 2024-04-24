@@ -20,12 +20,24 @@ const StyledProfileBadge = styled.div`
 
 const Name = styled.p`
   color: var(--color-zinc-100);
+
+  @media (width <= 1023px) {
+    & {
+      display: none;
+    }
+  }
 `;
 
 const Icon = styled(HiMiniChevronDown)`
   font-size: 2rem;
   stroke-width: 0.1rem;
   color: var(--color-zinc-100);
+
+  @media (width <= 1023px) {
+    & {
+      display: none;
+    }
+  }
 `;
 
 const Dropdown = styled.ul<{ $isOpen: boolean }>`
@@ -45,7 +57,14 @@ const Dropdown = styled.ul<{ $isOpen: boolean }>`
 
   position: absolute;
   top: 120%;
-  left: 0;
+  right: 0;
+
+  @media (width <= 1023px) {
+    & {
+      font-size: 1.4rem;
+      width: 20rem;
+    }
+  }
 `;
 
 const DropdownItem = styled.li`

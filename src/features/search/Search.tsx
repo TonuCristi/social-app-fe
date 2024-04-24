@@ -10,6 +10,12 @@ import { useClickOutside } from "../../hooks/useClickOutside";
 const StyledSearch = styled.div`
   position: relative;
   width: 100%;
+
+  @media (width <= 1023px) {
+    & {
+      display: none;
+    }
+  }
 `;
 
 const SearchResults = styled.ul<{ $isOpen: boolean }>`
@@ -42,6 +48,12 @@ const SearchResults = styled.ul<{ $isOpen: boolean }>`
   &::-webkit-scrollbar-thumb {
     background-color: var(--color-zinc-100);
     border-radius: 1.1rem;
+  }
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
   }
 `;
 

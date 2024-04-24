@@ -38,6 +38,12 @@ const StyledNavLinks = styled.ul`
       gap: 1.6rem;
     }
   }
+
+  @media (width <= 767px) {
+    & {
+      gap: 1.2rem;
+    }
+  }
 `;
 
 const NavItem = styled.li<{ $isActive?: boolean }>`
@@ -74,12 +80,14 @@ const NavItem = styled.li<{ $isActive?: boolean }>`
 
 export default function NavLinks() {
   return (
-    <StyledNavLinks>
-      {links.map(({ to, icon }) => (
-        <Navlink key={to} to={`/${to}`}>
-          {({ isActive }) => <NavItem $isActive={isActive}>{icon}</NavItem>}
-        </Navlink>
-      ))}
-    </StyledNavLinks>
+    <nav>
+      <StyledNavLinks>
+        {links.map(({ to, icon }) => (
+          <Navlink key={to} to={`/${to}`}>
+            {({ isActive }) => <NavItem $isActive={isActive}>{icon}</NavItem>}
+          </Navlink>
+        ))}
+      </StyledNavLinks>
+    </nav>
   );
 }

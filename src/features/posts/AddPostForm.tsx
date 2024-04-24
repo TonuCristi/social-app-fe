@@ -19,9 +19,9 @@ const StyledAddPostForm = styled.form`
   gap: 1.6rem;
   border-radius: 1.1rem;
 
-  @media (width >= 1835px) {
+  @media (width >= 1535px) {
     & {
-      width: 60%;
+      max-width: 80rem;
     }
   }
 
@@ -47,7 +47,6 @@ const StyledAddPostForm = styled.form`
 
 const ProfileLink = styled(NavLink)`
   text-decoration: none;
-  width: 7%;
   display: flex;
   justify-content: center;
   align-items: center;

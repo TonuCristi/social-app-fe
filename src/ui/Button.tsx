@@ -18,6 +18,12 @@ const variants = {
     align-items: center;
     justify-content: flex-end;
     gap: 1.2rem;
+
+    @media (width <= 1023px) {
+      & {
+        padding: 0.6rem;
+      }
+    }
   `,
   postStats: css`
     position: relative;

@@ -18,19 +18,7 @@ const StyledPost = styled.div`
 
   @media (width >= 1535px) {
     & {
-      width: 70%;
-    }
-  }
-
-  @media (width >= 1835px) {
-    & {
-      width: 50%;
-    }
-  }
-
-  @media (width >= 2535px) {
-    & {
-      width: 70rem;
+      max-width: 70rem;
     }
   }
 
@@ -55,6 +43,7 @@ const StyledPost = styled.div`
   @media (width <= 639px) {
     & {
       width: 100%;
+      grid-template-columns: 1fr;
     }
   }
 `;
@@ -74,6 +63,14 @@ const Info = styled.div`
       align-self: center;
     }
   }
+
+  /* @media (width <= 639px) {
+    & {
+      width: 100%;
+      grid-column: 1;
+      grid-row: 1;
+    }
+  } */
 `;
 
 const Name = styled.h4`
@@ -108,18 +105,39 @@ const Description = styled.pre`
       font-size: 1.4rem;
     }
   }
+
+  /* @media (width <= 639px) {
+    & {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  } */
 `;
 
 const Image = styled.img`
-  max-width: 100%;
+  width: 100%;
   border-radius: 1.5rem;
   grid-column: 2;
   grid-row: 3;
+
+  /* @media (width <= 639px) {
+    & {
+      grid-column: 1;
+      grid-row: 3;
+    }
+  } */
 `;
 
 const PostInteractionsWrapper = styled.div`
   grid-column: 2;
   grid-row: 4;
+
+  /* @media (width <= 639px) {
+    & {
+      grid-column: 1;
+      grid-row: 4;
+    }
+  } */
 `;
 
 export default function Post() {
@@ -132,13 +150,16 @@ export default function Post() {
           variant="post"
         />
       </ProfileLink>
+
       <Info>
         <ProfileLink to="/profile">
           <Name>Jack Reacher</Name>
         </ProfileLink>
         <PostTime>40 min ago</PostTime>
       </Info>
+
       <Description>Very nice in the mountains!</Description>
+
       <Image
         src="https://images.pexels.com/photos/568236/pexels-photo-568236.jpeg?auto=compress&cs=tinysrgb&w=600"
         alt={`Post of User`}
