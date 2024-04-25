@@ -65,10 +65,12 @@ export default function ProfileInfo() {
         </Info>
       </Container>
 
-      <Description>
-        <FieldName>Description:</FieldName>
-        {description}
-      </Description>
+      {description && (
+        <Description>
+          <FieldName>Description:</FieldName>
+          {description}
+        </Description>
+      )}
     </StyledProfileInfo>
   );
 }

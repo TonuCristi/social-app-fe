@@ -1,10 +1,40 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
+import { useState } from "react";
 
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import Profile from "./ProfileBadge";
 import Search from "../features/search/Search";
+import Button from "./Button";
+import FloatingNavLinks from "./FloatingNavLinks";
+
+import {
+  HiChatBubbleOvalLeft,
+  HiMiniBars3,
+  HiMiniHeart,
+  HiMiniHome,
+  HiMiniUserGroup,
+} from "react-icons/hi2";
+
+const links = [
+  {
+    to: "",
+    icon: <HiMiniHome />,
+  },
+  {
+    to: "notifications",
+    icon: <HiMiniHeart />,
+  },
+  {
+    to: "friends",
+    icon: <HiMiniUserGroup />,
+  },
+  {
+    to: "messages",
+    icon: <HiChatBubbleOvalLeft />,
+  },
+];
 
 const StyledNavbar = styled.header`
   width: 100%;
@@ -21,6 +51,13 @@ const StyledNavbar = styled.header`
   top: 0;
   left: 0;
   z-index: 999;
+
+  @media (width <= 639px) {
+    & {
+      display: flex;
+      gap: 2.4rem;
+    }
+  }
 `;
 
 const Container = styled.div`
@@ -35,7 +72,25 @@ const HomeLink = styled(NavLink)`
   text-decoration: none;
 `;
 
+const Wrapper = styled.div`
+  display: none;
+
+  @media (width <= 639px) {
+    & {
+      display: block;
+    }
+  }
+`;
+
+const BurgerMenuIcon = styled(HiMiniBars3)`
+  color: var(--color-zinc-100);
+  font-size: 2.8rem;
+  stroke-width: 0.1rem;
+`;
+
 export default function Navbar() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   return (
     <StyledNavbar>
       <Container>
@@ -45,7 +100,14 @@ export default function Navbar() {
         <Search />
       </Container>
 
-      <NavLinks />
+      <NavLinks links={links} />
+      {isOpen && <FloatingNavLinks links={links} setIsOpen={setIsOpen} />}
+
+      <Wrapper>
+        <Button onClick={() => setIsOpen(true)}>
+          <BurgerMenuIcon />
+        </Button>
+      </Wrapper>
 
       <Profile />
     </StyledNavbar>
