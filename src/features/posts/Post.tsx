@@ -63,14 +63,6 @@ const Info = styled.div`
       align-self: center;
     }
   }
-
-  /* @media (width <= 639px) {
-    & {
-      width: 100%;
-      grid-column: 1;
-      grid-row: 1;
-    }
-  } */
 `;
 
 const Name = styled.h4`
@@ -105,13 +97,6 @@ const Description = styled.pre`
       font-size: 1.4rem;
     }
   }
-
-  /* @media (width <= 639px) {
-    & {
-      grid-column: 1;
-      grid-row: 2;
-    }
-  } */
 `;
 
 const Image = styled.img`
@@ -119,25 +104,11 @@ const Image = styled.img`
   border-radius: 1.5rem;
   grid-column: 2;
   grid-row: 3;
-
-  /* @media (width <= 639px) {
-    & {
-      grid-column: 1;
-      grid-row: 3;
-    }
-  } */
 `;
 
 const PostInteractionsWrapper = styled.div`
   grid-column: 2;
   grid-row: 4;
-
-  /* @media (width <= 639px) {
-    & {
-      grid-column: 1;
-      grid-row: 4;
-    }
-  } */
 `;
 
 export default function Post() {

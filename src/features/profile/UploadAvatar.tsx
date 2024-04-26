@@ -14,7 +14,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { fb } from "../../firebase/firebase";
+import { fb } from "../../config/firebase";
 import { AuthApi } from "../../api/AuthApi";
 import { mapUser } from "../../utils/mapUser";
 

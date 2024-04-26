@@ -75,6 +75,12 @@ const variants = {
       background-color: var(--color-sky-600);
       cursor: not-allowed;
     }
+
+    @media (width <= 1279px) {
+      & {
+        font-size: 1.4rem;
+      }
+    }
   `,
   post: css`
     display: flex;

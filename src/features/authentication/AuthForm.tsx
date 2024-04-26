@@ -16,6 +16,48 @@ const Container = styled.div`
   border-radius: 1.1rem;
   padding: 2.4rem;
   width: 20%;
+
+  @media (width <= 1440px) {
+    & {
+      width: 25%;
+    }
+  }
+
+  @media (width <= 1279px) {
+    & {
+      width: 30%;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      width: 40%;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 50%;
+    }
+  }
+
+  @media (width <= 639px) {
+    & {
+      width: 65%;
+    }
+  }
+
+  @media (width <= 425px) {
+    & {
+      width: 85%;
+    }
+  }
+
+  @media (width <= 320px) {
+    & {
+      width: 90%;
+    }
+  }
 `;
 
 const StyledAuthForm = styled.form`

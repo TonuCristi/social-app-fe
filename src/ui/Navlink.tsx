@@ -17,11 +17,18 @@ type Props = {
   end?: boolean;
   children: ({ isActive }: { isActive: boolean }) => ReactNode;
   variant?: Variant;
+  onClick?: () => void;
 };
 
-export default function Navlink({ to, end = false, children, variant }: Props) {
+export default function Navlink({
+  to,
+  end = false,
+  children,
+  variant,
+  onClick,
+}: Props) {
   return (
-    <StyledNavlink to={to} end={end} $variant={variant}>
+    <StyledNavlink to={to} end={end} $variant={variant} onClick={onClick}>
       {children}
     </StyledNavlink>
   );

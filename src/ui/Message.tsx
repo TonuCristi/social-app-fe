@@ -15,6 +15,12 @@ const variants = {
 
 const StyledMessage = styled.p<{ $variant: Variant }>`
   ${(props) => variants[props.$variant]}
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
+  }
 `;
 
 type Props = {

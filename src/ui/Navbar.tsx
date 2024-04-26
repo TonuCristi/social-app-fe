@@ -15,6 +15,7 @@ import {
   HiMiniHeart,
   HiMiniHome,
   HiMiniUserGroup,
+  HiMiniMagnifyingGlass,
 } from "react-icons/hi2";
 
 const links = [
@@ -52,6 +53,12 @@ const StyledNavbar = styled.header`
   left: 0;
   z-index: 999;
 
+  @media (width <= 1279px) {
+    & {
+      grid-template-columns: 30fr 40fr 30fr;
+    }
+  }
+
   @media (width <= 639px) {
     & {
       display: flex;
@@ -72,6 +79,22 @@ const HomeLink = styled(NavLink)`
   text-decoration: none;
 `;
 
+const SearchWrapper = styled.div`
+  display: none;
+
+  @media (width <= 1023px) {
+    & {
+      display: block;
+    }
+  }
+`;
+
+const SearchIcon = styled(HiMiniMagnifyingGlass)`
+  color: var(--color-zinc-100);
+  font-size: 2.8rem;
+  stroke-width: 0.1rem;
+`;
+
 const Wrapper = styled.div`
   display: none;
 
@@ -84,7 +107,7 @@ const Wrapper = styled.div`
 
 const BurgerMenuIcon = styled(HiMiniBars3)`
   color: var(--color-zinc-100);
-  font-size: 2.8rem;
+  font-size: 2.4rem;
   stroke-width: 0.1rem;
 `;
 
@@ -98,10 +121,16 @@ export default function Navbar() {
           <Logo />
         </HomeLink>
         <Search />
+
+        <SearchWrapper>
+          <Button onClick={() => {}}>
+            <SearchIcon />
+          </Button>
+        </SearchWrapper>
       </Container>
 
       <NavLinks links={links} />
-      {isOpen && <FloatingNavLinks links={links} setIsOpen={setIsOpen} />}
+      <FloatingNavLinks links={links} isOpen={isOpen} setIsOpen={setIsOpen} />
 
       <Wrapper>
         <Button onClick={() => setIsOpen(true)}>

@@ -13,10 +13,35 @@ const Modal = styled.div`
   border-radius: 1.1rem;
   padding: 2.4rem;
   color: #fff;
-  width: 35%;
+  width: 40%;
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
+
+  @media (width <= 1279px) {
+    & {
+      width: 60%;
+      padding: 2rem;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 70%;
+    }
+  }
+
+  @media (width <= 639px) {
+    & {
+      width: 80%;
+    }
+  }
+
+  @media (width <= 425px) {
+    & {
+      width: 85%;
+    }
+  }
 `;
 
 const Uploader = styled.label`
@@ -56,6 +81,18 @@ const Wrapper = styled.div`
 const ButtonWrapper = styled.div`
   width: 30%;
   align-self: center;
+
+  @media (width <= 1023px) {
+    & {
+      width: 40%;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 45%;
+    }
+  }
 `;
 
 type Props = {

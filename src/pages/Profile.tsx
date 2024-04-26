@@ -7,7 +7,7 @@ const links = [
   {
     to: "",
     end: true,
-    text: "Profile",
+    text: "Your profile",
   },
   {
     to: "/changePassword",
@@ -23,21 +23,67 @@ const StyledProfile = styled.div`
   color: white;
   display: grid;
   grid-template-columns: 25fr 75fr;
-  width: 70%;
+  width: 75%;
   margin: 0 auto;
   border: 1px solid var(--color-zinc-500);
-  border-top: 1px solid transparent;
+  border-top: none;
   height: 100%;
+
+  @media (width >= 1535px) {
+    & {
+      max-width: 120rem;
+    }
+  }
+
+  @media (width <= 1279px) {
+    & {
+      width: 85%;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid var(--color-zinc-500);
+    }
+  }
 `;
 
 const ProfileNav = styled.nav`
   border-right: 1px solid var(--color-zinc-500);
   padding: 2.4rem;
+
+  @media (width <= 1023px) {
+    & {
+      padding: 2rem;
+      border-right: none;
+      border-bottom: 1px solid var(--color-zinc-500);
+    }
+  }
 `;
 
 const Title = styled.h1`
   margin-bottom: 2rem;
   font-size: 2.4rem;
+
+  @media (width <= 1023px) {
+    & {
+      font-size: 2rem;
+    }
+  }
+
+  @media (width <= 425px) {
+    & {
+      text-align: center;
+    }
+  }
 `;
 
 const NavLinks = styled.ul`
@@ -45,6 +91,29 @@ const NavLinks = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
+
+  @media (width <= 1023px) {
+    & {
+      font-size: 1.4rem;
+      flex-direction: row;
+    }
+  }
+
+  @media (width <= 425px) {
+    & {
+      width: 55%;
+      margin: 0 auto;
+      flex-direction: column;
+    }
+  }
+
+  @media (width <= 320px) {
+    & {
+      width: 70%;
+      margin: 0 auto;
+      flex-direction: column;
+    }
+  }
 `;
 
 const NavItem = styled.li<{ $isActive: boolean }>`
@@ -65,6 +134,12 @@ const NavItem = styled.li<{ $isActive: boolean }>`
 
 const Container = styled.div`
   padding: 2.4rem;
+
+  @media (width <= 1023px) {
+    & {
+      padding: 2rem;
+    }
+  }
 `;
 
 export default function Profile() {

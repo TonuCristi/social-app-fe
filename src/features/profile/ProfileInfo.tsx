@@ -14,6 +14,13 @@ const Container = styled.div`
   align-items: center;
   gap: 2.4rem;
   margin-bottom: 2.4rem;
+
+  @media (width <= 639px) {
+    & {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
 `;
 
 const Info = styled.div`
@@ -22,13 +29,43 @@ const Info = styled.div`
   row-gap: 2.4rem;
   column-gap: 3.2rem;
   align-items: center;
+
+  @media (width <= 639px) {
+    & {
+      column-gap: 2.4rem;
+    }
+  }
+
+  @media (width <= 425px) {
+    & {
+      grid-template-columns: auto;
+    }
+  }
 `;
 
 const Name = styled.h2`
   font-size: 3.2rem;
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 2.8rem;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      font-size: 2.4rem;
+    }
+  }
 `;
 
-const Field = styled.p``;
+const Field = styled.p`
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
+  }
+`;
 
 const FieldName = styled.span`
   font-weight: 500;
@@ -37,6 +74,12 @@ const FieldName = styled.span`
 
 const Description = styled.p`
   line-height: 1.6;
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
+  }
 `;
 
 export default function ProfileInfo() {

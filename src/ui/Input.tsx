@@ -40,6 +40,12 @@ const variants = {
       background-color: var(--color-zinc-400);
       border-radius: 0.3rem;
     }
+
+    @media (width <= 1279px) {
+      & {
+        font-size: 1.4rem;
+      }
+    }
   `,
   post: css`
     background-color: var(--color-zinc-900);

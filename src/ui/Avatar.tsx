@@ -26,6 +26,13 @@ const variants = {
   profile: css`
     width: 15rem;
     height: 15rem;
+
+    @media (width <= 1279px) {
+      & {
+        width: 10rem;
+        height: 10rem;
+      }
+    }
   `,
 };
 
