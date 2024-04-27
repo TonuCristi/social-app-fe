@@ -134,7 +134,11 @@ const variants = {
   //     background-color: var(--color-sky-600);
   //   }
   // `,
-  empty: css``,
+  empty: css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `,
 };
 
 const StyledButton = styled.button<{ $variant: Variant }>`

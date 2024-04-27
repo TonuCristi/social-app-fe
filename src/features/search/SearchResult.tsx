@@ -31,9 +31,13 @@ const Avatar = styled.img`
 
 const Name = styled.p``;
 
-export default function SearchResult() {
+type Props = {
+  onClick?: () => void;
+};
+
+export default function SearchResult({ onClick }: Props) {
   return (
-    <StyledSearchResult>
+    <StyledSearchResult onClick={onClick}>
       <Link to="/profile">
         <Avatar
           src="https://images.pexels.com/photos/2380794/pexels-photo-2380794.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"

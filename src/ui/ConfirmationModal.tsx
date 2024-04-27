@@ -12,6 +12,12 @@ const Container = styled.div`
 const Question = styled.p`
   margin-bottom: 2.4rem;
   color: var(--color-zinc-100);
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
+  }
 `;
 
 const Buttons = styled.div`

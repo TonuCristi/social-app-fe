@@ -8,6 +8,7 @@ import Profile from "./ProfileBadge";
 import Search from "../features/search/Search";
 import Button from "./Button";
 import FloatingNavLinks from "./FloatingNavLinks";
+import FloatingSearch from "../features/search/FloatingSearch";
 
 import {
   HiChatBubbleOvalLeft,
@@ -112,7 +113,8 @@ const BurgerMenuIcon = styled(HiMiniBars3)`
 `;
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
+  const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
 
   return (
     <StyledNavbar>
@@ -122,18 +124,33 @@ export default function Navbar() {
         </HomeLink>
         <Search />
 
+        <FloatingSearch isOpen={isOpenSearch} setIsOpen={setIsOpenSearch} />
         <SearchWrapper>
-          <Button onClick={() => {}}>
+          <Button
+            onClick={() => {
+              document.body.style.overflow = "hidden";
+              setIsOpenSearch(true);
+            }}
+          >
             <SearchIcon />
           </Button>
         </SearchWrapper>
       </Container>
 
       <NavLinks links={links} />
-      <FloatingNavLinks links={links} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <FloatingNavLinks
+        links={links}
+        isOpen={isOpenNav}
+        setIsOpen={setIsOpenNav}
+      />
 
       <Wrapper>
-        <Button onClick={() => setIsOpen(true)}>
+        <Button
+          onClick={() => {
+            document.body.style.overflow = "hidden";
+            setIsOpenNav(true);
+          }}
+        >
           <BurgerMenuIcon />
         </Button>
       </Wrapper>

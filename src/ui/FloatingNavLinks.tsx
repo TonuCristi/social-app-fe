@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction, useEffect, useRef } from "react";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 import { createPortal } from "react-dom";
 import styled from "styled-components";
 
@@ -7,8 +7,6 @@ import Navlink from "./Navlink";
 import Button from "./Button";
 
 import { HiMiniXMark } from "react-icons/hi2";
-import { useOverflow } from "../hooks/useOverflow";
-import { useClickOutside } from "../hooks/useClickOutside";
 
 const Nav = styled.nav<{ $isOpen: boolean }>`
   display: none;
@@ -22,12 +20,17 @@ const Nav = styled.nav<{ $isOpen: boolean }>`
   right: ${(props) => (props.$isOpen ? "0%" : "-100%")};
   height: 100vh;
   width: 100%;
-  border-left: 1px solid var(--color-zinc-500);
   background-color: rgba(9, 9, 11);
   padding: 4.8rem;
   transition: all 0.5s;
 
   @media (width <= 639px) {
+    & {
+      display: flex;
+    }
+  }
+
+  @media (width <= 425px) {
     & {
       display: flex;
     }
@@ -60,19 +63,20 @@ type Props = {
 };
 
 export default function FloatingNavLinks({ links, isOpen, setIsOpen }: Props) {
-  useOverflow();
-  const containerRef = useRef<HTMLElement>(null);
-  useClickOutside(containerRef, () => setIsOpen(false));
+  function handleClick() {
+    document.body.style.overflowY = "auto";
+    setIsOpen(false);
+  }
 
   return createPortal(
     <Nav $isOpen={isOpen}>
-      <Button onClick={() => setIsOpen(false)}>
+      <Button onClick={handleClick}>
         <CloseBurgerMenuIcon />
       </Button>
 
       <StyledFloatingNavLinks>
         {links.map(({ to, icon }) => (
-          <Navlink key={to} to={`/${to}`} onClick={() => setIsOpen(false)}>
+          <Navlink key={to} to={`/${to}`} onClick={handleClick}>
             {({ isActive }) => <NavItem isActive={isActive}>{icon}</NavItem>}
           </Navlink>
         ))}

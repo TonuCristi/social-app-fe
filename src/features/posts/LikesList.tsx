@@ -14,6 +14,36 @@ const StyledLikesList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
+  @media (width >= 1535px) {
+    & {
+      max-width: 50rem;
+    }
+  }
+
+  @media (width <= 1279px) {
+    & {
+      width: 40%;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      width: 50%;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 60%;
+    }
+  }
+
+  @media (width <= 639px) {
+    & {
+      width: 80%;
+    }
+  }
 `;
 
 const Wrapper = styled.div`
@@ -80,9 +110,15 @@ const ProfileLink = styled(NavLink)`
   border-radius: 1.1rem;
   color: var(--color-zinc-100);
   font-weight: 500;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   width: 100%;
   transition: all 0.2s;
+
+  @media (width <= 1279px) {
+    & {
+      font-size: 1.4rem;
+    }
+  }
 
   &:hover {
     background-color: var(--color-zinc-800);

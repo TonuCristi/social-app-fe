@@ -58,6 +58,7 @@ const GlobalStyle = createGlobalStyle`
         font-size: 1.6rem;
         font-family: "Roboto", sans-serif;
         background-color: var(--color-zinc-950);
+        overflow-x: hidden;
     }
 `;
 
