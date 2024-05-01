@@ -115,25 +115,6 @@ const variants = {
       }
     }
   `,
-  // floatPost: css`
-  //   position: fixed;
-  //   top: 90%;
-  //   left: 10%;
-  //   display: flex;
-  //   justify-content: center;
-  //   align-items: center;
-  //   background-color: var(--color-sky-500);
-  //   color: var(--color-zinc-100);
-  //   padding: 1.2rem 1.6rem;
-  //   border-radius: 2.3rem;
-  //   font-weight: 500;
-  //   transition: all 0.2s;
-  //   width: 10%;
-
-  //   &:hover {
-  //     background-color: var(--color-sky-600);
-  //   }
-  // `,
   empty: css`
     display: flex;
     justify-content: center;

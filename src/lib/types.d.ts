@@ -1,4 +1,4 @@
-// User
+// ----- User -----
 export type UserResponse = {
   _id: string;
   name: string;
@@ -32,3 +32,18 @@ export type UserEditRequest = User<
   Omit,
   "id" | "email" | "password" | "createdAt"
 >;
+
+// ----- Post -----
+export type PostResponse = {
+  _id: string;
+  description: string;
+  image: string;
+  createdAt: string;
+};
+
+export type PostT = {
+  id: string;
+  description: string;
+  image: string;
+  createdAt: string;
+};

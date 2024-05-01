@@ -4,6 +4,9 @@ import { NavLink } from "react-router-dom";
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
 
+import { PostT } from "../../lib/types";
+import { getTimePassed } from "../../utils/getTimePassed";
+
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
@@ -111,7 +114,16 @@ const PostInteractionsWrapper = styled.div`
   grid-row: 4;
 `;
 
-export default function Post() {
+type Props = {
+  post: PostT;
+};
+
+export default function Post({ post }: Props) {
+  const { description, image, createdAt } = post;
+
+  console.log(createdAt);
+  console.log(getTimePassed(createdAt) / 1000);
+
   return (
     <StyledPost>
       <ProfileLink to="/profile">
@@ -129,12 +141,9 @@ export default function Post() {
         <PostTime>40 min ago</PostTime>
       </Info>
 
-      <Description>Very nice in the mountains!</Description>
+      <Description>{description}</Description>
 
-      <Image
-        src="https://images.pexels.com/photos/568236/pexels-photo-568236.jpeg?auto=compress&cs=tinysrgb&w=600"
-        alt={`Post of User`}
-      />
+      {image && <Image src={image} alt={`Post of User`} />}
 
       <PostInteractionsWrapper>
         <PostInteractions />
