@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction, useRef } from "react";
-import { HiMiniXMark } from "react-icons/hi2";
-import { NavLink } from "react-router-dom";
 import styled from "styled-components";
+import { NavLink } from "react-router-dom";
+
+import { HiMiniXMark } from "react-icons/hi2";
 import { useClickOutside } from "../../hooks/useClickOutside";
 
 const StyledLikesList = styled.div`

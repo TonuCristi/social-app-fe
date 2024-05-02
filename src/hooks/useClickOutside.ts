@@ -5,10 +5,11 @@ export function useClickOutside(
   cb: () => void
 ) {
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(e: MouseEvent) {
+      e.stopPropagation();
       if (
         containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
+        !containerRef.current.contains(e.target as Node)
       ) {
         cb();
       }

@@ -6,6 +6,7 @@ import Avatar from "../../ui/Avatar";
 
 import { PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
+import PostImage from "./PostImage";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -102,9 +103,7 @@ const Description = styled.pre`
   }
 `;
 
-const Image = styled.img`
-  width: 100%;
-  border-radius: 1.5rem;
+const ImageWrapper = styled.div`
   grid-column: 2;
   grid-row: 3;
 `;
@@ -121,9 +120,6 @@ type Props = {
 export default function Post({ post }: Props) {
   const { description, image, createdAt } = post;
 
-  console.log(createdAt);
-  console.log(getTimePassed(createdAt) / 1000);
-
   return (
     <StyledPost>
       <ProfileLink to="/profile">
@@ -138,12 +134,16 @@ export default function Post({ post }: Props) {
         <ProfileLink to="/profile">
           <Name>Jack Reacher</Name>
         </ProfileLink>
-        <PostTime>40 min ago</PostTime>
+        <PostTime>{getTimePassed(createdAt)}</PostTime>
       </Info>
 
       <Description>{description}</Description>
 
-      {image && <Image src={image} alt={`Post of User`} />}
+      {image && (
+        <ImageWrapper>
+          <PostImage image={image} />
+        </ImageWrapper>
+      )}
 
       <PostInteractionsWrapper>
         <PostInteractions />
