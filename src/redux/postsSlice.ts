@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Post } from "../lib/types";
+import { PostT } from "../lib/types";
 import { RootState } from "./store";
 
 type PostsState = {
   isLoading: boolean;
   error: string;
-  posts: Post[];
+  posts: PostT[];
 };
 
 const initialState: PostsState = {
@@ -18,10 +18,19 @@ const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
-    loadPosts(state, action: PayloadAction<Post[]>) {
+    loadPosts(state, action: PayloadAction<PostT[]>) {
       state.isLoading = false;
       state.error = "";
       state.posts = action.payload;
+    },
+    addingPost(state) {
+      state.isLoading = true;
+      state.error = "";
+    },
+    addPost(state, action: PayloadAction<PostT>) {
+      state.isLoading = false;
+      state.posts = [action.payload, ...state.posts];
+      state.error = "";
     },
     loadError(state, action: PayloadAction<string>) {
       state.isLoading = false;
@@ -30,7 +39,7 @@ const postsSlice = createSlice({
   },
 });
 
-export const { loadPosts, loadError } = postsSlice.actions;
+export const { loadPosts, addingPost, addPost, loadError } = postsSlice.actions;
 
 export const selectPosts = (state: RootState) => state.posts;
 

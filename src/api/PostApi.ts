@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import api from "../config/api";
-import { PostResponse } from "../lib/types";
+import { PostRequest, PostResponse } from "../lib/types";
 
 const BASE_URL = "/posts";
 
@@ -9,5 +9,10 @@ export const PostApi = {
     return api
       .get(`${BASE_URL}/${userId}`)
       .then(({ data }: AxiosResponse<PostResponse[]>) => data);
+  },
+  createPost(post: PostRequest) {
+    return api
+      .post(`${BASE_URL}/createPost`, post)
+      .then(({ data }: AxiosResponse<PostResponse>) => data);
   },
 };

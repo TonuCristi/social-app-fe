@@ -3,7 +3,6 @@ import { store } from "./redux/store";
 import { Provider } from "react-redux";
 
 import ErrorPage from "./pages/ErrorPage";
-import Posts from "./pages/Posts";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import Friends from "./pages/Friends";
 import Messages from "./pages/Messages";
@@ -11,6 +10,7 @@ import Profile from "./pages/Profile";
 import ProfileInfo from "./features/profile/ProfileInfo";
 import ChangePassword from "./features/profile/ChangePassword";
 import EditProfile from "./features/profile/EditProfile";
+import Feed from "./pages/Feed";
 
 import GlobalStyle from "./styles/GlobalStyle";
 
@@ -22,7 +22,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Posts />,
+        element: <Feed />,
       },
       {
         path: "/notifications",

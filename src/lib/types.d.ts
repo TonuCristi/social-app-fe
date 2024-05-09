@@ -47,3 +47,9 @@ export type PostT = {
   image: string;
   createdAt: string;
 };
+
+export type PostRequest = {
+  description: string;
+  image: string;
+  user_id: string;
+};

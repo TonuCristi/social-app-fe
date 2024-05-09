@@ -33,8 +33,8 @@ export function getTimePassed(time: string) {
   if (timePassed / 60 / 24 >= 7 && timePassed / 60 / 24 < 8)
     return `1 week ago`;
 
-  // Between 2 days and 7 days
-  if (timePassed / 60 / 24 >= 2 && timePassed / 60 / 24 < 7)
+  // Between 2 days and 31 days
+  if (timePassed / 60 / 24 >= 2 && timePassed / 60 / 24 < 31)
     return `${Math.trunc(timePassed / 60 / 24)} days ago`;
 
   // 1 day
@@ -50,10 +50,14 @@ export function getTimePassed(time: string) {
     return `${Math.trunc(timePassed / 60)} hour ago`;
 
   // Between 1 minute and 60 minutes
-  if (timePassed > 2 && timePassed <= 60) {
+  if (timePassed >= 2 && timePassed <= 60) {
     return `${Math.trunc(timePassed)} minutes ago`;
   }
 
+  if (timePassed >= 1 && timePassed < 2) {
+    return `${Math.trunc(timePassed)} minute ago`;
+  }
+
   // Under 1 minute
-  if (timePassed <= 2) return `${Math.trunc(timePassed)} minute ago`;
+  if (timePassed < 1) return `Just now`;
 }

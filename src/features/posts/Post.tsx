@@ -47,7 +47,6 @@ const StyledPost = styled.div`
   @media (width <= 639px) {
     & {
       width: 100%;
-      grid-template-columns: 1fr;
     }
   }
 `;

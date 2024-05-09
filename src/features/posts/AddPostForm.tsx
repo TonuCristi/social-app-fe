@@ -9,11 +9,13 @@ import Button from "../../ui/Button";
 import Avatar from "../../ui/Avatar";
 
 import { selectCurrentUser } from "../../redux/currentUserSlice";
+import { PostRequest } from "../../lib/types";
+import { selectPosts } from "../../redux/postsSlice";
 
 const StyledAddPostForm = styled.form`
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
-  width: 100%;
+  width: 50%;
   padding: 1.6rem;
   display: flex;
   gap: 1.6rem;
@@ -28,6 +30,7 @@ const StyledAddPostForm = styled.form`
   @media (width <= 1279px) {
     & {
       padding: 1.4rem;
+      width: 60%;
     }
   }
 
@@ -35,12 +38,26 @@ const StyledAddPostForm = styled.form`
     & {
       padding: 1.2rem;
       gap: 1.2rem;
+      width: 70%;
     }
   }
 
   @media (width <= 767px) {
     & {
       padding: 1rem;
+      width: 80%;
+    }
+  }
+
+  @media (width <= 639px) {
+    & {
+      width: 90%;
+    }
+  }
+
+  @media (width <= 425) {
+    & {
+      width: 100%;
     }
   }
 `;
@@ -84,21 +101,25 @@ const PhotoIcon = styled(HiMiniPhoto)`
 `;
 
 type Inputs = {
-  postText: string;
-  file: File;
+  description: string;
+  image: File;
 };
 
-export default function AddPostForm() {
+type Props = {
+  onCreatePost: (post: PostRequest) => void;
+};
+
+export default function AddPostForm({ onCreatePost }: Props) {
   const { user } = useSelector(selectCurrentUser);
+  const { isLoading } = useSelector(selectPosts);
   const { register, watch, handleSubmit } = useForm<Inputs>({
     defaultValues: {
-      postText: "",
+      description: "",
     },
   });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
-  };
+  const onSubmit: SubmitHandler<Inputs> = (data) =>
+    onCreatePost({ ...data, image: "", user_id: user.id });
 
   return (
     <StyledAddPostForm onSubmit={handleSubmit(onSubmit)}>
@@ -109,7 +130,7 @@ export default function AddPostForm() {
         type="text"
         variant="post"
         placeholder={`What's happening, ${user.name.split(" ")[0]}?`}
-        {...register("postText")}
+        {...register("description")}
       />
 
       <Container>
@@ -120,14 +141,14 @@ export default function AddPostForm() {
           type="file"
           id="file"
           accept="image/png, image/jpeg"
-          {...register("file")}
+          {...register("image")}
         />
       </Container>
 
       <PostBtnWrapper>
         <Button
           variant="post"
-          disabled={watch("postText").length > 0 ? false : true}
+          disabled={watch("description").length > 0 ? false : true}
         >
           Post
         </Button>
