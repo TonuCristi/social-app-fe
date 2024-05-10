@@ -55,7 +55,7 @@ export default function Posts() {
     );
 
   return (
-    <StyledPosts onScroll={() => console.log("Merge")}>
+    <StyledPosts>
       {posts.map((post) => (
         <Post key={post.id} post={post} />
       ))}

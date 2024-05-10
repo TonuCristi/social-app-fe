@@ -15,4 +15,9 @@ export const PostApi = {
       .post(`${BASE_URL}/createPost`, post)
       .then(({ data }: AxiosResponse<PostResponse>) => data);
   },
+  updatePostImage(id: string, image: string) {
+    return api
+      .put(`${BASE_URL}/updateImage/${id}`, { image })
+      .then(({ data }: AxiosResponse<PostResponse>) => data);
+  },
 };

@@ -7,10 +7,12 @@ import AddPostForm from "../features/posts/AddPostForm";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
 import { addingPost, addPost, loadPosts } from "../redux/postsSlice";
-import { PostRequest, PostResponse } from "../lib/types";
+import { PostRequest, PostRequestFile, PostResponse } from "../lib/types";
 import { PostApi } from "../api/PostApi";
 import { loadError } from "../redux/authSlice";
 import { mapPost } from "../utils/mapPost";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { fb } from "../config/firebase";
 
 const StyledFeed = styled.div`
   display: flex;
@@ -28,9 +30,45 @@ export default function Feed() {
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
 
-  function handleCreatePost(post: PostRequest) {
-    dispatch(addingPost());
-    PostApi.createPost(post).then((res) => dispatch(addPost(mapPost(res))));
+  function handleCreatePost(post: PostRequestFile) {
+    // dispatch(addingPost());
+
+    PostApi.createPost({ ...post, image: "" }).then((res) => {
+      const postType = post.image.type.split("/")[1];
+
+      const storageRef = ref(fb, `${user.id}/${res._id}.${postType}`);
+
+      // const uploadTask = uploadBytesResumable(storageRef, post.image);
+
+      // uploadTask.on(
+      //   "state_changed",
+      //   (snapshot) => {
+      //     const progress =
+      //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      //     console.log("Upload is " + progress + "% done");
+      //     switch (snapshot.state) {
+      //       case "paused":
+      //         console.log("Upload is paused");
+      //         break;
+      //       case "running":
+      //         console.log("Upload is running");
+      //         break;
+      //     }
+      //   },
+      //   (error) => {
+      //     console.log(error);
+      //   },
+      //   () => {
+      //     getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+      //       console.log("File available at", url);
+      //       PostApi.updatePostImage(res._id, url).then((res) =>
+      //         console.log(res)
+      //       );
+      //     });
+      //   }
+      // );
+    });
+    // dispatch(addPost(mapPost(res)))
   }
 
   useEffect(() => {

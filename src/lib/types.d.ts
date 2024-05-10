@@ -53,3 +53,9 @@ export type PostRequest = {
   image: string;
   user_id: string;
 };
+
+export type PostRequestFile = {
+  description: string;
+  image: File;
+  user_id: string;
+};

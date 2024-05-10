@@ -1,4 +1,3 @@
-import { HiMiniPhoto } from "react-icons/hi2";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
@@ -9,8 +8,9 @@ import Button from "../../ui/Button";
 import Avatar from "../../ui/Avatar";
 
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { PostRequest } from "../../lib/types";
+import { PostRequestFile } from "../../lib/types";
 import { selectPosts } from "../../redux/postsSlice";
+import { HiMiniPhoto } from "react-icons/hi2";
 
 const StyledAddPostForm = styled.form`
   border: 1px solid var(--color-zinc-500);
@@ -102,11 +102,11 @@ const PhotoIcon = styled(HiMiniPhoto)`
 
 type Inputs = {
   description: string;
-  image: File;
+  image: FileList;
 };
 
 type Props = {
-  onCreatePost: (post: PostRequest) => void;
+  onCreatePost: (post: PostRequestFile) => void;
 };
 
 export default function AddPostForm({ onCreatePost }: Props) {
@@ -119,7 +119,7 @@ export default function AddPostForm({ onCreatePost }: Props) {
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) =>
-    onCreatePost({ ...data, image: "", user_id: user.id });
+    onCreatePost({ ...data, image: data.image[0], user_id: user.id });
 
   return (
     <StyledAddPostForm onSubmit={handleSubmit(onSubmit)}>
@@ -148,7 +148,11 @@ export default function AddPostForm({ onCreatePost }: Props) {
       <PostBtnWrapper>
         <Button
           variant="post"
-          disabled={watch("description").length > 0 ? false : true}
+          disabled={
+            watch("description").length > 0 || watch("image")?.length
+              ? false
+              : true
+          }
         >
           Post
         </Button>
