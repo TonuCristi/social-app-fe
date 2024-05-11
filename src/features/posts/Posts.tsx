@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
-import Post from "../features/posts/Post";
-import Loader from "../ui/Loader";
+import Post from "./Post";
+import Loader from "../../ui/Loader";
 
-import { useAppSelector } from "../redux/hooks";
-import { selectPosts } from "../redux/postsSlice";
+import { useAppSelector } from "../../redux/hooks";
+import { selectPosts } from "../../redux/postsSlice";
 
 const StyledPosts = styled.div`
   display: flex;

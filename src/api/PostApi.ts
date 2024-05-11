@@ -5,9 +5,9 @@ import { PostRequest, PostResponse } from "../lib/types";
 const BASE_URL = "/posts";
 
 export const PostApi = {
-  getPosts(userId: string) {
+  getPosts(userId: string, perPage: number, offset: number) {
     return api
-      .get(`${BASE_URL}/${userId}`)
+      .get(`${BASE_URL}/${userId}?perPage=${perPage}&offset=${offset}`)
       .then(({ data }: AxiosResponse<PostResponse[]>) => data);
   },
   createPost(post: PostRequest) {

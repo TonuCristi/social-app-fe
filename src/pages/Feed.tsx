@@ -1,18 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
-import Posts from "./Posts";
+import Posts from "../features/posts/Posts";
 import AddPostForm from "../features/posts/AddPostForm";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
-import { addingPost, addPost, loadPosts } from "../redux/postsSlice";
-import { PostRequest, PostRequestFile, PostResponse } from "../lib/types";
+import {
+  addingPost,
+  addPost,
+  loadMorePosts,
+  loadPosts,
+  selectPosts,
+} from "../redux/postsSlice";
+import { PostRequestFile, PostResponse } from "../lib/types";
 import { PostApi } from "../api/PostApi";
 import { loadError } from "../redux/authSlice";
 import { mapPost } from "../utils/mapPost";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { fb } from "../config/firebase";
+
+const PER_PAGE = 4;
 
 const StyledFeed = styled.div`
   display: flex;
@@ -25,54 +31,23 @@ const StyledFeed = styled.div`
 
 export default function Feed() {
   const { user } = useAppSelector(selectCurrentUser);
+  const { posts } = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
+  const elRef = useRef<HTMLDivElement>(null);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
 
   function handleCreatePost(post: PostRequestFile) {
-    // dispatch(addingPost());
+    dispatch(addingPost());
 
-    PostApi.createPost({ ...post, image: "" }).then((res) => {
-      const postType = post.image.type.split("/")[1];
-
-      const storageRef = ref(fb, `${user.id}/${res._id}.${postType}`);
-
-      // const uploadTask = uploadBytesResumable(storageRef, post.image);
-
-      // uploadTask.on(
-      //   "state_changed",
-      //   (snapshot) => {
-      //     const progress =
-      //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      //     console.log("Upload is " + progress + "% done");
-      //     switch (snapshot.state) {
-      //       case "paused":
-      //         console.log("Upload is paused");
-      //         break;
-      //       case "running":
-      //         console.log("Upload is running");
-      //         break;
-      //     }
-      //   },
-      //   (error) => {
-      //     console.log(error);
-      //   },
-      //   () => {
-      //     getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-      //       console.log("File available at", url);
-      //       PostApi.updatePostImage(res._id, url).then((res) =>
-      //         console.log(res)
-      //       );
-      //     });
-      //   }
-      // );
-    });
-    // dispatch(addPost(mapPost(res)))
+    PostApi.createPost({ ...post, image: "" }).then((res) =>
+      dispatch(addPost(mapPost(res)))
+    );
   }
 
   useEffect(() => {
-    PostApi.getPosts(user.id)
+    PostApi.getPosts(user.id, PER_PAGE, posts.length)
       .then((res) => {
         const posts = mapPosts(res);
         dispatch(loadPosts(posts));
@@ -80,10 +55,35 @@ export default function Feed() {
       .catch((err) => dispatch(loadError(err.response.data.error)));
   }, [user.id, dispatch]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const h = window.innerHeight;
+      const elTop = elRef.current?.getBoundingClientRect().top;
+
+      if (!elTop) return;
+
+      // console.log(h);
+      if (elTop - h < 0) {
+        console.log(posts.length);
+        // PostApi.getPosts(user.id, PER_PAGE, posts.length)
+        //   .then((res) => {
+        //     const posts = mapPosts(res);
+        //     dispatch(loadMorePosts(posts));
+        //   })
+        //   .catch((err) => dispatch(loadError(err.response.data.error)));
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.addEventListener("scroll", handleScroll);
+  }, [user.id, dispatch, posts.length]);
+
   return (
     <StyledFeed>
       <AddPostForm onCreatePost={handleCreatePost} />
       <Posts />
+      <div ref={elRef}></div>
     </StyledFeed>
   );
 }

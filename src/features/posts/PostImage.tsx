@@ -40,7 +40,37 @@ const CloseButton = styled.button`
 `;
 
 const ImageWrapper = styled.div`
-  max-width: 40%;
+  width: 40%;
+
+  @media (width <= 1279px) {
+    & {
+      width: 50%;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      width: 65%;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 75%;
+    }
+  }
+
+  @media (width <= 639px) {
+    & {
+      width: 80%;
+    }
+  }
+
+  @media (width <= 425px) {
+    & {
+      width: 90%;
+    }
+  }
 `;
 
 type Props = {

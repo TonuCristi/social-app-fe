@@ -23,6 +23,11 @@ const postsSlice = createSlice({
       state.error = "";
       state.posts = action.payload;
     },
+    loadMorePosts(state, action: PayloadAction<PostT[]>) {
+      state.isLoading = false;
+      state.error = "";
+      state.posts = [...action.payload, ...state.posts];
+    },
     addingPost(state) {
       state.isLoading = true;
       state.error = "";
@@ -39,7 +44,8 @@ const postsSlice = createSlice({
   },
 });
 
-export const { loadPosts, addingPost, addPost, loadError } = postsSlice.actions;
+export const { loadPosts, loadMorePosts, addingPost, addPost, loadError } =
+  postsSlice.actions;
 
 export const selectPosts = (state: RootState) => state.posts;
 
