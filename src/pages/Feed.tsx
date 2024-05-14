@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import Posts from "../features/posts/Posts";
@@ -7,7 +7,7 @@ import AddPostForm from "../features/posts/AddPostForm";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
 import {
-  addingPost,
+  startLoad,
   addPost,
   loadMorePosts,
   loadPosts,
@@ -34,12 +34,13 @@ export default function Feed() {
   const { posts } = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
   const elRef = useRef<HTMLDivElement>(null);
+  const status = useRef<boolean>(false);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
 
   function handleCreatePost(post: PostRequestFile) {
-    dispatch(addingPost());
+    dispatch(startLoad());
 
     PostApi.createPost({ ...post, image: "" }).then((res) =>
       dispatch(addPost(mapPost(res)))
@@ -53,37 +54,43 @@ export default function Feed() {
         dispatch(loadPosts(posts));
       })
       .catch((err) => dispatch(loadError(err.response.data.error)));
-  }, [user.id, dispatch]);
+
+    return () => {
+      dispatch(loadPosts([]));
+    };
+  }, []);
+
+  const fetchData = useCallback(() => {
+    if (status.current) return;
+
+    const h = window.innerHeight;
+    const elTop = elRef.current?.getBoundingClientRect().top;
+
+    if (elTop && elTop - h < 0) {
+      status.current = true;
+      PostApi.getPosts(user.id, PER_PAGE, posts.length)
+        .then((res) => {
+          const posts = mapPosts(res);
+          dispatch(loadMorePosts(posts));
+        })
+        .catch((err) => dispatch(loadError(err.response.data.error)))
+        .finally(() => {
+          status.current = false;
+        });
+    }
+  }, [posts.length, dispatch, user.id]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const h = window.innerHeight;
-      const elTop = elRef.current?.getBoundingClientRect().top;
+    window.addEventListener("scroll", fetchData);
 
-      if (!elTop) return;
-
-      // console.log(h);
-      if (elTop - h < 0) {
-        console.log(posts.length);
-        // PostApi.getPosts(user.id, PER_PAGE, posts.length)
-        //   .then((res) => {
-        //     const posts = mapPosts(res);
-        //     dispatch(loadMorePosts(posts));
-        //   })
-        //   .catch((err) => dispatch(loadError(err.response.data.error)));
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.addEventListener("scroll", handleScroll);
-  }, [user.id, dispatch, posts.length]);
+    return () => window.removeEventListener("scroll", fetchData);
+  }, [fetchData]);
 
   return (
     <StyledFeed>
       <AddPostForm onCreatePost={handleCreatePost} />
       <Posts />
-      <div ref={elRef}></div>
+      <div ref={elRef} />
     </StyledFeed>
   );
 }

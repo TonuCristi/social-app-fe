@@ -112,14 +112,16 @@ type Props = {
 export default function AddPostForm({ onCreatePost }: Props) {
   const { user } = useSelector(selectCurrentUser);
   const { isLoading } = useSelector(selectPosts);
-  const { register, watch, handleSubmit } = useForm<Inputs>({
+  const { register, watch, handleSubmit, reset } = useForm<Inputs>({
     defaultValues: {
       description: "",
     },
   });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) =>
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
     onCreatePost({ ...data, image: data.image[0], user_id: user.id });
+    reset();
+  };
 
   return (
     <StyledAddPostForm onSubmit={handleSubmit(onSubmit)}>
@@ -149,7 +151,9 @@ export default function AddPostForm({ onCreatePost }: Props) {
         <Button
           variant="post"
           disabled={
-            watch("description").length > 0 || watch("image")?.length
+            watch("description").length > 0 ||
+            watch("image")?.length > 0 ||
+            isLoading
               ? false
               : true
           }
