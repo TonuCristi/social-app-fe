@@ -1,13 +1,7 @@
 import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import styled, { css } from "styled-components";
 
-type Variant =
-  | "profile"
-  | "postStats"
-  | "auth"
-  | "post"
-  // | "floatPost"
-  | "empty";
+type Variant = "profile" | "postStats" | "auth" | "post" | "postEdit" | "empty";
 
 const variants = {
   profile: css`
@@ -114,6 +108,12 @@ const variants = {
         padding: 0.8rem 1.4rem;
       }
     }
+  `,
+  postEdit: css`
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    align-self: flex-start;
   `,
   empty: css`
     display: flex;

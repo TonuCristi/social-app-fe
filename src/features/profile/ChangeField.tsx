@@ -7,13 +7,13 @@ import {
   SetStateAction,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 import Input, { Variant } from "../../ui/Input";
 import Button from "../../ui/Button";
+import ConfirmationModal from "../../ui/ConfirmationModal";
 
 import { HiMiniPencilSquare } from "react-icons/hi2";
-import { createPortal } from "react-dom";
-import ConfirmationModal from "../../ui/ConfirmationModal";
 
 const StyledChangeField = styled.div`
   display: flex;

@@ -45,7 +45,7 @@ const LoaderWrapper = styled.div`
 `;
 
 export default function Posts() {
-  const { isLoading, posts } = useAppSelector(selectPosts);
+  const { isLoading, error, posts } = useAppSelector(selectPosts);
 
   if (isLoading)
     return (
@@ -53,6 +53,8 @@ export default function Posts() {
         <Loader />
       </LoaderWrapper>
     );
+
+  if (error) return <div>Something went wrong!</div>;
 
   return (
     <StyledPosts>

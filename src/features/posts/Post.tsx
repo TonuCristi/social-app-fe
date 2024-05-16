@@ -3,10 +3,12 @@ import { NavLink } from "react-router-dom";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
+import PostImage from "./PostImage";
+import EditPostButton from "./EditPostButton";
 
 import { PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
-import PostImage from "./PostImage";
+import { PostApi } from "../../api/PostApi";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -51,8 +53,9 @@ const StyledPost = styled.div`
   }
 `;
 
-const ProfileLink = styled(NavLink)`
-  text-decoration: none;
+const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Info = styled.div`
@@ -66,6 +69,10 @@ const Info = styled.div`
       align-self: center;
     }
   }
+`;
+
+const ProfileLink = styled(NavLink)`
+  text-decoration: none;
 `;
 
 const Name = styled.h4`
@@ -117,7 +124,13 @@ type Props = {
 };
 
 export default function Post({ post }: Props) {
-  const { description, image, createdAt } = post;
+  const { id, description, image, createdAt } = post;
+
+  function handleUpdatePostDescription(description: string) {
+    PostApi.updatePostDescription(id, description).then((res) =>
+      console.log(res)
+    );
+  }
 
   return (
     <StyledPost>
@@ -129,12 +142,20 @@ export default function Post({ post }: Props) {
         />
       </ProfileLink>
 
-      <Info>
-        <ProfileLink to="/profile">
-          <Name>Jack Reacher</Name>
-        </ProfileLink>
-        <PostTime>{getTimePassed(createdAt)}</PostTime>
-      </Info>
+      <Container>
+        <Info>
+          <ProfileLink to="/profile">
+            <Name>Jack Reacher</Name>
+          </ProfileLink>
+
+          <PostTime>{getTimePassed(createdAt)}</PostTime>
+        </Info>
+
+        <EditPostButton
+          post={post}
+          onUpdatePostDescription={handleUpdatePostDescription}
+        />
+      </Container>
 
       <Description>{description}</Description>
 

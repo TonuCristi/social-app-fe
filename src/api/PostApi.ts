@@ -12,12 +12,17 @@ export const PostApi = {
   },
   createPost(post: PostRequest) {
     return api
-      .post(`${BASE_URL}/createPost`, post)
+      .post(`${BASE_URL}/post/createPost`, post)
       .then(({ data }: AxiosResponse<PostResponse>) => data);
   },
   updatePostImage(id: string, image: string) {
     return api
-      .put(`${BASE_URL}/updateImage/${id}`, { image })
+      .put(`${BASE_URL}/post/updateImage/${id}`, { image })
+      .then(({ data }: AxiosResponse<PostResponse>) => data);
+  },
+  updatePostDescription(id: string, description: string) {
+    return api
+      .put(`${BASE_URL}/post/updateDescription/${id}`, { description })
       .then(({ data }: AxiosResponse<PostResponse>) => data);
   },
 };
