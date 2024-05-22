@@ -10,6 +10,13 @@ import { AuthApi } from "../api/AuthApi";
 import { fetchUser, selectCurrentUser } from "../redux/currentUserSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { mapUser } from "../utils/mapUser";
+import { loadPosts, selectPosts } from "../redux/postsSlice";
+import { loadError } from "../redux/authSlice";
+import { PostApi } from "../api/PostApi";
+import { PostResponse } from "../lib/types";
+import { mapPost } from "../utils/mapPost";
+
+const PER_PAGE = 4;
 
 const StyledRootLayout = styled.div``;
 
@@ -24,14 +31,33 @@ const Main = styled.main`
 `;
 
 export default function RootLayout() {
-  const { isLoading, error } = useAppSelector(selectCurrentUser);
+  const { isLoading, error, user } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
+  const { posts } = useAppSelector(selectPosts);
+
+  const mapPosts = (posts: PostResponse[]) =>
+    posts.map((post) => mapPost(post));
 
   useEffect(() => {
     AuthApi.getUser()
       .then((res) => dispatch(fetchUser(mapUser(res))))
       .catch((err) => console.log(err.response.data.error));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!user.id) return;
+
+    PostApi.getPosts(user.id, PER_PAGE, posts.length)
+      .then((res) => {
+        const posts = mapPosts(res);
+        dispatch(loadPosts(posts));
+      })
+      .catch((err) => dispatch(loadError(err.response.data.error)));
+
+    return () => {
+      dispatch(loadPosts([]));
+    };
+  }, [user.id]);
 
   if (isLoading)
     return (

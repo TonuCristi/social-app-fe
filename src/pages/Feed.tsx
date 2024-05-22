@@ -10,7 +10,6 @@ import {
   startLoad,
   addPost,
   loadMorePosts,
-  loadPosts,
   selectPosts,
 } from "../redux/postsSlice";
 import { PostRequestFile, PostResponse } from "../lib/types";
@@ -46,19 +45,6 @@ export default function Feed() {
       dispatch(addPost(mapPost(res)))
     );
   }
-
-  useEffect(() => {
-    PostApi.getPosts(user.id, PER_PAGE, posts.length)
-      .then((res) => {
-        const posts = mapPosts(res);
-        dispatch(loadPosts(posts));
-      })
-      .catch((err) => dispatch(loadError(err.response.data.error)));
-
-    return () => {
-      dispatch(loadPosts([]));
-    };
-  }, []);
 
   const fetchData = useCallback(() => {
     if (status.current) return;

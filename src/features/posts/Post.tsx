@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
+import { Dispatch, SetStateAction } from "react";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
@@ -126,10 +127,14 @@ type Props = {
 export default function Post({ post }: Props) {
   const { id, description, image, createdAt } = post;
 
-  function handleUpdatePostDescription(description: string) {
-    PostApi.updatePostDescription(id, description).then((res) =>
-      console.log(res)
-    );
+  function handleUpdatePostDescription(
+    description: string,
+    setIsOpen: Dispatch<SetStateAction<boolean>>
+  ) {
+    PostApi.updatePostDescription(id, description).then((res) => {
+      console.log(res);
+      setIsOpen(false);
+    });
   }
 
   return (
