@@ -13,6 +13,13 @@ export function useWebSocket(url: string) {
 
     ws.onclose = () => console.log("Closed");
 
+    ws.onmessage = (e) => {
+      console.log("New noyt");
+      // console.log(JSON.parse(JSON.parse(e.data)));
+      console.log(JSON.parse(e.data));
+      // console.log(e.data);
+    };
+
     setSocket(ws);
 
     // return () => {

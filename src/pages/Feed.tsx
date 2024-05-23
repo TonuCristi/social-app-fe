@@ -47,6 +47,8 @@ export default function Feed() {
   }
 
   const fetchData = useCallback(() => {
+    sessionStorage.setItem("scroll", `${window.scrollY}`);
+
     if (status.current) return;
 
     const h = window.innerHeight;
@@ -65,6 +67,14 @@ export default function Feed() {
         });
     }
   }, [posts.length, dispatch, user.id]);
+
+  useEffect(() => {
+    const scroll = sessionStorage.getItem("scroll");
+
+    if (!scroll || +scroll === 0) return;
+
+    window.scrollTo(0, +scroll);
+  }, []);
 
   useEffect(() => {
     window.addEventListener("scroll", fetchData);

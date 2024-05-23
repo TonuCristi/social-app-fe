@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 
 import { HiMiniXMark } from "react-icons/hi2";
 import { useClickOutside } from "../../hooks/useClickOutside";
+import Button from "../../ui/Button";
 
 const StyledLikesList = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -47,7 +48,7 @@ const StyledLikesList = styled.div`
   }
 `;
 
-const Wrapper = styled.div`
+const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -58,12 +59,10 @@ const Title = styled.h3`
   color: var(--color-zinc-100);
 `;
 
-const CloseButton = styled.button`
-  border: none;
+const CloseIcon = styled(HiMiniXMark)`
+  font-size: 3.2rem;
+  color: var(--color-zinc-100);
   background-color: var(--color-zinc-700);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 0.4rem;
   border-radius: 100%;
   cursor: pointer;
@@ -71,11 +70,6 @@ const CloseButton = styled.button`
 
   &:hover {
     background-color: var(--color-zinc-800);
-  }
-
-  & > * {
-    font-size: 2.8rem;
-    color: var(--color-zinc-100);
   }
 `;
 
@@ -142,12 +136,12 @@ export default function LikesList({ setIsOpen }: Props) {
 
   return (
     <StyledLikesList ref={containerRef} onClick={(e) => e.stopPropagation()}>
-      <Wrapper>
+      <Container>
         <Title>Likes</Title>
-        <CloseButton onClick={() => setIsOpen(false)}>
-          <HiMiniXMark />
-        </CloseButton>
-      </Wrapper>
+        <Button onClick={() => setIsOpen(false)}>
+          <CloseIcon />
+        </Button>
+      </Container>
 
       <Likes>
         <li>

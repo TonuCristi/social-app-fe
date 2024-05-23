@@ -59,6 +59,10 @@ export default function RootLayout() {
     };
   }, [user.id]);
 
+  useEffect(() => {
+    sessionStorage.removeItem("scroll");
+  }, []);
+
   if (isLoading)
     return (
       <LoaderWrapper>

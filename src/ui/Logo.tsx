@@ -1,5 +1,7 @@
-import { HiFire } from "react-icons/hi";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
+
+import { HiFire } from "react-icons/hi";
 
 const StyledLogo = styled.span`
   font-weight: 600;
@@ -17,8 +19,16 @@ const Icon = styled(HiFire)`
 `;
 
 export default function Logo() {
+  const location = useLocation();
+
+  function handleReload() {
+    if (location.pathname !== "/") return;
+
+    window.location.reload();
+  }
+
   return (
-    <StyledLogo>
+    <StyledLogo onClick={handleReload}>
       <Icon />
     </StyledLogo>
   );

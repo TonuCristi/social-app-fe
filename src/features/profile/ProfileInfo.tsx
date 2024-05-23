@@ -4,6 +4,7 @@ import UploadAvatar from "./UploadAvatar";
 
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
+import { useWebSocket } from "../../hooks/useWebSocket";
 
 const StyledProfileInfo = styled.div`
   color: var(--color-zinc-100);
@@ -84,8 +85,22 @@ const Description = styled.p`
 
 export default function ProfileInfo() {
   const {
-    user: { name, email, description, birth_date, createdAt },
+    user: { id, name, email, description, birth_date, createdAt },
   } = useAppSelector(selectCurrentUser);
+
+  const { socket, status } = useWebSocket("http://localhost:5173/");
+
+  function handleClick() {
+    console.log(status);
+
+    const not = {
+      type: "friend_request",
+      to: "664f9f8cefa9170c712dc060",
+      from: id,
+    };
+
+    socket?.send(JSON.stringify(not));
+  }
 
   return (
     <StyledProfileInfo>
@@ -109,7 +124,7 @@ export default function ProfileInfo() {
       </Container>
 
       {description && (
-        <Description>
+        <Description onClick={handleClick}>
           <FieldName>Description:</FieldName>
           {description}
         </Description>

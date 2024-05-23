@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -6,6 +5,8 @@ import Input from "../../ui/Input";
 import Button from "../../ui/Button";
 
 import { PostT } from "../../lib/types";
+import { HiMiniXMark } from "react-icons/hi2";
+import { Dispatch, SetStateAction } from "react";
 
 const StyledEditPostModal = styled.div`
   display: flex;
@@ -18,9 +19,30 @@ const StyledEditPostModal = styled.div`
   padding: 2.4rem;
 `;
 
+const Container = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const Title = styled.h3`
   color: var(--color-zinc-100);
   font-size: 2.4rem;
+`;
+
+const CloseIcon = styled(HiMiniXMark)`
+  font-size: 3.2rem;
+  color: var(--color-zinc-100);
+  background-color: var(--color-zinc-700);
+  padding: 0.4rem;
+  border-radius: 100%;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-zinc-800);
+  }
 `;
 
 const StyledEditPostForm = styled.form`
@@ -41,10 +63,7 @@ type Inputs = {
 
 type Props = {
   post: PostT;
-  onUpdatePostDescription: (
-    description: string,
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-  ) => void;
+  onUpdatePostDescription: (description: string) => void;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -60,12 +79,18 @@ export default function EditPostModal({
     },
   });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    onUpdatePostDescription(data.description, setIsOpen);
+    onUpdatePostDescription(data.description);
   };
 
   return (
     <StyledEditPostModal>
-      <Title>Edit post</Title>
+      <Container>
+        <Title>Edit post</Title>
+        <Button onClick={() => setIsOpen(false)}>
+          <CloseIcon />
+        </Button>
+      </Container>
+
       <StyledEditPostForm onSubmit={handleSubmit(onSubmit)}>
         <Input
           variant="auth"

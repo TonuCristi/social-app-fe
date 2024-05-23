@@ -11,6 +11,7 @@ export function useLogout() {
     dispatch(removeToken());
     dispatch(removeUser());
     localStorage.removeItem("token");
+    sessionStorage.removeItem("scroll");
     navigate("/");
   }
 

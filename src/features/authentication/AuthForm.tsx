@@ -139,6 +139,7 @@ export default function AuthForm({ onSignup, onLogin }: Props) {
         <ButtonWrapper>
           <Button variant="auth">{isLogin ? "Login" : "Signup"}</Button>
         </ButtonWrapper>
+
         {error && (
           <MessageWrapper>
             <Message variant="error">{error}</Message>

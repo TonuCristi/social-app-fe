@@ -1,15 +1,22 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
-import { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
+import { createPortal } from "react-dom";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
 import PostImage from "./PostImage";
-import EditPostButton from "./EditPostButton";
+import Overlay from "../../ui/Overlay";
+import EditPostModal from "./EditPostModal";
+import Button from "../../ui/Button";
 
 import { PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { PostApi } from "../../api/PostApi";
+import { HiMiniEllipsisHorizontal } from "react-icons/hi2";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { loadPosts, selectPosts } from "../../redux/postsSlice";
+import { mapPost } from "../../utils/mapPost";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -120,59 +127,84 @@ const PostInteractionsWrapper = styled.div`
   grid-row: 4;
 `;
 
+const Icon = styled(HiMiniEllipsisHorizontal)`
+  color: var(--color-zinc-100);
+  font-size: 2.4rem;
+  stroke-width: 0.03rem;
+`;
+
 type Props = {
   post: PostT;
 };
 
 export default function Post({ post }: Props) {
   const { id, description, image, createdAt } = post;
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { posts } = useAppSelector(selectPosts);
+  const dispatch = useAppDispatch();
 
-  function handleUpdatePostDescription(
-    description: string,
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-  ) {
+  function handleUpdatePostDescription(description: string) {
     PostApi.updatePostDescription(id, description).then((res) => {
-      console.log(res);
+      const editedPost = mapPost(res);
+      const foundIndex = posts.findIndex((post) => post.id === editedPost.id);
+      const result = [
+        ...posts.slice(0, foundIndex),
+        editedPost,
+        ...posts.slice(foundIndex + 1, posts.length),
+      ];
+      dispatch(loadPosts(result));
       setIsOpen(false);
     });
   }
 
   return (
-    <StyledPost>
-      <ProfileLink to="/profile">
-        <Avatar
-          src="https://images.pexels.com/photos/2380794/pexels-photo-2380794.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-          name="John"
-          variant="post"
-        />
-      </ProfileLink>
+    <>
+      <StyledPost>
+        <ProfileLink to="/profile">
+          <Avatar
+            src="https://images.pexels.com/photos/2380794/pexels-photo-2380794.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+            name="John"
+            variant="post"
+          />
+        </ProfileLink>
 
-      <Container>
-        <Info>
-          <ProfileLink to="/profile">
-            <Name>Jack Reacher</Name>
-          </ProfileLink>
+        <Container>
+          <Info>
+            <ProfileLink to="/profile">
+              <Name>Jack Reacher</Name>
+            </ProfileLink>
 
-          <PostTime>{getTimePassed(createdAt)}</PostTime>
-        </Info>
+            <PostTime>{getTimePassed(createdAt)}</PostTime>
+          </Info>
 
-        <EditPostButton
-          post={post}
-          onUpdatePostDescription={handleUpdatePostDescription}
-        />
-      </Container>
+          <Button variant="postEdit" onClick={() => setIsOpen(true)}>
+            <Icon />
+          </Button>
+        </Container>
 
-      <Description>{description}</Description>
+        <Description>{description}</Description>
 
-      {image && (
-        <ImageWrapper>
-          <PostImage image={image} />
-        </ImageWrapper>
-      )}
+        {image && (
+          <ImageWrapper>
+            <PostImage image={image} />
+          </ImageWrapper>
+        )}
 
-      <PostInteractionsWrapper>
-        <PostInteractions />
-      </PostInteractionsWrapper>
-    </StyledPost>
+        <PostInteractionsWrapper>
+          <PostInteractions />
+        </PostInteractionsWrapper>
+      </StyledPost>
+      {isOpen &&
+        createPortal(
+          <Overlay>
+            <EditPostModal
+              post={post}
+              onUpdatePostDescription={handleUpdatePostDescription}
+              setIsOpen={setIsOpen}
+            />
+          </Overlay>,
+          document.body
+        )}
+    </>
   );
 }
