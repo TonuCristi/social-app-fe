@@ -85,7 +85,7 @@ export default function Feed() {
   return (
     <StyledFeed>
       <AddPostForm onCreatePost={handleCreatePost} />
-      <Posts />
+      <Posts variant="feed" />
       <div ref={elRef} />
     </StyledFeed>
   );

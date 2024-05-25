@@ -19,6 +19,7 @@ const StyledChangeField = styled.div`
   display: flex;
   align-items: center;
   gap: 1.2rem;
+  width: 100%;
 `;
 
 const IconWrapper = styled.div`

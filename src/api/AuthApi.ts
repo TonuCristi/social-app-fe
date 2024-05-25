@@ -8,6 +8,8 @@ import api from "../config/api";
 
 const BASE_URL = "/users";
 
+const controller = new AbortController();
+
 export const AuthApi = {
   signup(user: UserSignupRequest) {
     return api
@@ -75,5 +77,14 @@ export const AuthApi = {
         ({ data }: AxiosResponse<{ user: UserResponse; message: string }>) =>
           data
       );
+  },
+  searchUsers(s: string | undefined) {
+    // controller.abort();
+
+    return api
+      .get(`${BASE_URL}/searchUsers?s=${s}`, {
+        signal: controller.signal,
+      })
+      .then(({ data }: AxiosResponse<UserResponse[]>) => data);
   },
 };

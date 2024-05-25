@@ -13,10 +13,12 @@ import Button from "../../ui/Button";
 import { PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { PostApi } from "../../api/PostApi";
-import { HiMiniEllipsisHorizontal } from "react-icons/hi2";
+import { HiMiniEllipsisHorizontal, HiMiniXMark } from "react-icons/hi2";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { loadPosts, selectPosts } from "../../redux/postsSlice";
 import { mapPost } from "../../utils/mapPost";
+import ConfirmationModal from "../../ui/ConfirmationModal";
+import { selectCurrentUser } from "../../redux/currentUserSlice";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -63,7 +65,7 @@ const StyledPost = styled.div`
 
 const Container = styled.div`
   display: flex;
-  justify-content: space-between;
+  gap: 0.8rem;
 `;
 
 const Info = styled.div`
@@ -127,10 +129,34 @@ const PostInteractionsWrapper = styled.div`
   grid-row: 4;
 `;
 
-const Icon = styled(HiMiniEllipsisHorizontal)`
+const ButtonWrapper = styled.div`
+  margin-left: auto;
+`;
+
+const EditIcon = styled(HiMiniEllipsisHorizontal)`
   color: var(--color-zinc-100);
   font-size: 2.4rem;
   stroke-width: 0.03rem;
+  padding: 0.1rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-zinc-700);
+    border-radius: 100%;
+  }
+`;
+
+const DeleteIcon = styled(HiMiniXMark)`
+  color: var(--color-zinc-100);
+  font-size: 2.4rem;
+  stroke-width: 0.03rem;
+  padding: 0.1rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-zinc-700);
+    border-radius: 100%;
+  }
 `;
 
 type Props = {
@@ -138,9 +164,11 @@ type Props = {
 };
 
 export default function Post({ post }: Props) {
-  const { id, description, image, createdAt } = post;
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { id, description, image, createdAt, user_id } = post;
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const { posts } = useAppSelector(selectPosts);
+  const { user } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
 
   function handleUpdatePostDescription(description: string) {
@@ -153,7 +181,16 @@ export default function Post({ post }: Props) {
         ...posts.slice(foundIndex + 1, posts.length),
       ];
       dispatch(loadPosts(result));
-      setIsOpen(false);
+      setIsModalOpen(false);
+    });
+  }
+
+  function handleDeletePost() {
+    if (user_id !== user.id) return;
+
+    PostApi.deletePost(id).then(() => {
+      const result = posts.filter((post) => post.id !== id);
+      dispatch(loadPosts(result));
     });
   }
 
@@ -177,9 +214,20 @@ export default function Post({ post }: Props) {
             <PostTime>{getTimePassed(createdAt)}</PostTime>
           </Info>
 
-          <Button variant="postEdit" onClick={() => setIsOpen(true)}>
-            <Icon />
-          </Button>
+          <ButtonWrapper>
+            <Button variant="postEdit" onClick={() => setIsModalOpen(true)}>
+              <EditIcon />
+            </Button>
+          </ButtonWrapper>
+
+          {user_id === user.id && (
+            <Button
+              variant="postEdit"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              <DeleteIcon />
+            </Button>
+          )}
         </Container>
 
         <Description>{description}</Description>
@@ -194,15 +242,25 @@ export default function Post({ post }: Props) {
           <PostInteractions />
         </PostInteractionsWrapper>
       </StyledPost>
-      {isOpen &&
+
+      {isModalOpen &&
         createPortal(
           <Overlay>
             <EditPostModal
               post={post}
               onUpdatePostDescription={handleUpdatePostDescription}
-              setIsOpen={setIsOpen}
+              setIsModalOpen={setIsModalOpen}
             />
           </Overlay>,
+          document.body
+        )}
+
+      {isDeleteModalOpen &&
+        createPortal(
+          <ConfirmationModal
+            onConfirm={handleDeletePost}
+            onClose={() => setIsDeleteModalOpen(false)}
+          />,
           document.body
         )}
     </>

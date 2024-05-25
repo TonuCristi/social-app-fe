@@ -38,6 +38,7 @@ export type PostResponse = {
   _id: string;
   description: string;
   image: string;
+  user_id: string;
   createdAt: string;
 };
 
@@ -45,6 +46,7 @@ export type PostT = {
   id: string;
   description: string;
   image: string;
+  user_id: string;
   createdAt: string;
 };
 

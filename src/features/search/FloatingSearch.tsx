@@ -126,6 +126,7 @@ export default function FloatingSearch({ isOpen, setIsOpen }: Props) {
         />
 
         <SearchResults>
+          {/* <SearchResult onClick={handleClick} />
           <SearchResult onClick={handleClick} />
           <SearchResult onClick={handleClick} />
           <SearchResult onClick={handleClick} />
@@ -139,8 +140,7 @@ export default function FloatingSearch({ isOpen, setIsOpen }: Props) {
           <SearchResult onClick={handleClick} />
           <SearchResult onClick={handleClick} />
           <SearchResult onClick={handleClick} />
-          <SearchResult onClick={handleClick} />
-          <SearchResult onClick={handleClick} />
+          <SearchResult onClick={handleClick} /> */}
         </SearchResults>
       </Containter>
     </StyledFloatingSearch>,

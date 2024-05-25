@@ -25,4 +25,9 @@ export const PostApi = {
       .put(`${BASE_URL}/post/updateDescription/${id}`, { description })
       .then(({ data }: AxiosResponse<PostResponse>) => data);
   },
+  deletePost(id: string) {
+    return api
+      .delete(`${BASE_URL}/post/deletePOst/${id}`)
+      .then(({ data }: AxiosResponse<{ message: string }>) => data);
+  },
 };

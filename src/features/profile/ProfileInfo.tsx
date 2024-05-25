@@ -1,10 +1,21 @@
+import { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import UploadAvatar from "./UploadAvatar";
+import Posts from "../posts/Posts";
 
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { useWebSocket } from "../../hooks/useWebSocket";
+import { PostResponse } from "../../lib/types";
+import { mapPost } from "../../utils/mapPost";
+import { PostApi } from "../../api/PostApi";
+import {
+  loadError,
+  loadMorePosts,
+  selectUserPosts,
+} from "../../redux/userPostsSlice";
+
+const PER_PAGE = 4;
 
 const StyledProfileInfo = styled.div`
   color: var(--color-zinc-100);
@@ -88,19 +99,39 @@ export default function ProfileInfo() {
     user: { id, name, email, description, birth_date, createdAt },
   } = useAppSelector(selectCurrentUser);
 
-  const { socket, status } = useWebSocket("http://localhost:5173/");
+  const { posts } = useAppSelector(selectUserPosts);
+  const dispatch = useAppDispatch();
+  const elRef = useRef<HTMLDivElement>(null);
+  const status = useRef<boolean>(false);
 
-  function handleClick() {
-    console.log(status);
+  const mapPosts = (posts: PostResponse[]) =>
+    posts.map((post) => mapPost(post));
 
-    const not = {
-      type: "friend_request",
-      to: "664f9f8cefa9170c712dc060",
-      from: id,
-    };
+  const fetchData = useCallback(() => {
+    if (status.current) return;
 
-    socket?.send(JSON.stringify(not));
-  }
+    const h = window.innerHeight;
+    const elTop = elRef.current?.getBoundingClientRect().top;
+
+    if (elTop && elTop - h < 0) {
+      status.current = true;
+      PostApi.getPosts(id, PER_PAGE, posts.length)
+        .then((res) => {
+          const posts = mapPosts(res);
+          dispatch(loadMorePosts(posts));
+        })
+        .catch((err) => dispatch(loadError(err.response.data.error)))
+        .finally(() => {
+          status.current = false;
+        });
+    }
+  }, [posts.length, dispatch, id]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", fetchData);
+
+    return () => window.removeEventListener("scroll", fetchData);
+  }, [fetchData]);
 
   return (
     <StyledProfileInfo>
@@ -109,26 +140,31 @@ export default function ProfileInfo() {
 
         <Info>
           <Name>{name}</Name>
-          <Field>
-            <FieldName>Birthday:</FieldName>
-            {new Date(birth_date).toLocaleDateString()}
-          </Field>
+          {birth_date && (
+            <Field>
+              <FieldName>Birthday:</FieldName>
+              {new Date(birth_date).toLocaleDateString()}
+            </Field>
+          )}
           <Field>
             <FieldName>Email:</FieldName> {email}
           </Field>
           <Field>
-            <FieldName>Our friend since:</FieldName>
+            <FieldName>Joined:</FieldName>
             {new Date(createdAt).toLocaleDateString()}
           </Field>
         </Info>
       </Container>
 
       {description && (
-        <Description onClick={handleClick}>
+        <Description>
           <FieldName>Description:</FieldName>
           {description}
         </Description>
       )}
+
+      <Posts variant="profile" />
+      <div ref={elRef} />
     </StyledProfileInfo>
   );
 }

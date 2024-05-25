@@ -1,9 +1,11 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
-const StyledSearchResult = styled.li``;
+import Avatar from "../../ui/Avatar";
 
-const Link = styled(NavLink)`
+import { User } from "../../lib/types";
+
+const StyledSearchResult = styled(NavLink)`
   text-decoration: none;
   padding: 0.6rem 1.2rem;
   background-color: var(--color-zinc-700);
@@ -23,28 +25,18 @@ const Link = styled(NavLink)`
   }
 `;
 
-const Avatar = styled.img`
-  width: 4rem;
-  height: 4rem;
-  border-radius: 100%;
-`;
-
 const Name = styled.p``;
 
 type Props = {
-  onClick?: () => void;
+  onCloseSearchResults: () => void;
+  user: User;
 };
 
-export default function SearchResult({ onClick }: Props) {
+export default function SearchResult({ onCloseSearchResults, user }: Props) {
   return (
-    <StyledSearchResult onClick={onClick}>
-      <Link to="/profile">
-        <Avatar
-          src="https://images.pexels.com/photos/2380794/pexels-photo-2380794.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-          alt={`Photo of User`}
-        />
-        <Name>Jack Reacher</Name>
-      </Link>
+    <StyledSearchResult to="/profile" onClick={onCloseSearchResults}>
+      <Avatar variant="profileBadge" src={user.avatar} name={user.name} />
+      <Name>{user.name}</Name>
     </StyledSearchResult>
   );
 }

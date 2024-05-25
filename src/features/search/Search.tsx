@@ -1,11 +1,14 @@
 import styled from "styled-components";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Input from "../../ui/Input";
 import SearchResult from "./SearchResult";
 
 import { useClickOutside } from "../../hooks/useClickOutside";
+import { AuthApi } from "../../api/AuthApi";
+import { User, UserResponse } from "../../lib/types";
+import { mapUser } from "../../utils/mapUser";
 
 const StyledSearch = styled.div`
   position: relative;
@@ -18,13 +21,14 @@ const StyledSearch = styled.div`
   }
 `;
 
-const SearchResults = styled.ul<{ $isOpen: boolean }>`
+const SearchResults = styled.ul<{ $isOpen: boolean; $isResult: boolean }>`
   list-style: none;
+  color: var(--color-zinc-100);
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
   width: 100%;
   max-height: 30rem;
-  overflow-y: scroll;
+  overflow-y: ${(props) => (props.$isResult ? "scroll" : "hidden")};
   border-radius: 1.1rem;
   padding: 1.2rem;
   display: flex;
@@ -63,9 +67,37 @@ type SearchInputs = {
 
 export default function Search() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { register } = useForm<SearchInputs>();
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { register, watch, reset } = useForm<SearchInputs>({
+    defaultValues: {
+      searchValue: "",
+    },
+  });
   const containerRef = useRef(null);
   useClickOutside(containerRef, () => setIsOpen(false));
+
+  const mapUsers = (users: UserResponse[]) =>
+    users.map((user) => mapUser(user));
+
+  function handleCloseSearchResults() {
+    setIsOpen(false);
+    reset();
+  }
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      const controller = new AbortController();
+      controller.abort();
+      AuthApi.searchUsers(value.searchValue).then((res) => {
+        // console.log(res);
+        const users = mapUsers(res);
+        setSearchResults(users);
+      });
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   return (
     <StyledSearch ref={containerRef}>
@@ -74,18 +106,22 @@ export default function Search() {
         placeholder="Search..."
         variant="search"
         {...register("searchValue")}
-        onClick={() => {
-          setIsOpen((prev) => !prev);
-        }}
+        onClick={() => setIsOpen((prev) => !prev)}
       />
 
-      <SearchResults $isOpen={isOpen}>
-        <SearchResult />
-        <SearchResult />
-        <SearchResult />
-        <SearchResult />
-        <SearchResult />
-        <SearchResult />
+      <SearchResults $isOpen={isOpen} $isResult={searchResults.length > 0}>
+        {searchResults.length > 0 ? (
+          searchResults.map((user) => (
+            <li key={user.id}>
+              <SearchResult
+                onCloseSearchResults={handleCloseSearchResults}
+                user={user}
+              />
+            </li>
+          ))
+        ) : (
+          <li>No results...</li>
+        )}
       </SearchResults>
     </StyledSearch>
   );

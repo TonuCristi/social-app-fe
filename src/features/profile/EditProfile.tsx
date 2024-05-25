@@ -148,7 +148,7 @@ export default function EditProfile() {
 
         <ChangeField
           variant="auth"
-          type="text"
+          type="date"
           placeholder="Birth date"
           newValue={watch("birth_date")}
           onChangeValue={handleChangeBirthdate}

@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { Dispatch, SetStateAction } from "react";
 
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
 
 import { PostT } from "../../lib/types";
 import { HiMiniXMark } from "react-icons/hi2";
-import { Dispatch, SetStateAction } from "react";
 
 const StyledEditPostModal = styled.div`
   display: flex;
@@ -64,13 +64,13 @@ type Inputs = {
 type Props = {
   post: PostT;
   onUpdatePostDescription: (description: string) => void;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function EditPostModal({
   post,
   onUpdatePostDescription,
-  setIsOpen,
+  setIsModalOpen,
 }: Props) {
   const { description } = post;
   const { register, handleSubmit } = useForm<Inputs>({
@@ -86,7 +86,7 @@ export default function EditPostModal({
     <StyledEditPostModal>
       <Container>
         <Title>Edit post</Title>
-        <Button onClick={() => setIsOpen(false)}>
+        <Button onClick={() => setIsModalOpen(false)}>
           <CloseIcon />
         </Button>
       </Container>
