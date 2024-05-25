@@ -45,7 +45,7 @@ export default function EditProfile() {
     defaultValues: {
       name,
       email,
-      birth_date: new Date(birth_date).toLocaleDateString(),
+      birth_date: birth_date,
       description,
     },
   });

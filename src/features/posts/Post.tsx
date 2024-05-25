@@ -9,6 +9,7 @@ import PostImage from "./PostImage";
 import Overlay from "../../ui/Overlay";
 import EditPostModal from "./EditPostModal";
 import Button from "../../ui/Button";
+import ConfirmationModal from "../../ui/ConfirmationModal";
 
 import { PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
@@ -16,9 +17,8 @@ import { PostApi } from "../../api/PostApi";
 import { HiMiniEllipsisHorizontal, HiMiniXMark } from "react-icons/hi2";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { loadPosts, selectPosts } from "../../redux/postsSlice";
-import { mapPost } from "../../utils/mapPost";
-import ConfirmationModal from "../../ui/ConfirmationModal";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
+import { mapPost } from "../../utils/mapPost";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -29,8 +29,9 @@ const StyledPost = styled.div`
 
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
   column-gap: 1.6rem;
+  row-gap: 2rem;
 
   @media (width >= 1535px) {
     & {
@@ -106,11 +107,16 @@ const PostTime = styled.span`
   }
 `;
 
-const Description = styled.pre`
-  color: var(--color-zinc-100);
-  margin: 1.6rem 0 1.2rem;
+const Content = styled.div`
   grid-column: 2;
   grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+`;
+
+const Description = styled.pre`
+  color: var(--color-zinc-100);
 
   @media (width <= 1279px) {
     & {
@@ -119,14 +125,9 @@ const Description = styled.pre`
   }
 `;
 
-const ImageWrapper = styled.div`
-  grid-column: 2;
-  grid-row: 3;
-`;
-
 const PostInteractionsWrapper = styled.div`
   grid-column: 2;
-  grid-row: 4;
+  grid-row: 3;
 `;
 
 const ButtonWrapper = styled.div`
@@ -138,11 +139,11 @@ const EditIcon = styled(HiMiniEllipsisHorizontal)`
   font-size: 2.4rem;
   stroke-width: 0.03rem;
   padding: 0.1rem;
+  border-radius: 100%;
   transition: all 0.2s;
 
   &:hover {
-    background-color: var(--color-zinc-700);
-    border-radius: 100%;
+    background-color: var(--color-sky-500);
   }
 `;
 
@@ -151,11 +152,11 @@ const DeleteIcon = styled(HiMiniXMark)`
   font-size: 2.4rem;
   stroke-width: 0.03rem;
   padding: 0.1rem;
+  border-radius: 100%;
   transition: all 0.2s;
 
   &:hover {
-    background-color: var(--color-zinc-700);
-    border-radius: 100%;
+    background-color: var(--color-sky-500);
   }
 `;
 
@@ -230,13 +231,11 @@ export default function Post({ post }: Props) {
           )}
         </Container>
 
-        <Description>{description}</Description>
+        <Content>
+          {description && <Description>{description}</Description>}
 
-        {image && (
-          <ImageWrapper>
-            <PostImage image={image} />
-          </ImageWrapper>
-        )}
+          {image && <PostImage image={image} />}
+        </Content>
 
         <PostInteractionsWrapper>
           <PostInteractions />

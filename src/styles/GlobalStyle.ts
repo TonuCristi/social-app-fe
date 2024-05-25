@@ -24,6 +24,7 @@ const GlobalStyle = createGlobalStyle`
         --color-sky-400: rgb(56, 189, 248);
         --color-sky-blur-400: rgb(56, 189, 248, 0.3);
         --color-sky-500: rgb(14, 165, 233);
+        --color-sky-blur-500: rgb(14, 165, 233, 0.3);
         --color-sky-600: rgb(2, 132, 199);
         --color-sky-700: rgb(3, 105, 161);
         --color-sky-800: rgb(7, 89, 133);

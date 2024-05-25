@@ -8,8 +8,7 @@ import { HiMiniXMark } from "react-icons/hi2";
 import { useClickOutside } from "../../hooks/useClickOutside";
 
 const Image = styled.img<{ $isOpen: boolean }>`
-  width: 100%;
-  height: 100%;
+  max-width: 70%;
   border-radius: 1.5rem;
   cursor: ${(props) => (props.$isOpen ? "default" : "pointer")};
 `;

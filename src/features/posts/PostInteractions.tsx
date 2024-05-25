@@ -8,7 +8,6 @@ const StyledPostInteractions = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 2.4rem;
-  margin-top: 1.2rem;
 `;
 
 const Button = styled.button<{ $variant: string }>`
@@ -42,7 +41,7 @@ const Button = styled.button<{ $variant: string }>`
     background-color: ${(props) =>
       props.$variant === "red"
         ? "var(--color-red-blur-400)"
-        : "var(--color-sky-blur-400)"};
+        : "var(--color-sky-blur-500)"};
     backdrop-filter: blur(10px);
   }
 
@@ -50,7 +49,7 @@ const Button = styled.button<{ $variant: string }>`
     color: ${(props) =>
       props.$variant === "red"
         ? "var(--color-red-400)"
-        : "var(--color-sky-400)"};
+        : "var(--color-sky-500)"};
   }
 `;
 
