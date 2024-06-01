@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import UploadAvatar from "./UploadAvatar";
 import Posts from "../posts/Posts";
+import Post from "../posts/Post";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
@@ -12,6 +13,7 @@ import { PostApi } from "../../api/PostApi";
 import {
   loadError,
   loadMorePosts,
+  loadPosts,
   selectUserPosts,
 } from "../../redux/userPostsSlice";
 
@@ -99,13 +101,28 @@ export default function ProfileInfo() {
     user: { id, name, email, description, birth_date, createdAt },
   } = useAppSelector(selectCurrentUser);
 
-  const { posts } = useAppSelector(selectUserPosts);
+  const { isLoading, error, userPosts } = useAppSelector(selectUserPosts);
   const dispatch = useAppDispatch();
   const elRef = useRef<HTMLDivElement>(null);
   const status = useRef<boolean>(false);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
+
+  useEffect(() => {
+    if (!id) return;
+
+    PostApi.getPosts(id, PER_PAGE, userPosts.length)
+      .then((res) => {
+        const posts = mapPosts(res);
+        dispatch(loadPosts(posts));
+      })
+      .catch((err) => dispatch(loadError(err.response.data.error)));
+
+    return () => {
+      dispatch(loadPosts([]));
+    };
+  }, [id, dispatch]);
 
   const fetchData = useCallback(() => {
     if (status.current) return;
@@ -115,7 +132,7 @@ export default function ProfileInfo() {
 
     if (elTop && elTop - h < 0) {
       status.current = true;
-      PostApi.getPosts(id, PER_PAGE, posts.length)
+      PostApi.getPosts(id, PER_PAGE, userPosts.length)
         .then((res) => {
           const posts = mapPosts(res);
           dispatch(loadMorePosts(posts));
@@ -125,7 +142,7 @@ export default function ProfileInfo() {
           status.current = false;
         });
     }
-  }, [posts.length, dispatch, id]);
+  }, [userPosts.length, dispatch, id]);
 
   useEffect(() => {
     window.addEventListener("scroll", fetchData);
@@ -163,7 +180,11 @@ export default function ProfileInfo() {
         </Description>
       )}
 
-      <Posts variant="profile" />
+      <Posts variant="profile" isLoading={isLoading} error={error}>
+        {userPosts.map((post) => (
+          <Post key={post.id} post={post} />
+        ))}
+      </Posts>
       <div ref={elRef} />
     </StyledProfileInfo>
   );

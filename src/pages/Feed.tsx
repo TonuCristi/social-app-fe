@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import Posts from "../features/posts/Posts";
 import AddPostForm from "../features/posts/AddPostForm";
+import Post from "../features/posts/Post";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
@@ -16,6 +17,8 @@ import { PostRequestFile, PostResponse } from "../lib/types";
 import { PostApi } from "../api/PostApi";
 import { loadError } from "../redux/authSlice";
 import { mapPost } from "../utils/mapPost";
+import { ref, uploadBytes } from "firebase/storage";
+import { fb } from "../config/firebase";
 
 const PER_PAGE = 4;
 
@@ -30,7 +33,7 @@ const StyledFeed = styled.div`
 
 export default function Feed() {
   const { user } = useAppSelector(selectCurrentUser);
-  const { posts } = useAppSelector(selectPosts);
+  const { isLoading, error, posts } = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
   const elRef = useRef<HTMLDivElement>(null);
   const status = useRef<boolean>(false);
@@ -44,6 +47,13 @@ export default function Feed() {
     PostApi.createPost({ ...post, image: "" }).then((res) =>
       dispatch(addPost(mapPost(res)))
     );
+
+    const storageRef = ref(fb, "some-image");
+
+    uploadBytes(storageRef, post.image).then((snapshot) => {
+      console.log(snapshot);
+      console.log("Uploaded a blob or file!");
+    });
   }
 
   const fetchData = useCallback(() => {
@@ -74,6 +84,8 @@ export default function Feed() {
     if (!scroll || +scroll === 0) return;
 
     window.scrollTo(0, +scroll);
+
+    return () => sessionStorage.removeItem("scroll");
   }, []);
 
   useEffect(() => {
@@ -85,7 +97,11 @@ export default function Feed() {
   return (
     <StyledFeed>
       <AddPostForm onCreatePost={handleCreatePost} />
-      <Posts variant="feed" />
+      <Posts variant="feed" isLoading={isLoading} error={error}>
+        {posts.map((post) => (
+          <Post key={post.id} post={post} />
+        ))}
+      </Posts>
       <div ref={elRef} />
     </StyledFeed>
   );

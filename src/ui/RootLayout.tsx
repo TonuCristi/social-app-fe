@@ -57,11 +57,7 @@ export default function RootLayout() {
     return () => {
       dispatch(loadPosts([]));
     };
-  }, [user.id]);
-
-  useEffect(() => {
-    sessionStorage.removeItem("scroll");
-  }, []);
+  }, [user.id, dispatch]);
 
   if (isLoading)
     return (

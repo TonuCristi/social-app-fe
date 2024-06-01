@@ -1,10 +1,7 @@
 import styled, { css } from "styled-components";
+import { ReactNode } from "react";
 
-import Post from "./Post";
 import Loader from "../../ui/Loader";
-
-import { useAppSelector } from "../../redux/hooks";
-import { selectPosts } from "../../redux/postsSlice";
 
 type Variant = "feed" | "profile";
 
@@ -53,16 +50,20 @@ const StyledPosts = styled.div<{ $variant: Variant }>`
 `;
 
 const LoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 2.4rem;
 `;
 
 type Props = {
   variant: Variant;
+  isLoading: boolean;
+  error: string;
+  children: ReactNode;
 };
 
-export default function Posts({ variant }: Props) {
-  const { isLoading, error, posts } = useAppSelector(selectPosts);
-
+export default function Posts({ variant, isLoading, error, children }: Props) {
   if (isLoading)
     return (
       <LoaderWrapper>
@@ -72,11 +73,5 @@ export default function Posts({ variant }: Props) {
 
   if (error) return <div>Something went wrong!</div>;
 
-  return (
-    <StyledPosts $variant={variant}>
-      {posts.map((post) => (
-        <Post key={post.id} post={post} />
-      ))}
-    </StyledPosts>
-  );
+  return <StyledPosts $variant={variant}>{children}</StyledPosts>;
 }
