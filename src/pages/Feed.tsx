@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Posts from "../features/posts/Posts";
 import AddPostForm from "../features/posts/AddPostForm";
 import Post from "../features/posts/Post";
+import UserPost from "../features/posts/UserPost";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
@@ -97,11 +98,17 @@ export default function Feed() {
   return (
     <StyledFeed>
       <AddPostForm onCreatePost={handleCreatePost} />
+
       <Posts variant="feed" isLoading={isLoading} error={error}>
-        {posts.map((post) => (
-          <Post key={post.id} post={post} />
-        ))}
+        {posts.map((post) =>
+          post.user_id === user.id ? (
+            <UserPost key={post.id} post={post} />
+          ) : (
+            <Post key={post.id} post={post} />
+          )
+        )}
       </Posts>
+
       <div ref={elRef} />
     </StyledFeed>
   );

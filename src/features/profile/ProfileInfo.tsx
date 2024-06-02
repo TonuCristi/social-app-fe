@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import UploadAvatar from "./UploadAvatar";
 import Posts from "../posts/Posts";
-import Post from "../posts/Post";
+import UserPost from "../posts/UserPost";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
@@ -109,21 +109,6 @@ export default function ProfileInfo() {
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
 
-  useEffect(() => {
-    if (!id) return;
-
-    PostApi.getPosts(id, PER_PAGE, userPosts.length)
-      .then((res) => {
-        const posts = mapPosts(res);
-        dispatch(loadPosts(posts));
-      })
-      .catch((err) => dispatch(loadError(err.response.data.error)));
-
-    return () => {
-      dispatch(loadPosts([]));
-    };
-  }, [id, dispatch]);
-
   const fetchData = useCallback(() => {
     if (status.current) return;
 
@@ -143,6 +128,21 @@ export default function ProfileInfo() {
         });
     }
   }, [userPosts.length, dispatch, id]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    PostApi.getPosts(id, PER_PAGE, userPosts.length)
+      .then((res) => {
+        const posts = mapPosts(res);
+        dispatch(loadPosts(posts));
+      })
+      .catch((err) => dispatch(loadError(err.response.data.error)));
+
+    return () => {
+      dispatch(loadPosts([]));
+    };
+  }, [id, dispatch]);
 
   useEffect(() => {
     window.addEventListener("scroll", fetchData);
@@ -182,7 +182,7 @@ export default function ProfileInfo() {
 
       <Posts variant="profile" isLoading={isLoading} error={error}>
         {userPosts.map((post) => (
-          <Post key={post.id} post={post} />
+          <UserPost key={post.id} post={post} />
         ))}
       </Posts>
       <div ref={elRef} />

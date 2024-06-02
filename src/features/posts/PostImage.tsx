@@ -40,6 +40,9 @@ const CloseButton = styled.button`
 
 const ImageWrapper = styled.div`
   width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   @media (width <= 1279px) {
     & {
