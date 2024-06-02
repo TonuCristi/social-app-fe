@@ -61,3 +61,16 @@ export type PostRequestFile = {
   image: File;
   user_id: string;
 };
+
+// ----- Like -----
+export type LikeResponse = {
+  _id: string;
+  user_id: string;
+  post_id: string;
+};
+
+export type Like = {
+  id: string;
+  user_id: string;
+  post_id: string;
+};

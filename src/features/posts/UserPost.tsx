@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import PostInteractions from "./PostInteractions";
@@ -11,7 +11,7 @@ import EditPostModal from "./EditPostModal";
 import Button from "../../ui/Button";
 import ConfirmationModal from "../../ui/ConfirmationModal";
 
-import { PostT } from "../../lib/types";
+import { Like, LikeResponse, PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { PostApi } from "../../api/PostApi";
 import { HiMiniEllipsisHorizontal, HiMiniXMark } from "react-icons/hi2";
@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { loadPosts, selectPosts } from "../../redux/postsSlice";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { mapPost } from "../../utils/mapPost";
+import { mapLike } from "../../utils/mapLike";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -171,6 +172,17 @@ export default function UserPost({ post }: Props) {
   const { user } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const { id, description, image, createdAt } = post;
+  const [likes, setLikes] = useState<Like[]>([]);
+  const [isLikesLoading, setIsLikesLoading] = useState<boolean>(true);
+
+  const mapLikes = (likes: LikeResponse[]) =>
+    likes.map((like) => mapLike(like));
+
+  function handleLikePost() {
+    if (likes.find((like) => like.user_id === user.id)) return;
+
+    PostApi.likePost(id, user.id).then((res) => console.log(res));
+  }
 
   function handleUpdatePostDescription(description: string) {
     PostApi.updatePostDescription(id, description).then((res) => {
@@ -187,13 +199,20 @@ export default function UserPost({ post }: Props) {
   }
 
   function handleDeletePost() {
-    // if (user_id !== user.id) return;
-
     PostApi.deletePost(id).then(() => {
       const result = posts.filter((post) => post.id !== id);
       dispatch(loadPosts(result));
     });
   }
+
+  useEffect(() => {
+    setIsLikesLoading(true);
+    PostApi.getLikes(id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+      setIsLikesLoading(false);
+    });
+  }, [id]);
 
   return (
     <>
@@ -229,7 +248,7 @@ export default function UserPost({ post }: Props) {
         </Content>
 
         <PostInteractionsWrapper>
-          <PostInteractions />
+          <PostInteractions likes={likes} onLikePost={handleLikePost} />
         </PostInteractionsWrapper>
       </StyledPost>
 

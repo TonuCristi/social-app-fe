@@ -1,7 +1,15 @@
 import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import styled, { css } from "styled-components";
 
-type Variant = "profile" | "postStats" | "auth" | "post" | "postEdit" | "empty";
+type Variant =
+  | "profile"
+  | "postStats"
+  | "postLike"
+  | "postComments"
+  | "auth"
+  | "post"
+  | "postEdit"
+  | "empty";
 
 const variants = {
   profile: css`
@@ -50,6 +58,78 @@ const variants = {
 
     &:hover {
       color: var(--color-emerald-500);
+    }
+  `,
+  postLike: css`
+    position: relative;
+    z-index: 0;
+    border: none;
+    background: none;
+    color: var(--color-zinc-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    & div::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 100%;
+      background-color: transparent;
+      transition: all 0.2s;
+    }
+
+    &:hover div::before {
+      background-color: var(--color-red-blur-400);
+      backdrop-filter: blur(10px);
+    }
+
+    &:hover {
+      color: var(--color-red-400);
+    }
+  `,
+  postComments: css`
+    position: relative;
+    z-index: 0;
+    border: none;
+    background: none;
+    color: var(--color-zinc-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    & div::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 100%;
+      background-color: transparent;
+      transition: all 0.2s;
+    }
+
+    &:hover div::before {
+      background-color: var(--color-sky-blur-500);
+      backdrop-filter: blur(10px);
+    }
+
+    &:hover {
+      color: var(--color-sky-500);
     }
   `,
   auth: css`

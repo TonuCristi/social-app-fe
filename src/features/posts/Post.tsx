@@ -1,14 +1,17 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
 import PostImage from "./PostImage";
 
-import { PostT } from "../../lib/types";
+import { Like, LikeResponse, PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
+import { PostApi } from "../../api/PostApi";
+import { mapLike } from "../../utils/mapLike";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -125,8 +128,19 @@ type Props = {
 };
 
 export default function Post({ post }: Props) {
+  const { id, description, image, createdAt } = post;
   const { user } = useAppSelector(selectCurrentUser);
-  const { description, image, createdAt } = post;
+  const [likes, setLikes] = useState<Like[]>([]);
+
+  const mapLikes = (likes: LikeResponse[]) =>
+    likes.map((like) => mapLike(like));
+
+  useEffect(() => {
+    PostApi.getLikes(id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+    });
+  }, [id]);
 
   return (
     <>
@@ -152,7 +166,7 @@ export default function Post({ post }: Props) {
         </Content>
 
         <PostInteractionsWrapper>
-          <PostInteractions />
+          {/* <PostInteractions likes={likes} /> */}
         </PostInteractionsWrapper>
       </StyledPost>
     </>

@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import api from "../config/api";
-import { PostRequest, PostResponse } from "../lib/types";
+import { LikeResponse, PostRequest, PostResponse } from "../lib/types";
 
 const BASE_URL = "/posts";
 
@@ -27,7 +27,17 @@ export const PostApi = {
   },
   deletePost(id: string) {
     return api
-      .delete(`${BASE_URL}/post/deletePOst/${id}`)
+      .delete(`${BASE_URL}/post/deletePost/${id}`)
       .then(({ data }: AxiosResponse<{ message: string }>) => data);
+  },
+  likePost(postId: string, userId: string) {
+    return api
+      .post(`${BASE_URL}/post/like/${postId}`, { user_id: userId })
+      .then(({ data }: AxiosResponse<{ message: string }>) => data);
+  },
+  getLikes(postId: string) {
+    return api
+      .get(`${BASE_URL}/post/likes/${postId}`)
+      .then(({ data }: AxiosResponse<LikeResponse[]>) => data);
   },
 };
