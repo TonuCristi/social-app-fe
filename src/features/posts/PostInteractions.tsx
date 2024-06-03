@@ -59,7 +59,6 @@ type Props = {
   isLiked: boolean;
   onLikePost: () => void;
   onUnlikePost: () => void;
-  isLoading: boolean;
 };
 
 export default function PostInteractions({
@@ -67,7 +66,6 @@ export default function PostInteractions({
   isLiked,
   onLikePost,
   onUnlikePost,
-  isLoading,
 }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const likesCount = Intl.NumberFormat("en", { notation: "compact" }).format(

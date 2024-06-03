@@ -12,6 +12,7 @@ import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { PostApi } from "../../api/PostApi";
 import { mapLike } from "../../utils/mapLike";
+import LoadingPost from "./LoadingPost";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -148,9 +149,11 @@ export default function Post({ post }: Props) {
   }
 
   function handleUnlikePost() {
-    if (!likes.find((like) => like.user_id === user.id)) return;
+    const like = likes.find((like) => like.user_id === user.id);
 
-    PostApi.unlikePost(id, user.id).then((res) => {
+    if (!like) return;
+
+    PostApi.unlikePost(id, like.id).then((res) => {
       const likes = mapLikes(res);
       setLikes(likes);
       setIsLiked(false);
@@ -166,6 +169,10 @@ export default function Post({ post }: Props) {
       setIsLikesLoading(false);
     });
   }, [id, user.id]);
+
+  if (isLikesLoading) {
+    return <LoadingPost />;
+  }
 
   return (
     <>
@@ -196,7 +203,6 @@ export default function Post({ post }: Props) {
             isLiked={isLiked}
             onLikePost={handleLikePost}
             onUnlikePost={handleUnlikePost}
-            isLoading={isLikesLoading}
           />
         </PostInteractionsWrapper>
       </StyledPost>

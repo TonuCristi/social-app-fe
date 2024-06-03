@@ -20,6 +20,7 @@ import { loadPosts, selectPosts } from "../../redux/postsSlice";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { mapPost } from "../../utils/mapPost";
 import { mapLike } from "../../utils/mapLike";
+import LoadingPost from "./LoadingPost";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -232,6 +233,10 @@ export default function UserPost({ post }: Props) {
     });
   }, [id, user.id]);
 
+  if (isLikesLoading) {
+    return <LoadingPost />;
+  }
+
   return (
     <>
       <StyledPost>
@@ -271,7 +276,6 @@ export default function UserPost({ post }: Props) {
             isLiked={isLiked}
             onLikePost={handleLikePost}
             onUnlikePost={handleUnlikePost}
-            isLoading={isLikesLoading}
           />
         </PostInteractionsWrapper>
       </StyledPost>

@@ -9,7 +9,6 @@ import Avatar from "../../ui/Avatar";
 
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { PostRequestFile } from "../../lib/types";
-import { selectPosts } from "../../redux/postsSlice";
 import { HiMiniPhoto } from "react-icons/hi2";
 
 const StyledAddPostForm = styled.form`
@@ -111,7 +110,6 @@ type Props = {
 
 export default function AddPostForm({ onCreatePost }: Props) {
   const { user } = useSelector(selectCurrentUser);
-  const { isLoading } = useSelector(selectPosts);
   const { register, watch, handleSubmit, reset } = useForm<Inputs>({
     defaultValues: {
       description: "",
@@ -151,9 +149,7 @@ export default function AddPostForm({ onCreatePost }: Props) {
         <Button
           variant="post"
           disabled={
-            watch("description").length > 0 ||
-            watch("image")?.length > 0 ||
-            isLoading
+            watch("description").length > 0 || watch("image")?.length > 0
               ? false
               : true
           }
