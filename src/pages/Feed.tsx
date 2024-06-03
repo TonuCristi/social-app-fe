@@ -49,12 +49,12 @@ export default function Feed() {
       dispatch(addPost(mapPost(res)))
     );
 
-    const storageRef = ref(fb, "some-image");
+    // const storageRef = ref(fb, "some-image");
 
-    uploadBytes(storageRef, post.image).then((snapshot) => {
-      console.log(snapshot);
-      console.log("Uploaded a blob or file!");
-    });
+    // uploadBytes(storageRef, post.image).then((snapshot) => {
+    //   console.log(snapshot);
+    //   console.log("Uploaded a blob or file!");
+    // });
   }
 
   const fetchData = useCallback(() => {

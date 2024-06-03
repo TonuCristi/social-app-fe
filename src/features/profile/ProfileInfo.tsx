@@ -101,10 +101,12 @@ export default function ProfileInfo() {
     user: { id, name, email, description, birth_date, createdAt },
   } = useAppSelector(selectCurrentUser);
 
-  const { isLoading, error, userPosts } = useAppSelector(selectUserPosts);
+  const { isLoading, error, posts } = useAppSelector(selectUserPosts);
   const dispatch = useAppDispatch();
   const elRef = useRef<HTMLDivElement>(null);
   const status = useRef<boolean>(false);
+
+  console.log(posts);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
@@ -117,7 +119,7 @@ export default function ProfileInfo() {
 
     if (elTop && elTop - h < 0) {
       status.current = true;
-      PostApi.getPosts(id, PER_PAGE, userPosts.length)
+      PostApi.getPosts(id, PER_PAGE, posts.length)
         .then((res) => {
           const posts = mapPosts(res);
           dispatch(loadMorePosts(posts));
@@ -127,12 +129,10 @@ export default function ProfileInfo() {
           status.current = false;
         });
     }
-  }, [userPosts.length, dispatch, id]);
+  }, [posts.length, dispatch, id]);
 
   useEffect(() => {
-    if (!id) return;
-
-    PostApi.getPosts(id, PER_PAGE, userPosts.length)
+    PostApi.getPosts(id, PER_PAGE, posts.length)
       .then((res) => {
         const posts = mapPosts(res);
         dispatch(loadPosts(posts));
@@ -144,11 +144,11 @@ export default function ProfileInfo() {
     };
   }, [id, dispatch]);
 
-  useEffect(() => {
-    window.addEventListener("scroll", fetchData);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", fetchData);
 
-    return () => window.removeEventListener("scroll", fetchData);
-  }, [fetchData]);
+  //   return () => window.removeEventListener("scroll", fetchData);
+  // }, [fetchData]);
 
   return (
     <StyledProfileInfo>
@@ -181,7 +181,7 @@ export default function ProfileInfo() {
       )}
 
       <Posts variant="profile" isLoading={isLoading} error={error}>
-        {userPosts.map((post) => (
+        {posts.map((post) => (
           <UserPost key={post.id} post={post} />
         ))}
       </Posts>

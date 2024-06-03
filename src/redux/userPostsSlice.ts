@@ -5,13 +5,13 @@ import { RootState } from "./store";
 type UserPostsState = {
   isLoading: boolean;
   error: string;
-  userPosts: PostT[];
+  posts: PostT[];
 };
 
 const initialState: UserPostsState = {
   isLoading: true,
   error: "",
-  userPosts: [],
+  posts: [],
 };
 
 const userPostsSlice = createSlice({
@@ -21,12 +21,12 @@ const userPostsSlice = createSlice({
     loadPosts(state, action: PayloadAction<PostT[]>) {
       state.isLoading = false;
       state.error = "";
-      state.userPosts = action.payload;
+      state.posts = action.payload;
     },
     loadMorePosts(state, action: PayloadAction<PostT[]>) {
       state.isLoading = false;
       state.error = "";
-      state.userPosts = [...state.userPosts, ...action.payload];
+      state.posts = [...state.posts, ...action.payload];
     },
     startLoad(state) {
       state.isLoading = true;
@@ -34,7 +34,7 @@ const userPostsSlice = createSlice({
     },
     addPost(state, action: PayloadAction<PostT>) {
       state.isLoading = false;
-      state.userPosts = [action.payload, ...state.userPosts];
+      state.posts = [action.payload, ...state.posts];
       state.error = "";
     },
     loadError(state, action: PayloadAction<string>) {
