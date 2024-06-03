@@ -26,6 +26,11 @@ export const AuthApi = {
       .get(`${BASE_URL}`)
       .then(({ data }: AxiosResponse<UserResponse>) => data);
   },
+  getUserById(id: string) {
+    return api
+      .get(`${BASE_URL}/${id}`)
+      .then(({ data }: AxiosResponse<UserResponse>) => data);
+  },
   changePassword(
     passwords: {
       oldPassword: string;

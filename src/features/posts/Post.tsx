@@ -131,16 +131,41 @@ export default function Post({ post }: Props) {
   const { id, description, image, createdAt } = post;
   const { user } = useAppSelector(selectCurrentUser);
   const [likes, setLikes] = useState<Like[]>([]);
+  const [isLikesLoading, setIsLikesLoading] = useState<boolean>(true);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   const mapLikes = (likes: LikeResponse[]) =>
     likes.map((like) => mapLike(like));
 
+  function handleLikePost() {
+    if (likes.find((like) => like.user_id === user.id)) return;
+
+    PostApi.likePost(id, user.id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+      setIsLiked(true);
+    });
+  }
+
+  function handleUnlikePost() {
+    if (!likes.find((like) => like.user_id === user.id)) return;
+
+    PostApi.unlikePost(id, user.id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+      setIsLiked(false);
+    });
+  }
+
   useEffect(() => {
+    setIsLikesLoading(true);
     PostApi.getLikes(id).then((res) => {
       const likes = mapLikes(res);
       setLikes(likes);
+      if (likes.find((like) => like.user_id === user.id)) setIsLiked(true);
+      setIsLikesLoading(false);
     });
-  }, [id]);
+  }, [id, user.id]);
 
   return (
     <>
@@ -166,7 +191,13 @@ export default function Post({ post }: Props) {
         </Content>
 
         <PostInteractionsWrapper>
-          {/* <PostInteractions likes={likes} /> */}
+          <PostInteractions
+            likes={likes}
+            isLiked={isLiked}
+            onLikePost={handleLikePost}
+            onUnlikePost={handleUnlikePost}
+            isLoading={isLikesLoading}
+          />
         </PostInteractionsWrapper>
       </StyledPost>
     </>

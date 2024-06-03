@@ -23,8 +23,9 @@ const IconWrapper = styled.div`
   position: relative;
 `;
 
-const LikeIcon = styled(HiMiniHeart)`
+const LikeIcon = styled(HiMiniHeart)<{ $isLiked?: boolean }>`
   font-size: 2rem;
+  color: ${(props) => props.$isLiked && "var(--color-red-400)"};
 
   @media (width <= 1023px) {
     & {
@@ -55,10 +56,19 @@ const LikesIcon = styled(HiMiniHeart)`
 
 type Props = {
   likes: Like[];
+  isLiked: boolean;
   onLikePost: () => void;
+  onUnlikePost: () => void;
+  isLoading: boolean;
 };
 
-export default function PostInteractions({ likes, onLikePost }: Props) {
+export default function PostInteractions({
+  likes,
+  isLiked,
+  onLikePost,
+  onUnlikePost,
+  isLoading,
+}: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const likesCount = Intl.NumberFormat("en", { notation: "compact" }).format(
     likes.length
@@ -67,9 +77,12 @@ export default function PostInteractions({ likes, onLikePost }: Props) {
   return (
     <>
       <StyledPostInteractions>
-        <Button variant="postLike" onClick={onLikePost}>
+        <Button
+          variant="postLike"
+          onClick={isLiked ? onUnlikePost : onLikePost}
+        >
           <IconWrapper>
-            <LikeIcon />
+            <LikeIcon $isLiked={isLiked} />
           </IconWrapper>
           <p>{likesCount}</p>
         </Button>

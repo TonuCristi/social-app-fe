@@ -33,7 +33,12 @@ export const PostApi = {
   likePost(postId: string, userId: string) {
     return api
       .post(`${BASE_URL}/post/like/${postId}`, { user_id: userId })
-      .then(({ data }: AxiosResponse<{ message: string }>) => data);
+      .then(({ data }: AxiosResponse<LikeResponse[]>) => data);
+  },
+  unlikePost(postId: string, likeId: string) {
+    return api
+      .post(`${BASE_URL}/post/unlike/${postId}`, { like_id: likeId })
+      .then(({ data }: AxiosResponse<LikeResponse[]>) => data);
   },
   getLikes(postId: string) {
     return api

@@ -174,6 +174,7 @@ export default function UserPost({ post }: Props) {
   const { id, description, image, createdAt } = post;
   const [likes, setLikes] = useState<Like[]>([]);
   const [isLikesLoading, setIsLikesLoading] = useState<boolean>(true);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   const mapLikes = (likes: LikeResponse[]) =>
     likes.map((like) => mapLike(like));
@@ -181,7 +182,23 @@ export default function UserPost({ post }: Props) {
   function handleLikePost() {
     if (likes.find((like) => like.user_id === user.id)) return;
 
-    PostApi.likePost(id, user.id).then((res) => console.log(res));
+    PostApi.likePost(id, user.id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+      setIsLiked(true);
+    });
+  }
+
+  function handleUnlikePost() {
+    const like = likes.find((like) => like.user_id === user.id);
+
+    if (!like) return;
+
+    PostApi.unlikePost(id, like.id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+      setIsLiked(false);
+    });
   }
 
   function handleUpdatePostDescription(description: string) {
@@ -210,9 +227,10 @@ export default function UserPost({ post }: Props) {
     PostApi.getLikes(id).then((res) => {
       const likes = mapLikes(res);
       setLikes(likes);
+      if (likes.find((like) => like.user_id === user.id)) setIsLiked(true);
       setIsLikesLoading(false);
     });
-  }, [id]);
+  }, [id, user.id]);
 
   return (
     <>
@@ -248,7 +266,13 @@ export default function UserPost({ post }: Props) {
         </Content>
 
         <PostInteractionsWrapper>
-          <PostInteractions likes={likes} onLikePost={handleLikePost} />
+          <PostInteractions
+            likes={likes}
+            isLiked={isLiked}
+            onLikePost={handleLikePost}
+            onUnlikePost={handleUnlikePost}
+            isLoading={isLikesLoading}
+          />
         </PostInteractionsWrapper>
       </StyledPost>
 
