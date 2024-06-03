@@ -106,7 +106,7 @@ export default function ProfileInfo() {
   const elRef = useRef<HTMLDivElement>(null);
   const status = useRef<boolean>(false);
 
-  console.log(posts);
+  // console.log(posts);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
@@ -144,11 +144,11 @@ export default function ProfileInfo() {
     };
   }, [id, dispatch]);
 
-  // useEffect(() => {
-  //   window.addEventListener("scroll", fetchData);
+  useEffect(() => {
+    window.addEventListener("scroll", fetchData);
 
-  //   return () => window.removeEventListener("scroll", fetchData);
-  // }, [fetchData]);
+    return () => window.removeEventListener("scroll", fetchData);
+  }, [fetchData]);
 
   return (
     <StyledProfileInfo>

@@ -18,8 +18,6 @@ import { PostRequestFile, PostResponse } from "../lib/types";
 import { PostApi } from "../api/PostApi";
 import { loadError } from "../redux/authSlice";
 import { mapPost } from "../utils/mapPost";
-import { ref, uploadBytes } from "firebase/storage";
-import { fb } from "../config/firebase";
 
 const PER_PAGE = 4;
 
@@ -48,13 +46,6 @@ export default function Feed() {
     PostApi.createPost({ ...post, image: "" }).then((res) =>
       dispatch(addPost(mapPost(res)))
     );
-
-    // const storageRef = ref(fb, "some-image");
-
-    // uploadBytes(storageRef, post.image).then((snapshot) => {
-    //   console.log(snapshot);
-    //   console.log("Uploaded a blob or file!");
-    // });
   }
 
   const fetchData = useCallback(() => {
