@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import { useEffect } from "react";
 
 import Navbar from "./Navbar";
@@ -77,6 +77,7 @@ export default function RootLayout() {
           <Outlet />
         </Main>
       </Container>
+      <ScrollRestoration />
     </StyledRootLayout>
   );
 }

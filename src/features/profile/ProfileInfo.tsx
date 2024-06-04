@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import UploadAvatar from "./UploadAvatar";
@@ -106,30 +106,8 @@ export default function ProfileInfo() {
   const elRef = useRef<HTMLDivElement>(null);
   const status = useRef<boolean>(false);
 
-  // console.log(posts);
-
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
-
-  const fetchData = useCallback(() => {
-    if (status.current) return;
-
-    const h = window.innerHeight;
-    const elTop = elRef.current?.getBoundingClientRect().top;
-
-    if (elTop && elTop - h < 0) {
-      status.current = true;
-      PostApi.getPosts(id, PER_PAGE, posts.length)
-        .then((res) => {
-          const posts = mapPosts(res);
-          dispatch(loadMorePosts(posts));
-        })
-        .catch((err) => dispatch(loadError(err.response.data.error)))
-        .finally(() => {
-          status.current = false;
-        });
-    }
-  }, [posts.length, dispatch, id]);
 
   useEffect(() => {
     PostApi.getPosts(id, PER_PAGE, posts.length)
@@ -145,10 +123,30 @@ export default function ProfileInfo() {
   }, [id, dispatch]);
 
   useEffect(() => {
+    const fetchData = () => {
+      if (status.current) return;
+
+      const h = window.innerHeight;
+      const elTop = elRef.current?.getBoundingClientRect().top;
+
+      if (elTop && elTop - h < 0) {
+        status.current = true;
+        PostApi.getPosts(id, PER_PAGE, posts.length)
+          .then((res) => {
+            const posts = mapPosts(res);
+            dispatch(loadMorePosts(posts));
+          })
+          .catch((err) => dispatch(loadError(err.response.data.error)))
+          .finally(() => {
+            status.current = false;
+          });
+      }
+    };
+
     window.addEventListener("scroll", fetchData);
 
     return () => window.removeEventListener("scroll", fetchData);
-  }, [fetchData]);
+  }, [posts.length, id, dispatch]);
 
   return (
     <StyledProfileInfo>
@@ -185,7 +183,7 @@ export default function ProfileInfo() {
           <UserPost key={post.id} post={post} />
         ))}
       </Posts>
-      <div ref={elRef} />
+      {posts.length > 0 && <div ref={elRef} />}
     </StyledProfileInfo>
   );
 }

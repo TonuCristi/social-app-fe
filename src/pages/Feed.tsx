@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import Posts from "../features/posts/Posts";
@@ -48,28 +48,6 @@ export default function Feed() {
     );
   }
 
-  const fetchData = useCallback(() => {
-    sessionStorage.setItem("scroll", `${window.scrollY}`);
-
-    if (status.current) return;
-
-    const h = window.innerHeight;
-    const elTop = elRef.current?.getBoundingClientRect().top;
-
-    if (elTop && elTop - h < 0) {
-      status.current = true;
-      PostApi.getPosts(user.id, PER_PAGE, posts.length)
-        .then((res) => {
-          const posts = mapPosts(res);
-          dispatch(loadMorePosts(posts));
-        })
-        .catch((err) => dispatch(loadError(err.response.data.error)))
-        .finally(() => {
-          status.current = false;
-        });
-    }
-  }, [posts.length, dispatch, user.id]);
-
   useEffect(() => {
     const scroll = sessionStorage.getItem("scroll");
 
@@ -81,10 +59,32 @@ export default function Feed() {
   }, []);
 
   useEffect(() => {
+    const fetchData = () => {
+      sessionStorage.setItem("scroll", `${window.scrollY}`);
+
+      if (status.current) return;
+
+      const h = window.innerHeight;
+      const elTop = elRef.current?.getBoundingClientRect().top;
+
+      if (elTop && elTop - h < 0) {
+        status.current = true;
+        PostApi.getPosts(user.id, PER_PAGE, posts.length)
+          .then((res) => {
+            const posts = mapPosts(res);
+            dispatch(loadMorePosts(posts));
+          })
+          .catch((err) => dispatch(loadError(err.response.data.error)))
+          .finally(() => {
+            status.current = false;
+          });
+      }
+    };
+
     window.addEventListener("scroll", fetchData);
 
     return () => window.removeEventListener("scroll", fetchData);
-  }, [fetchData]);
+  }, [dispatch, user.id, posts.length]);
 
   return (
     <StyledFeed>

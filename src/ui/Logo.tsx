@@ -22,9 +22,7 @@ export default function Logo() {
   const location = useLocation();
 
   function handleReload() {
-    if (location.pathname !== "/") return;
-
-    window.location.reload();
+    if (location.pathname === "/") window.location.reload();
   }
 
   return (
