@@ -1,18 +1,16 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
 import PostImage from "./PostImage";
+import LoadingPost from "./LoadingPost";
 
-import { Like, LikeResponse, PostT } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { PostApi } from "../../api/PostApi";
-import { mapLike } from "../../utils/mapLike";
-import LoadingPost from "./LoadingPost";
+import { useLikes } from "./useLikes";
+import { PostT } from "../../lib/types";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -131,44 +129,9 @@ type Props = {
 export default function Post({ post }: Props) {
   const { id, description, image, createdAt } = post;
   const { user } = useAppSelector(selectCurrentUser);
-  const [likes, setLikes] = useState<Like[]>([]);
-  const [isLikesLoading, setIsLikesLoading] = useState<boolean>(true);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
 
-  const mapLikes = (likes: LikeResponse[]) =>
-    likes.map((like) => mapLike(like));
-
-  function handleLikePost() {
-    if (likes.find((like) => like.user_id === user.id)) return;
-
-    PostApi.likePost(id, user.id).then((res) => {
-      const likes = mapLikes(res);
-      setLikes(likes);
-      setIsLiked(true);
-    });
-  }
-
-  function handleUnlikePost() {
-    const like = likes.find((like) => like.user_id === user.id);
-
-    if (!like) return;
-
-    PostApi.unlikePost(id, like.id).then((res) => {
-      const likes = mapLikes(res);
-      setLikes(likes);
-      setIsLiked(false);
-    });
-  }
-
-  useEffect(() => {
-    setIsLikesLoading(true);
-    PostApi.getLikes(id).then((res) => {
-      const likes = mapLikes(res);
-      setLikes(likes);
-      if (likes.find((like) => like.user_id === user.id)) setIsLiked(true);
-      setIsLikesLoading(false);
-    });
-  }, [id, user.id]);
+  const { handleLikePost, handleUnlikePost, likes, isLikesLoading, isLiked } =
+    useLikes(id, user.id);
 
   if (isLikesLoading) {
     return <LoadingPost />;

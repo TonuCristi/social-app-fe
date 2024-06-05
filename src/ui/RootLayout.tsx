@@ -34,6 +34,17 @@ export default function RootLayout() {
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
 
+  function getPosts(perPage: number, offset: number) {
+    console.log("Executed");
+
+    PostApi.getPosts(user.id, perPage, offset)
+      .then((res) => {
+        const posts = mapPosts(res);
+        dispatch(loadPosts(posts));
+      })
+      .catch((err) => dispatch(loadError(err.response.data.error)));
+  }
+
   useEffect(() => {
     AuthApi.getUser()
       .then((res) => dispatch(fetchUser(mapUser(res))))
@@ -43,12 +54,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (!user.id) return;
 
-    PostApi.getPosts(user.id, PER_PAGE, posts.length)
-      .then((res) => {
-        const posts = mapPosts(res);
-        dispatch(loadPosts(posts));
-      })
-      .catch((err) => dispatch(loadError(err.response.data.error)));
+    getPosts(PER_PAGE, posts.length);
 
     return () => {
       dispatch(loadPosts([]));
@@ -67,7 +73,7 @@ export default function RootLayout() {
   return (
     <StyledRootLayout>
       <Container>
-        <Navbar />
+        <Navbar getPosts={getPosts} />
 
         <main>
           <Outlet />

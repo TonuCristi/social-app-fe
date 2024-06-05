@@ -218,9 +218,7 @@ export default function UploadAvatarModal({
           <Button
             variant="auth"
             disabled={isLoading}
-            onClick={() => {
-              onUpload(blob, image);
-            }}
+            onClick={() => onUpload(blob, image)}
           >
             Upload
           </Button>

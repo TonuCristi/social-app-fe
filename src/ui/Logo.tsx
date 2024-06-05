@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
 
 import { HiFire } from "react-icons/hi";
 
@@ -18,15 +17,13 @@ const Icon = styled(HiFire)`
   color: var(--color-sky-400);
 `;
 
-export default function Logo() {
-  const location = useLocation();
+type Props = {
+  onClick: () => void;
+};
 
-  function handleReload() {
-    if (location.pathname === "/") window.location.reload();
-  }
-
+export default function Logo({ onClick }: Props) {
   return (
-    <StyledLogo onClick={handleReload}>
+    <StyledLogo onClick={onClick}>
       <Icon />
     </StyledLogo>
   );
