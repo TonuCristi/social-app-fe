@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { Dispatch, Fragment, SetStateAction, useState } from "react";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
+import { createPortal } from "react-dom";
 
 import Message from "../../ui/Message";
 import ChangeField from "./ChangeField";
@@ -12,7 +13,6 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
 import { AuthApi } from "../../api/AuthApi";
 import { mapUser } from "../../utils/mapUser";
-import { createPortal } from "react-dom";
 import { HiMiniPencilSquare } from "react-icons/hi2";
 
 const fields = [
@@ -80,17 +80,22 @@ export default function EditProfile() {
     user: { id, name, email, birth_date, description },
   } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
-
   const { register, watch } = useForm<Inputs>({
     defaultValues: {
       name,
       email,
-      birth_date,
+      birth_date: new Date(birth_date).toLocaleDateString(),
       description,
     },
   });
-
   const [currentField, setCurrentField] = useState<string | null>(null);
+  const [message, setMessage] = useState<{
+    value: string;
+    isSuccess: boolean;
+  }>({
+    value: "",
+    isSuccess: false,
+  });
 
   function handleChangeField(identifier: string) {
     if (identifier === "name") {
@@ -98,10 +103,10 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          // setMessage({ text: res.message, isSuccess: true });
+          setMessage({ value: res.message, isSuccess: true });
         })
         .catch((err) => {
-          // setMessage({ text: err.response.data.error, isSuccess: false });
+          setMessage({ value: err.response.data.error, isSuccess: false });
         })
         .finally(() => setCurrentField(null));
     }
@@ -111,10 +116,10 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          // setMessage({ text: res.message, isSuccess: true });
+          setMessage({ value: res.message, isSuccess: true });
         })
         .catch((err) => {
-          // setMessage({ text: err.response.data.error, isSuccess: false });
+          setMessage({ value: err.response.data.error, isSuccess: false });
         })
         .finally(() => setCurrentField(null));
     }
@@ -124,10 +129,10 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          // setMessage({ text: res.message, isSuccess: true });
+          setMessage({ value: res.message, isSuccess: true });
         })
         .catch((err) => {
-          // setMessage({ text: err.response.data.error, isSuccess: false });
+          setMessage({ value: err.response.data.error, isSuccess: false });
         })
         .finally(() => setCurrentField(null));
     }
@@ -137,10 +142,10 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          // setMessage({ text: res.message, isSuccess: true });
+          setMessage({ value: res.message, isSuccess: true });
         })
         .catch((err) => {
-          // setMessage({ text: err.response.data.error, isSuccess: false });
+          setMessage({ value: err.response.data.error, isSuccess: false });
         })
         .finally(() => setCurrentField(null));
     }
@@ -169,6 +174,12 @@ export default function EditProfile() {
             </ChangeField>
           ))}
         </Form>
+
+        {message.value && (
+          <Message variant={message.isSuccess ? "regular" : "error"}>
+            {message.value}
+          </Message>
+        )}
       </StyledEditProfile>
 
       {fields.map((field) => (

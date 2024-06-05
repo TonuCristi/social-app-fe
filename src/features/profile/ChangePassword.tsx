@@ -10,6 +10,12 @@ import { AuthApi } from "../../api/AuthApi";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 
+const fields = [
+  { name: "oldPassword", placeholder: "Old password" },
+  { name: "newPassword", placeholder: "New password" },
+  { name: "newPasswordRepeat", placeholder: "Repeat new password" },
+] as const;
+
 const StyledChangePassword = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,19 +48,21 @@ type Inputs = {
 export default function ChangePassword() {
   const { register, handleSubmit, reset } = useForm<Inputs>();
   const { user } = useAppSelector(selectCurrentUser);
-  const [message, setMessage] = useState<{ text: string; isSuccess: boolean }>({
-    text: "",
-    isSuccess: false,
-  });
+  const [message, setMessage] = useState<{ value: string; isSuccess: boolean }>(
+    {
+      value: "",
+      isSuccess: false,
+    }
+  );
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     AuthApi.changePassword(data, user.id)
       .then((res) => {
-        setMessage({ text: res.message, isSuccess: true });
+        setMessage({ value: res.message, isSuccess: true });
         reset();
       })
       .catch((err) =>
-        setMessage({ text: err.response.data.error, isSuccess: false })
+        setMessage({ value: err.response.data.error, isSuccess: false })
       );
   };
 
@@ -62,33 +70,24 @@ export default function ChangePassword() {
     <StyledChangePassword>
       <Title>Change password</Title>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <Input
-          variant="auth"
-          type="password"
-          placeholder="Old password"
-          {...register("oldPassword")}
-        />
-        <Input
-          variant="auth"
-          type="password"
-          placeholder="New password"
-          {...register("newPassword")}
-        />
-        <Input
-          variant="auth"
-          type="password"
-          placeholder="Repeat new password"
-          {...register("newPasswordRepeat")}
-        />
+        {fields.map((field) => (
+          <Input
+            key={field.name}
+            variant="auth"
+            type="password"
+            placeholder={field.placeholder}
+            {...register(field.name)}
+          />
+        ))}
 
         <ButtonWrapper>
           <Button variant="auth">Update</Button>
         </ButtonWrapper>
       </Form>
 
-      {message.text && (
+      {message.value && (
         <Message variant={message.isSuccess ? "regular" : "error"}>
-          {message.text}
+          {message.value}
         </Message>
       )}
     </StyledChangePassword>

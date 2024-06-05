@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import Overlay from "../../ui/Overlay";
 import Button from "../../ui/Button";
@@ -99,12 +99,12 @@ type Props = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   onUpload: (file: Blob | null, image: string | undefined) => void;
   message: {
-    text: string;
+    value: string;
     isSuccess: boolean;
   };
   setMessage: Dispatch<
     SetStateAction<{
-      text: string;
+      value: string;
       isSuccess: boolean;
     }>
   >;
@@ -139,7 +139,6 @@ export default function UploadAvatarModal({
     width: 0,
     height: 0,
   });
-  const isCropped = useRef<boolean>(false);
 
   const createBlob = (files: FileList | null) => {
     if (files && files[0]) {
@@ -177,8 +176,7 @@ export default function UploadAvatarModal({
       );
       canvas.toBlob((blob) => {
         setBlob(blob);
-        isCropped.current = true;
-        setMessage({ text: "Image cropped!", isSuccess: true });
+        setMessage({ value: "Image cropped!", isSuccess: true });
       });
     };
   }
@@ -235,9 +233,9 @@ export default function UploadAvatarModal({
           </Button>
         </Buttons>
 
-        {message.text && (
+        {message.value && (
           <Message variant={message.isSuccess ? "regular" : "error"}>
-            {message.text}
+            {message.value}
           </Message>
         )}
       </Modal>

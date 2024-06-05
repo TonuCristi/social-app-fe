@@ -70,24 +70,24 @@ export default function UploadAvatar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<{
-    text: string;
+    value: string;
     isSuccess: boolean;
   }>({
-    text: "",
+    value: "",
     isSuccess: false,
   });
 
   async function handleUpload(file: Blob | null, image: string | undefined) {
     if (!image) {
       return setMessage({
-        text: "You should upload a photo!",
+        value: "You should upload a photo!",
         isSuccess: false,
       });
     }
 
     if (!file) {
       return setMessage({
-        text: "You should crop the photo!",
+        value: "You should crop the photo!",
         isSuccess: false,
       });
     }
@@ -100,7 +100,7 @@ export default function UploadAvatar() {
       const avatarRef = ref(fb, `avatars/${id}.${deleteImgType}`);
 
       await deleteObject(avatarRef).catch(() => {
-        setMessage({ text: "Something went wrong!", isSuccess: false });
+        setMessage({ value: "Something went wrong!", isSuccess: false });
         setIsLoading(false);
       });
     }
@@ -116,7 +116,7 @@ export default function UploadAvatar() {
       "state_changed",
       () => {},
       () => {
-        setMessage({ text: "Something went wrong!", isSuccess: false });
+        setMessage({ value: "Something went wrong!", isSuccess: false });
         setIsLoading(false);
       },
       () => {
@@ -127,7 +127,7 @@ export default function UploadAvatar() {
               dispatch(fetchUser(user));
             })
             .catch((err) => {
-              setMessage({ text: err.response.data.error, isSuccess: false });
+              setMessage({ value: err.response.data.error, isSuccess: false });
             })
             .finally(() => {
               setIsOpen(false);
@@ -142,7 +142,7 @@ export default function UploadAvatar() {
     <>
       <Button
         onClick={() => {
-          setMessage({ text: "", isSuccess: false });
+          setMessage({ value: "", isSuccess: false });
           setIsOpen(true);
         }}
       >
