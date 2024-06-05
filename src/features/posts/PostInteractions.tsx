@@ -103,7 +103,7 @@ export default function PostInteractions({
       {isOpen &&
         createPortal(
           <Overlay>
-            <LikesList setIsOpen={setIsOpen} />
+            <LikesList setIsOpen={setIsOpen} likes={likes} />
           </Overlay>,
           document.body
         )}

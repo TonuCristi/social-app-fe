@@ -29,13 +29,18 @@ const Buttons = styled.div`
 type Props = {
   onConfirm: () => void;
   onClose: () => void;
+  question: string;
 };
 
-export default function ConfirmationModal({ onConfirm, onClose }: Props) {
+export default function ConfirmationModal({
+  onConfirm,
+  onClose,
+  question,
+}: Props) {
   return (
     <Overlay>
       <Container>
-        <Question>Are you sure about this operation?</Question>
+        <Question>{question}</Question>
         <Buttons>
           <Button variant="auth" onClick={onConfirm}>
             Confirm

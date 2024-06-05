@@ -118,6 +118,7 @@ export default function ProfileBadge() {
             <ConfirmationModal
               onConfirm={() => logout()}
               onClose={() => setIsModalOpen(false)}
+              question="Are you sure about logging out?"
             />,
             document.body
           )}

@@ -26,10 +26,6 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const Main = styled.main`
-  height: 100%;
-`;
-
 export default function RootLayout() {
   const { isLoading, error, user } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
@@ -73,9 +69,9 @@ export default function RootLayout() {
       <Container>
         <Navbar />
 
-        <Main>
+        <main>
           <Outlet />
-        </Main>
+        </main>
       </Container>
       <ScrollRestoration />
     </StyledRootLayout>

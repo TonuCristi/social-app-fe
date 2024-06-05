@@ -90,7 +90,6 @@ export default function Search() {
       const controller = new AbortController();
       controller.abort();
       AuthApi.searchUsers(value.searchValue).then((res) => {
-        // console.log(res);
         const users = mapUsers(res);
         setSearchResults(users);
       });

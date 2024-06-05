@@ -297,6 +297,7 @@ export default function UserPost({ post }: Props) {
           <ConfirmationModal
             onConfirm={handleDeletePost}
             onClose={() => setIsDeleteModalOpen(false)}
+            question="Are you sure about deleting this post?"
           />,
           document.body
         )}

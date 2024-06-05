@@ -1,15 +1,26 @@
 import styled from "styled-components";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Message from "../../ui/Message";
 import ChangeField from "./ChangeField";
-import ChangeDescription from "./ChangeDescription";
+import ConfirmationModal from "../../ui/ConfirmationModal";
+import Input from "../../ui/Input";
+import Button from "../../ui/Button";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
 import { AuthApi } from "../../api/AuthApi";
 import { mapUser } from "../../utils/mapUser";
+import { createPortal } from "react-dom";
+import { HiMiniPencilSquare } from "react-icons/hi2";
+
+const fields = [
+  { identifier: "name", name: "username", type: "text" },
+  { identifier: "email", name: "email", type: "email" },
+  { identifier: "birth_date", name: "birth date", type: "date" },
+  { identifier: "description", name: "description", type: "" },
+] as const;
 
 const StyledEditProfile = styled.div`
   display: flex;
@@ -29,6 +40,34 @@ const Form = styled.form`
   gap: 1.2rem;
 `;
 
+const Textarea = styled.textarea`
+  border: none;
+  background: none;
+  outline: none;
+  background-color: var(--color-zinc-800);
+  padding: 1.2rem;
+  border-radius: 1.1rem;
+  color: var(--color-zinc-100);
+  width: 100%;
+`;
+
+const IconWrapper = styled.div`
+  background-color: var(--color-zinc-800);
+  color: var(--color-zinc-100);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  padding: 0.6rem;
+  font-size: 1.8rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-sky-500);
+    color: var(--color-zinc-800);
+  }
+`;
+
 type Inputs = {
   name: string;
   email: string;
@@ -40,133 +79,111 @@ export default function EditProfile() {
   const {
     user: { id, name, email, birth_date, description },
   } = useAppSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
 
   const { register, watch } = useForm<Inputs>({
     defaultValues: {
       name,
       email,
-      birth_date: birth_date,
+      birth_date,
       description,
     },
   });
 
-  const dispatch = useAppDispatch();
+  const [currentField, setCurrentField] = useState<string | null>(null);
 
-  const [message, setMessage] = useState<{
-    text: string;
-    isSuccess: boolean;
-  }>({
-    text: "",
-    isSuccess: false,
-  });
+  function handleChangeField(identifier: string) {
+    if (identifier === "name") {
+      AuthApi.changeUsername(watch("name"), id)
+        .then((res) => {
+          const user = mapUser(res.user);
+          dispatch(fetchUser(user));
+          // setMessage({ text: res.message, isSuccess: true });
+        })
+        .catch((err) => {
+          // setMessage({ text: err.response.data.error, isSuccess: false });
+        })
+        .finally(() => setCurrentField(null));
+    }
 
-  function handleChangeEmail(
-    value: string,
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-  ) {
-    AuthApi.changeEmail(value, id)
-      .then((res) => {
-        const user = mapUser(res.user);
-        dispatch(fetchUser(user));
-        setMessage({ text: res.message, isSuccess: true });
-      })
-      .catch((err) => {
-        setMessage({ text: err.response.data.error, isSuccess: false });
-      })
-      .finally(() => setIsOpen(false));
-  }
+    if (identifier === "email") {
+      AuthApi.changeEmail(watch("email"), id)
+        .then((res) => {
+          const user = mapUser(res.user);
+          dispatch(fetchUser(user));
+          // setMessage({ text: res.message, isSuccess: true });
+        })
+        .catch((err) => {
+          // setMessage({ text: err.response.data.error, isSuccess: false });
+        })
+        .finally(() => setCurrentField(null));
+    }
 
-  function handleChangeUsername(
-    value: string,
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-  ) {
-    AuthApi.changeUsername(value, id)
-      .then((res) => {
-        const user = mapUser(res.user);
-        dispatch(fetchUser(user));
-        setMessage({ text: res.message, isSuccess: true });
-      })
-      .catch((err) => {
-        setMessage({ text: err.response.data.error, isSuccess: false });
-      })
-      .finally(() => setIsOpen(false));
-  }
+    if (identifier === "birth_date") {
+      AuthApi.changeBirthdate(watch("birth_date"), id)
+        .then((res) => {
+          const user = mapUser(res.user);
+          dispatch(fetchUser(user));
+          // setMessage({ text: res.message, isSuccess: true });
+        })
+        .catch((err) => {
+          // setMessage({ text: err.response.data.error, isSuccess: false });
+        })
+        .finally(() => setCurrentField(null));
+    }
 
-  function handleChangeBirthdate(
-    value: string,
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-  ) {
-    AuthApi.changeBirthdate(value, id)
-      .then((res) => {
-        const user = mapUser(res.user);
-        dispatch(fetchUser(user));
-        setMessage({ text: res.message, isSuccess: true });
-      })
-      .catch((err) => {
-        setMessage({ text: err.response.data.error, isSuccess: false });
-      })
-      .finally(() => setIsOpen(false));
-  }
-
-  function handleChangeDescription(
-    value: string,
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-  ) {
-    AuthApi.changeDescription(value, id)
-      .then((res) => {
-        const user = mapUser(res.user);
-        dispatch(fetchUser(user));
-        setMessage({ text: res.message, isSuccess: true });
-      })
-      .catch((err) => {
-        setMessage({ text: err.response.data.error, isSuccess: false });
-      })
-      .finally(() => setIsOpen(false));
+    if (identifier === "description") {
+      AuthApi.changeDescription(watch("description"), id)
+        .then((res) => {
+          const user = mapUser(res.user);
+          dispatch(fetchUser(user));
+          // setMessage({ text: res.message, isSuccess: true });
+        })
+        .catch((err) => {
+          // setMessage({ text: err.response.data.error, isSuccess: false });
+        })
+        .finally(() => setCurrentField(null));
+    }
   }
 
   return (
-    <StyledEditProfile>
-      <Title>Edit profile</Title>
-      <Form onSubmit={(e) => e.preventDefault()}>
-        <ChangeField
-          variant="auth"
-          type="text"
-          placeholder="Name"
-          newValue={watch("name")}
-          onChangeValue={handleChangeUsername}
-          {...register("name")}
-        />
+    <>
+      <StyledEditProfile>
+        <Title>Edit profile</Title>
+        <Form onSubmit={(e) => e.preventDefault()}>
+          {fields.map((field) => (
+            <ChangeField key={field.identifier}>
+              {field.identifier === "description" ? (
+                <Textarea
+                  placeholder="Description"
+                  {...register("description")}
+                />
+              ) : (
+                <Input variant="auth" {...register(field.identifier)} />
+              )}
+              <Button onClick={() => setCurrentField(field.identifier)}>
+                <IconWrapper>
+                  <HiMiniPencilSquare />
+                </IconWrapper>
+              </Button>
+            </ChangeField>
+          ))}
+        </Form>
+      </StyledEditProfile>
 
-        <ChangeField
-          variant="auth"
-          type="text"
-          placeholder="Email"
-          newValue={watch("email")}
-          onChangeValue={handleChangeEmail}
-          {...register("email")}
-        />
-
-        <ChangeField
-          variant="auth"
-          type="date"
-          placeholder="Birth date"
-          newValue={watch("birth_date")}
-          onChangeValue={handleChangeBirthdate}
-          {...register("birth_date")}
-        />
-
-        <ChangeDescription
-          newValue={watch("description")}
-          onChangeValue={handleChangeDescription}
-          {...register("description")}
-        />
-      </Form>
-
-      {message.text && (
-        <Message variant={message.isSuccess ? "regular" : "error"}>
-          {message.text}
-        </Message>
-      )}
-    </StyledEditProfile>
+      {fields.map((field) => (
+        <Fragment key={field.identifier}>
+          {currentField === field.identifier &&
+            createPortal(
+              <ConfirmationModal
+                onConfirm={() => handleChangeField(field.identifier)}
+                onClose={() => setCurrentField(null)}
+                question={`Are you sure about changing the ${field.name}?`}
+              />,
+              document.body
+            )}
+        </Fragment>
+      ))}
+    </>
   );
 }
