@@ -3,7 +3,7 @@ import styled from "styled-components";
 import AuthForm from "../features/authentication/AuthForm";
 
 import { UserLoginRequest, UserSignupRequest } from "../lib/types";
-import { loadToken, loadError, addToken } from "../redux/authSlice";
+import { loadToken, loadAuthError, addToken } from "../redux/authSlice";
 import { AuthApi } from "../api/AuthApi";
 import { useAppDispatch } from "../redux/hooks";
 
@@ -32,7 +32,7 @@ export default function Authentication() {
         localStorage.setItem("token", res);
         dispatch(addToken(res));
       })
-      .catch((err) => dispatch(loadError(err.response.data.error)));
+      .catch((err) => dispatch(loadAuthError(err.response.data.error)));
   };
 
   const handleLogin = (user: UserLoginRequest) => {
@@ -42,7 +42,7 @@ export default function Authentication() {
         localStorage.setItem("token", res);
         dispatch(addToken(res));
       })
-      .catch((err) => dispatch(loadError(err.response.data.error)));
+      .catch((err) => dispatch(loadAuthError(err.response.data.error)));
   };
 
   return (

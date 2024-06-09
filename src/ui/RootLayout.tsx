@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { Outlet, ScrollRestoration } from "react-router-dom";
-import { useEffect } from "react";
+import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
+import { useCallback, useEffect } from "react";
 
 import Navbar from "./Navbar";
 import Loader from "./Loader";
@@ -10,13 +10,12 @@ import { AuthApi } from "../api/AuthApi";
 import { fetchUser, selectCurrentUser } from "../redux/currentUserSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { mapUser } from "../utils/mapUser";
-import { loadPosts, selectPosts } from "../redux/postsSlice";
-import { loadError } from "../redux/authSlice";
+import { loadError, loadPosts } from "../redux/postsSlice";
 import { PostApi } from "../api/PostApi";
 import { PostResponse } from "../lib/types";
 import { mapPost } from "../utils/mapPost";
 
-const PER_PAGE = 4;
+const PER_PAGE = 6;
 
 const StyledRootLayout = styled.div``;
 
@@ -29,20 +28,27 @@ const Container = styled.div`
 export default function RootLayout() {
   const { isLoading, error, user } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
-  const { posts } = useAppSelector(selectPosts);
+  const location = useLocation();
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
 
-  function getPosts(perPage: number, offset: number) {
-    console.log("Executed");
+  const getPosts = useCallback(
+    function getPosts(perPage: number, offset: number) {
+      PostApi.getPosts(user.id, perPage, offset)
+        .then((res) => {
+          const posts = mapPosts(res);
+          dispatch(loadPosts(posts));
+        })
+        .catch((err) => dispatch(loadError(err.response.data.error)));
+    },
+    [user.id, dispatch]
+  );
 
-    PostApi.getPosts(user.id, perPage, offset)
-      .then((res) => {
-        const posts = mapPosts(res);
-        dispatch(loadPosts(posts));
-      })
-      .catch((err) => dispatch(loadError(err.response.data.error)));
+  function handleRefetch() {
+    if (location.pathname === "/") {
+      getPosts(PER_PAGE, 0);
+    }
   }
 
   useEffect(() => {
@@ -54,12 +60,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (!user.id) return;
 
-    getPosts(PER_PAGE, posts.length);
-
-    return () => {
-      dispatch(loadPosts([]));
-    };
-  }, [user.id, dispatch]);
+    getPosts(PER_PAGE, 0);
+  }, [user.id, getPosts]);
 
   if (isLoading)
     return (
@@ -73,7 +75,7 @@ export default function RootLayout() {
   return (
     <StyledRootLayout>
       <Container>
-        <Navbar getPosts={getPosts} />
+        <Navbar onRefetch={handleRefetch} />
 
         <main>
           <Outlet />

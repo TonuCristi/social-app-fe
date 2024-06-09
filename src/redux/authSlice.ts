@@ -22,7 +22,7 @@ export const authSlice = createSlice({
       state.isLoading = true;
       state.error = "";
     },
-    loadError: (state, action: PayloadAction<string>) => {
+    loadAuthError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.isLoading = false;
     },
@@ -36,7 +36,7 @@ export const authSlice = createSlice({
   },
 });
 
-export const { loadToken, loadError, addToken, removeToken } =
+export const { loadToken, loadAuthError, addToken, removeToken } =
   authSlice.actions;
 
 export const selectAuth = (state: RootState) => state.auth;

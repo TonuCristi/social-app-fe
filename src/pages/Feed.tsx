@@ -13,13 +13,13 @@ import {
   addPost,
   loadMorePosts,
   selectPosts,
+  loadError,
 } from "../redux/postsSlice";
 import { PostRequestFile, PostResponse } from "../lib/types";
 import { PostApi } from "../api/PostApi";
-import { loadError } from "../redux/authSlice";
 import { mapPost } from "../utils/mapPost";
 
-const PER_PAGE = 4;
+const PER_PAGE = 6;
 
 const StyledFeed = styled.div`
   display: flex;
@@ -34,7 +34,6 @@ export default function Feed() {
   const { user } = useAppSelector(selectCurrentUser);
   const { isLoading, error, posts } = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
-  const elRef = useRef<HTMLDivElement>(null);
   const status = useRef<boolean>(false);
 
   const mapPosts = (posts: PostResponse[]) =>
@@ -59,32 +58,42 @@ export default function Feed() {
   }, []);
 
   useEffect(() => {
-    const fetchData = () => {
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
+    };
+
+    function fetchData() {
       sessionStorage.setItem("scroll", `${window.scrollY}`);
 
       if (status.current) return;
 
-      const h = window.innerHeight;
-      const elTop = elRef.current?.getBoundingClientRect().top;
+      status.current = true;
+      // console.log(PER_PAGE, posts.length, posts.length + PER_PAGE);
+      PostApi.getPosts(user.id, PER_PAGE, posts.length)
+        .then((res) => {
+          const posts = mapPosts(res);
+          dispatch(loadMorePosts(posts));
+        })
+        .catch((err) => dispatch(loadError(err.response.data.error)))
+        .finally(() => {
+          status.current = false;
+        });
+    }
 
-      if (elTop && elTop - h < 0) {
-        status.current = true;
-        PostApi.getPosts(user.id, PER_PAGE, posts.length)
-          .then((res) => {
-            const posts = mapPosts(res);
-            dispatch(loadMorePosts(posts));
-          })
-          .catch((err) => dispatch(loadError(err.response.data.error)))
-          .finally(() => {
-            status.current = false;
-          });
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchData();
       }
-    };
+    }, options);
 
-    window.addEventListener("scroll", fetchData);
+    const target = document.querySelector(".target");
+    if (!target) return;
+    observer.observe(target);
 
-    return () => window.removeEventListener("scroll", fetchData);
-  }, [dispatch, user.id, posts.length]);
+    return () => observer.unobserve(target);
+  }, [dispatch, user.id, posts.length, isLoading]);
 
   return (
     <StyledFeed>
@@ -100,7 +109,7 @@ export default function Feed() {
         )}
       </Posts>
 
-      <div ref={elRef} />
+      {posts.length > 0 && <div className="target" />}
     </StyledFeed>
   );
 }

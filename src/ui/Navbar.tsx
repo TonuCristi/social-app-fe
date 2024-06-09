@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
 import Logo from "./Logo";
@@ -18,8 +18,6 @@ import {
   HiMiniUserGroup,
   HiMiniMagnifyingGlass,
 } from "react-icons/hi2";
-import { startLoad } from "../redux/postsSlice";
-import { useAppDispatch } from "../redux/hooks";
 
 const links = [
   {
@@ -115,27 +113,18 @@ const BurgerMenuIcon = styled(HiMiniBars3)`
 `;
 
 type Props = {
-  getPosts: (perPage: number, offset: number) => void;
+  onRefetch: () => void;
 };
 
-export default function Navbar({ getPosts }: Props) {
+export default function Navbar({ onRefetch }: Props) {
   const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
   const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
-  const location = useLocation();
-  const dispatch = useAppDispatch();
-
-  function handleRefetch() {
-    if (location.pathname === "/") {
-      dispatch(startLoad());
-      getPosts(4, 0);
-    }
-  }
 
   return (
     <StyledNavbar>
       <Container>
         <HomeLink to="/">
-          <Logo onClick={handleRefetch} />
+          <Logo onClick={onRefetch} />
         </HomeLink>
         <Search />
 

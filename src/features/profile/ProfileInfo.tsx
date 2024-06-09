@@ -11,13 +11,13 @@ import { PostResponse } from "../../lib/types";
 import { mapPost } from "../../utils/mapPost";
 import { PostApi } from "../../api/PostApi";
 import {
-  loadError,
-  loadMorePosts,
-  loadPosts,
+  loadUserPostsError,
+  loadMoreUserPosts,
+  loadUserPosts,
   selectUserPosts,
 } from "../../redux/userPostsSlice";
 
-const PER_PAGE = 4;
+const PER_PAGE = 6;
 
 const StyledProfileInfo = styled.div`
   color: var(--color-zinc-100);
@@ -103,50 +103,58 @@ export default function ProfileInfo() {
 
   const { isLoading, error, posts } = useAppSelector(selectUserPosts);
   const dispatch = useAppDispatch();
-  const elRef = useRef<HTMLDivElement>(null);
   const status = useRef<boolean>(false);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
 
   useEffect(() => {
-    PostApi.getPosts(id, PER_PAGE, posts.length)
+    PostApi.getPosts(id, PER_PAGE, 0)
       .then((res) => {
         const posts = mapPosts(res);
-        dispatch(loadPosts(posts));
+        dispatch(loadUserPosts(posts));
       })
-      .catch((err) => dispatch(loadError(err.response.data.error)));
+      .catch((err) => dispatch(loadUserPostsError(err.response.data.error)));
 
     return () => {
-      dispatch(loadPosts([]));
+      dispatch(loadUserPosts([]));
     };
   }, [id, dispatch]);
 
   useEffect(() => {
-    const fetchData = () => {
-      if (status.current) return;
-
-      const h = window.innerHeight;
-      const elTop = elRef.current?.getBoundingClientRect().top;
-
-      if (elTop && elTop - h < 0) {
-        status.current = true;
-        PostApi.getPosts(id, PER_PAGE, posts.length)
-          .then((res) => {
-            const posts = mapPosts(res);
-            dispatch(loadMorePosts(posts));
-          })
-          .catch((err) => dispatch(loadError(err.response.data.error)))
-          .finally(() => {
-            status.current = false;
-          });
-      }
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0,
     };
 
-    window.addEventListener("scroll", fetchData);
+    function fetchData() {
+      if (status.current) return;
 
-    return () => window.removeEventListener("scroll", fetchData);
-  }, [posts.length, id, dispatch]);
+      status.current = true;
+      PostApi.getPosts(id, PER_PAGE, posts.length)
+        .then((res) => {
+          const posts = mapPosts(res);
+          dispatch(loadMoreUserPosts(posts));
+        })
+        .catch((err) => dispatch(loadUserPostsError(err.response.data.error)))
+        .finally(() => {
+          status.current = false;
+        });
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchData();
+      }
+    }, options);
+
+    const target = document.querySelector(".target");
+    if (!target) return;
+    observer.observe(target);
+
+    return () => observer.unobserve(target);
+  }, [dispatch, id, posts.length, isLoading]);
 
   return (
     <StyledProfileInfo>
@@ -183,7 +191,8 @@ export default function ProfileInfo() {
           <UserPost key={post.id} post={post} />
         ))}
       </Posts>
-      {posts.length > 0 && <div ref={elRef} />}
+
+      {posts.length > 0 && <div className="target" />}
     </StyledProfileInfo>
   );
 }

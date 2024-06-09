@@ -18,34 +18,39 @@ const userPostsSlice = createSlice({
   name: "userPosts",
   initialState,
   reducers: {
-    loadPosts(state, action: PayloadAction<PostT[]>) {
+    loadUserPosts(state, action: PayloadAction<PostT[]>) {
       state.isLoading = false;
       state.error = "";
       state.posts = action.payload;
     },
-    loadMorePosts(state, action: PayloadAction<PostT[]>) {
+    loadMoreUserPosts(state, action: PayloadAction<PostT[]>) {
       state.isLoading = false;
       state.error = "";
       state.posts = [...state.posts, ...action.payload];
     },
-    startLoad(state) {
+    startUserPostsLoad(state) {
       state.isLoading = true;
       state.error = "";
     },
-    addPost(state, action: PayloadAction<PostT>) {
+    addUserPost(state, action: PayloadAction<PostT>) {
       state.isLoading = false;
       state.posts = [action.payload, ...state.posts];
       state.error = "";
     },
-    loadError(state, action: PayloadAction<string>) {
+    loadUserPostsError(state, action: PayloadAction<string>) {
       state.isLoading = false;
       state.error = action.payload;
     },
   },
 });
 
-export const { loadPosts, loadMorePosts, startLoad, addPost, loadError } =
-  userPostsSlice.actions;
+export const {
+  loadUserPosts,
+  loadMoreUserPosts,
+  startUserPostsLoad,
+  addUserPost,
+  loadUserPostsError,
+} = userPostsSlice.actions;
 
 export const selectUserPosts = (state: RootState) => state.userPosts;
 

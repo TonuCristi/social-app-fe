@@ -8,7 +8,7 @@ import Message from "../../ui/Message";
 import Loader from "../../ui/Loader";
 
 import { UserLoginRequest, UserSignupRequest } from "../../lib/types";
-import { loadError, selectAuth } from "../../redux/authSlice";
+import { loadAuthError, selectAuth } from "../../redux/authSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 
 const Container = styled.div`
@@ -151,7 +151,7 @@ export default function AuthForm({ onSignup, onLogin }: Props) {
         variant="auth"
         onClick={() => {
           setIsLogin((prev) => !prev);
-          dispatch(loadError(""));
+          dispatch(loadAuthError(""));
           reset();
         }}
       >
