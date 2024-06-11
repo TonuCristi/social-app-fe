@@ -1,15 +1,14 @@
-import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import Input from "../../ui/Input";
 import Button from "../../ui/Button";
 import Avatar from "../../ui/Avatar";
 
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { PostRequestFile } from "../../lib/types";
 import { HiMiniPhoto } from "react-icons/hi2";
+import { useAppSelector } from "../../redux/hooks";
 
 const StyledAddPostForm = styled.form`
   border: 1px solid var(--color-zinc-500);
@@ -68,6 +67,23 @@ const ProfileLink = styled(NavLink)`
   align-items: center;
 `;
 
+const DescriptionTextarea = styled.textarea`
+  width: 100%;
+  resize: none;
+  background-color: var(--color-zinc-900);
+  border: none;
+  font-weight: 500;
+  padding: 1.2rem;
+  width: 100%;
+  border-radius: 1.1rem;
+  outline: none;
+  color: var(--color-zinc-100);
+
+  &::placeholder {
+    color: var(--color-zinc-500);
+  }
+`;
+
 const Container = styled.div`
   align-self: center;
 `;
@@ -109,7 +125,7 @@ type Props = {
 };
 
 export default function AddPostForm({ onCreatePost }: Props) {
-  const { user } = useSelector(selectCurrentUser);
+  const { user } = useAppSelector(selectCurrentUser);
   const { register, watch, handleSubmit, reset } = useForm<Inputs>({
     defaultValues: {
       description: "",
@@ -126,9 +142,9 @@ export default function AddPostForm({ onCreatePost }: Props) {
       <ProfileLink to="/profile">
         <Avatar src={user.avatar} name={user.name} variant="postForm" />
       </ProfileLink>
-      <Input
-        type="text"
-        variant="post"
+
+      <DescriptionTextarea
+        rows={1}
         placeholder={`What's happening, ${user.name.split(" ")[0]}?`}
         {...register("description")}
       />

@@ -8,7 +8,7 @@ import { HiMiniXMark } from "react-icons/hi2";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { Like } from "../../lib/types";
 
-const StyledLikesList = styled.div`
+const StyledLikes = styled.div`
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
   border-radius: 1.1rem;
@@ -75,7 +75,7 @@ const CloseIcon = styled(HiMiniXMark)`
   }
 `;
 
-const Likes = styled.ul`
+const LikesList = styled.ul`
   list-style: none;
   border-radius: 1.1rem;
   display: flex;
@@ -98,30 +98,30 @@ const Likes = styled.ul`
 `;
 
 type Props = {
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setIsLikesListOpen: Dispatch<SetStateAction<boolean>>;
   likes: Like[];
 };
 
-export default function LikesList({ setIsOpen, likes }: Props) {
+export default function Likes({ setIsLikesListOpen, likes }: Props) {
   const containerRef = useRef(null);
-  useClickOutside(containerRef, () => setIsOpen(false));
+  useClickOutside(containerRef, () => setIsLikesListOpen(false));
 
   return (
-    <StyledLikesList ref={containerRef}>
+    <StyledLikes ref={containerRef}>
       <Container>
         <Title>Likes</Title>
-        <Button onClick={() => setIsOpen(false)}>
+        <Button onClick={() => setIsLikesListOpen(false)}>
           <CloseIcon />
         </Button>
       </Container>
 
-      <Likes>
+      <LikesList>
         {likes.map((like) => (
           <li key={like.id}>
             <UserLike id={like.user_id} />
           </li>
         ))}
-      </Likes>
-    </StyledLikesList>
+      </LikesList>
+    </StyledLikes>
   );
 }

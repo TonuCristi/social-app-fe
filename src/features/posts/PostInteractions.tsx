@@ -3,8 +3,9 @@ import { createPortal } from "react-dom";
 import styled from "styled-components";
 
 import Overlay from "../../ui/Overlay";
-import LikesList from "./LikesList";
 import Button from "../../ui/Button";
+import Comments from "./Comments";
+import Likes from "./Likes";
 
 import { HiMiniChatBubbleOvalLeft, HiMiniHeart } from "react-icons/hi2";
 import { Like } from "../../lib/types";
@@ -67,7 +68,8 @@ export default function PostInteractions({
   onLikePost,
   onUnlikePost,
 }: Props) {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLikesListOpen, setIsLikesListOpen] = useState<boolean>(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
   const likesCount = Intl.NumberFormat("en", { notation: "compact" }).format(
     likes.length
   );
@@ -85,14 +87,14 @@ export default function PostInteractions({
           <p>{likesCount}</p>
         </Button>
 
-        <Button variant="postComments">
+        <Button variant="postComments" onClick={() => setIsCommentsOpen(true)}>
           <IconWrapper>
             <CommentIcon />
           </IconWrapper>
           <p>5.7K</p>
         </Button>
 
-        <Button variant="postStats" onClick={() => setIsOpen(true)}>
+        <Button variant="postStats" onClick={() => setIsLikesListOpen(true)}>
           <IconWrapper>
             <LikesIcon />
           </IconWrapper>
@@ -100,10 +102,18 @@ export default function PostInteractions({
         </Button>
       </StyledPostInteractions>
 
-      {isOpen &&
+      {isLikesListOpen &&
         createPortal(
           <Overlay>
-            <LikesList setIsOpen={setIsOpen} likes={likes} />
+            <Likes setIsLikesListOpen={setIsLikesListOpen} likes={likes} />
+          </Overlay>,
+          document.body
+        )}
+
+      {isCommentsOpen &&
+        createPortal(
+          <Overlay>
+            <Comments setIsCommentsOpen={setIsCommentsOpen} />
           </Overlay>,
           document.body
         )}
