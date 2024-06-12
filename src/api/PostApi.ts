@@ -1,6 +1,11 @@
 import { AxiosResponse } from "axios";
 import api from "../config/api";
-import { LikeResponse, PostRequest, PostResponse } from "../lib/types";
+import {
+  CommentResponse,
+  LikeResponse,
+  PostRequest,
+  PostResponse,
+} from "../lib/types";
 
 const BASE_URL = "/posts";
 
@@ -44,5 +49,24 @@ export const PostApi = {
     return api
       .get(`${BASE_URL}/post/likes/${postId}`)
       .then(({ data }: AxiosResponse<LikeResponse[]>) => data);
+  },
+  addComment(
+    postId: string,
+    userId: string,
+    commentId: string | null,
+    comment: string
+  ) {
+    return api
+      .post(`${BASE_URL}/post/comment/${postId}`, {
+        comment,
+        user_id: userId,
+        comment_id: commentId,
+      })
+      .then(({ data }: AxiosResponse<CommentResponse[]>) => data);
+  },
+  getComments(postId: string) {
+    return api
+      .get(`${BASE_URL}/post/comments/${postId}`)
+      .then(({ data }: AxiosResponse<CommentResponse[]>) => data);
   },
 };

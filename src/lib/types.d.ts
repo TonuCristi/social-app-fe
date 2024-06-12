@@ -74,3 +74,22 @@ export type Like = {
   user_id: string;
   post_id: string;
 };
+
+// ----- Comment -----
+export type CommentResponse = {
+  _id: string;
+  comment: string;
+  comment_id: string | null;
+  user_id: string;
+  post_id: string;
+  createdAt: string;
+};
+
+export type Comment = {
+  id: string;
+  comment: string;
+  comment_id: string | null;
+  user_id: string;
+  post_id: string;
+  createdAt: string;
+};

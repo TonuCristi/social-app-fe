@@ -8,7 +8,7 @@ import Comments from "./Comments";
 import Likes from "./Likes";
 
 import { HiMiniChatBubbleOvalLeft, HiMiniHeart } from "react-icons/hi2";
-import { Like } from "../../lib/types";
+import { Comment, Like } from "../../lib/types";
 
 const StyledPostInteractions = styled.div`
   display: flex;
@@ -60,6 +60,8 @@ type Props = {
   isLiked: boolean;
   onLikePost: () => void;
   onUnlikePost: () => void;
+  comments: Comment[];
+  onAddComment: (comment: string, commentId: string | null) => void;
 };
 
 export default function PostInteractions({
@@ -67,6 +69,8 @@ export default function PostInteractions({
   isLiked,
   onLikePost,
   onUnlikePost,
+  comments,
+  onAddComment,
 }: Props) {
   const [isLikesListOpen, setIsLikesListOpen] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
@@ -113,7 +117,11 @@ export default function PostInteractions({
       {isCommentsOpen &&
         createPortal(
           <Overlay>
-            <Comments setIsCommentsOpen={setIsCommentsOpen} />
+            <Comments
+              setIsCommentsOpen={setIsCommentsOpen}
+              comments={comments}
+              onAddComment={onAddComment}
+            />
           </Overlay>,
           document.body
         )}

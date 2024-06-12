@@ -21,6 +21,7 @@ import { loadPosts, selectPosts } from "../../redux/postsSlice";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { mapPost } from "../../utils/mapPost";
 import { useLikes } from "./useLikes";
+import useComments from "./useComments";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -177,6 +178,11 @@ export default function UserPost({ post }: Props) {
   const { handleLikePost, handleUnlikePost, likes, isLikesLoading, isLiked } =
     useLikes(id, user.id);
 
+  const { handleAddComment, comments, isCommentsLoading } = useComments(
+    id,
+    user.id
+  );
+
   function handleUpdatePostDescription(description: string) {
     PostApi.updatePostDescription(id, description).then((res) => {
       const editedPost = mapPost(res);
@@ -198,7 +204,7 @@ export default function UserPost({ post }: Props) {
     });
   }
 
-  if (isLikesLoading) {
+  if (isLikesLoading || isCommentsLoading) {
     return <LoadingPost />;
   }
 
@@ -241,6 +247,8 @@ export default function UserPost({ post }: Props) {
             isLiked={isLiked}
             onLikePost={handleLikePost}
             onUnlikePost={handleUnlikePost}
+            comments={comments}
+            onAddComment={handleAddComment}
           />
         </PostInteractionsWrapper>
       </StyledPost>

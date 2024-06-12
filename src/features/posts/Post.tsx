@@ -11,6 +11,7 @@ import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { useLikes } from "./useLikes";
 import { PostT } from "../../lib/types";
+import useComments from "./useComments";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -138,37 +139,36 @@ export default function Post({ post }: Props) {
   }
 
   return (
-    <>
-      <StyledPost>
-        <ProfileLink to="/profile">
-          <Avatar src={user.avatar} name={user.name} variant="post" />
-        </ProfileLink>
+    <StyledPost>
+      <ProfileLink to="/profile">
+        <Avatar src={user.avatar} name={user.name} variant="post" />
+      </ProfileLink>
 
-        <Container>
-          <Info>
-            <ProfileLink to="/profile">
-              <Name>{user.name}</Name>
-            </ProfileLink>
+      <Container>
+        <Info>
+          <ProfileLink to="/profile">
+            <Name>{user.name}</Name>
+          </ProfileLink>
 
-            <PostTime>{getTimePassed(createdAt)}</PostTime>
-          </Info>
-        </Container>
+          <PostTime>{getTimePassed(createdAt)}</PostTime>
+        </Info>
+      </Container>
 
-        <Content>
-          {description && <Description>{description}</Description>}
+      <Content>
+        {description && <Description>{description}</Description>}
 
-          {image && <PostImage image={image} />}
-        </Content>
+        {image && <PostImage image={image} />}
+      </Content>
 
-        <PostInteractionsWrapper>
-          <PostInteractions
-            likes={likes}
-            isLiked={isLiked}
-            onLikePost={handleLikePost}
-            onUnlikePost={handleUnlikePost}
-          />
-        </PostInteractionsWrapper>
-      </StyledPost>
-    </>
+      <PostInteractionsWrapper>
+        <PostInteractions
+          likes={likes}
+          isLiked={isLiked}
+          onLikePost={handleLikePost}
+          onUnlikePost={handleUnlikePost}
+          onAddComment={handleAddComment}
+        />
+      </PostInteractionsWrapper>
+    </StyledPost>
   );
 }

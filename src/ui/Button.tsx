@@ -9,6 +9,7 @@ type Variant =
   | "auth"
   | "post"
   | "postEdit"
+  | "comment"
   | "empty";
 
 const variants = {
@@ -194,6 +195,11 @@ const variants = {
     justify-content: flex-end;
     align-items: flex-start;
     align-self: flex-start;
+  `,
+  comment: css`
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--color-zinc-300);
   `,
   empty: css`
     display: flex;

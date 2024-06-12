@@ -1,10 +1,9 @@
 import { NavLink } from "react-router-dom";
-import Avatar from "../../ui/Avatar";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
-import { User } from "../../lib/types";
-import { AuthApi } from "../../api/AuthApi";
-import { mapUser } from "../../utils/mapUser";
+
+import Avatar from "../../ui/Avatar";
+
+import { useUser } from "../../hooks/useUser";
 
 const ProfileLink = styled(NavLink)`
   display: flex;
@@ -36,14 +35,7 @@ type Props = {
 };
 
 export default function UserLike({ id }: Props) {
-  const [user, setUser] = useState<User>();
-
-  useEffect(() => {
-    AuthApi.getUserById(id).then((res) => {
-      const user = mapUser(res);
-      setUser(user);
-    });
-  }, [id]);
+  const user = useUser(id);
 
   return (
     <ProfileLink to="/profile">

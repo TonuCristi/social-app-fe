@@ -1,21 +1,19 @@
 import { Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
 
-import Avatar from "../../ui/Avatar";
 import Button from "../../ui/Button";
-
-import { HiMiniXMark, HiMiniPaperAirplane } from "react-icons/hi2";
-import { useAppSelector } from "../../redux/hooks";
-import { selectCurrentUser } from "../../redux/currentUserSlice";
 import UserComment from "./UserComment";
-import { SubmitHandler, useForm } from "react-hook-form";
+import AddCommentForm from "./AddCommentForm";
+
+import { HiMiniXMark } from "react-icons/hi2";
+import { Comment } from "../../lib/types";
 
 const StyledComments = styled.div`
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
   border-radius: 1.1rem;
   width: 40%;
-  height: 60%;
+  height: 80%;
   padding: 2.4rem;
   display: flex;
   flex-direction: column;
@@ -80,63 +78,35 @@ const CloseIcon = styled(HiMiniXMark)`
 const CommentsList = styled.ul`
   list-style: none;
   color: var(--color-zinc-100);
-`;
-
-const AddCommentForm = styled.form`
+  overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  margin-top: auto;
-`;
+  flex-direction: column;
+  gap: 2.4rem;
 
-const CommentTextarea = styled.textarea`
-  width: 100%;
-  resize: none;
-  background-color: var(--color-zinc-900);
-  border: none;
-  font-weight: 500;
-  padding: 1.2rem;
-  width: 100%;
-  border-radius: 1.1rem;
-  outline: none;
-  color: var(--color-zinc-100);
-
-  &::placeholder {
-    color: var(--color-zinc-500);
+  &::-webkit-scrollbar {
+    background-color: var(--color-zinc-700);
+    border-radius: 1.1rem;
+    width: 1rem;
   }
-`;
 
-const AddCommentIcon = styled(HiMiniPaperAirplane)<{ $isActive: boolean }>`
-  color: ${(props) =>
-    props.$isActive ? "var(--color-sky-500)" : "var(--color-zinc-500)"};
-  font-size: 2rem;
-  transition: all 0.2s;
-
-  &:hover {
-    color: var(--color-sky-500);
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-zinc-100);
+    border-radius: 1.1rem;
   }
 `;
 
 type Props = {
   setIsCommentsOpen: Dispatch<SetStateAction<boolean>>;
+  comments: Comment[];
+  onAddComment: (comment: string, commentId: string | null) => void;
 };
 
-type Inputs = {
-  comment: string;
-};
-
-export default function Comments({ setIsCommentsOpen }: Props) {
-  const { user } = useAppSelector(selectCurrentUser);
-  const { register, handleSubmit, watch } = useForm<Inputs>({
-    defaultValues: {
-      comment: "",
-    },
-  });
-
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
-  };
-
+export default function Comments({
+  setIsCommentsOpen,
+  comments,
+  onAddComment,
+}: Props) {
   return (
     <StyledComments>
       <Container>
@@ -147,41 +117,12 @@ export default function Comments({ setIsCommentsOpen }: Props) {
       </Container>
 
       <CommentsList>
-        <li>
-          <UserComment />
-        </li>
-        <li>
-          <UserComment />
-        </li>
-        <li>
-          <UserComment />
-        </li>
-        <li>
-          <UserComment />
-        </li>
-        <li>
-          <UserComment />
-        </li>
-        <li>
-          <UserComment />
-        </li>
-        <li>
-          <UserComment />
-        </li>
+        {comments.map((comment) => (
+          <UserComment key={comment.id} comment={comment} />
+        ))}
       </CommentsList>
 
-      <AddCommentForm onSubmit={handleSubmit(onSubmit)}>
-        <Avatar variant="post" name={user.name} src={user.avatar} />
-        <CommentTextarea
-          rows={1}
-          placeholder="Write a comment..."
-          {...register("comment")}
-        />
-
-        <Button disabled={!(watch("comment").length > 0)}>
-          <AddCommentIcon $isActive={watch("comment").length > 0} />
-        </Button>
-      </AddCommentForm>
+      <AddCommentForm onAddComment={onAddComment} />
     </StyledComments>
   );
 }
