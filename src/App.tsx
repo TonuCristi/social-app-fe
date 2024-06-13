@@ -13,6 +13,7 @@ import EditProfile from "./features/profile/EditProfile";
 import Feed from "./pages/Feed";
 
 import GlobalStyle from "./styles/GlobalStyle";
+import { Toaster } from "react-hot-toast";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,31 @@ export default function App() {
   return (
     <Provider store={store}>
       <RouterProvider router={router} />
+      <Toaster
+        position="top-center"
+        // reverseOrder={false}
+        toastOptions={{
+          // Define default options
+          className: "",
+          duration: 5000,
+          style: {
+            background: "var(--color-zinc-800)",
+            color: "var(--color-zinc-100)",
+            border: "1px solid var(--color-zinc-500)",
+          },
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+          },
+          error: {
+            duration: 3000,
+          },
+          loading: {
+            duration: 3000,
+          },
+        }}
+      />
       <GlobalStyle />
     </Provider>
   );

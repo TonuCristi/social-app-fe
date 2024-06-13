@@ -1,15 +1,14 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
+import toast from "react-hot-toast";
 
 import Posts from "../features/posts/Posts";
 import AddPostForm from "../features/posts/AddPostForm";
 import Post from "../features/posts/Post";
-import UserPost from "../features/posts/UserPost";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
 import {
-  startLoad,
   addPost,
   loadMorePosts,
   selectPosts,
@@ -40,11 +39,11 @@ export default function Feed() {
     posts.map((post) => mapPost(post));
 
   function handleCreatePost(post: PostRequestFile) {
-    dispatch(startLoad());
-
-    PostApi.createPost({ ...post, image: "" }).then((res) =>
-      dispatch(addPost(mapPost(res)))
-    );
+    PostApi.createPost({ ...post, image: "" }).then((res) => {
+      const post = mapPost(res);
+      dispatch(addPost(post));
+      toast.success("Post added!");
+    });
   }
 
   useEffect(() => {
@@ -70,7 +69,6 @@ export default function Feed() {
       if (status.current) return;
 
       status.current = true;
-      // console.log(PER_PAGE, posts.length, posts.length + PER_PAGE);
       PostApi.getPosts(user.id, PER_PAGE, posts.length)
         .then((res) => {
           const posts = mapPosts(res);
@@ -100,13 +98,9 @@ export default function Feed() {
       <AddPostForm onCreatePost={handleCreatePost} />
 
       <Posts variant="feed" isLoading={isLoading} error={error}>
-        {posts.map((post) =>
-          post.user_id === user.id ? (
-            <UserPost key={post.id} post={post} />
-          ) : (
-            <Post key={post.id} post={post} />
-          )
-        )}
+        {posts.map((post) => (
+          <Post key={post.id} post={post} />
+        ))}
       </Posts>
 
       {posts.length > 0 && <div className="target" />}

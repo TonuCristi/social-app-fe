@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
 import { PostApi } from "../../api/PostApi";
 import { Comment, CommentResponse } from "../../lib/types";
 import { mapComment } from "../../utils/mapComment";
 
-export default function useComments(postId: string, userId: string) {
+export function useComments(postId: string, userId: string) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isCommentsLoading, setIsCommentsLoading] = useState<boolean>(true);
 
@@ -12,8 +14,19 @@ export default function useComments(postId: string, userId: string) {
 
   function handleAddComment(comment: string, commentId: string | null) {
     PostApi.addComment(postId, userId, commentId, comment).then((res) => {
-      const comments = mapComments(res).reverse();
-      setComments(comments);
+      const comment = mapComment(res);
+      setComments([comment, ...comments]);
+      toast.success("Comment added!");
+    });
+  }
+
+  function handleDeleteComment(commentId: string) {
+    PostApi.deleteComment(commentId).then(() => {
+      const filteredComments = comments.filter(
+        (comment) => comment.id !== commentId
+      );
+      setComments(filteredComments);
+      toast.success("Comment deleted!");
     });
   }
 
@@ -25,5 +38,5 @@ export default function useComments(postId: string, userId: string) {
     });
   }, [postId]);
 
-  return { handleAddComment, comments, isCommentsLoading };
+  return { handleAddComment, handleDeleteComment, comments, isCommentsLoading };
 }

@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "../../ui/Button";
 import Avatar from "../../ui/Avatar";
+import Textarea from "../../ui/Textarea";
 
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
@@ -15,23 +16,6 @@ const StyledAddCommentForm = styled.form`
   gap: 1.2rem;
   margin-top: auto;
   background-color: var(--color-zinc-950);
-`;
-
-const CommentTextarea = styled.textarea`
-  width: 100%;
-  resize: none;
-  background-color: var(--color-zinc-900);
-  border: none;
-  font-weight: 500;
-  padding: 1.2rem;
-  width: 100%;
-  border-radius: 1.1rem;
-  outline: none;
-  color: var(--color-zinc-100);
-
-  &::placeholder {
-    color: var(--color-zinc-500);
-  }
 `;
 
 const AddCommentIcon = styled(HiMiniPaperAirplane)<{ $isActive: boolean }>`
@@ -73,7 +57,8 @@ export default function AddCommentForm({ onAddComment }: Props) {
   return (
     <StyledAddCommentForm onSubmit={handleSubmit(onSubmit)}>
       <Avatar variant="post" name={user.name} src={user.avatar} />
-      <CommentTextarea
+      <Textarea
+        variant="comment"
         rows={1}
         placeholder="Write a comment..."
         {...register("comment")}

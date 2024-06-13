@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "../../ui/Button";
 import Avatar from "../../ui/Avatar";
+import Textarea from "../../ui/Textarea";
 
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { PostRequestFile } from "../../lib/types";
@@ -67,23 +68,6 @@ const ProfileLink = styled(NavLink)`
   align-items: center;
 `;
 
-const DescriptionTextarea = styled.textarea`
-  width: 100%;
-  resize: none;
-  background-color: var(--color-zinc-900);
-  border: none;
-  font-weight: 500;
-  padding: 1.2rem;
-  width: 100%;
-  border-radius: 1.1rem;
-  outline: none;
-  color: var(--color-zinc-100);
-
-  &::placeholder {
-    color: var(--color-zinc-500);
-  }
-`;
-
 const Container = styled.div`
   align-self: center;
 `;
@@ -143,9 +127,10 @@ export default function AddPostForm({ onCreatePost }: Props) {
         <Avatar src={user.avatar} name={user.name} variant="postForm" />
       </ProfileLink>
 
-      <DescriptionTextarea
+      <Textarea
+        variant="addPost"
         rows={1}
-        placeholder={`What's happening, ${user.name.split(" ")[0]}?`}
+        placeholder={`What's happening, ${user.name}?`}
         {...register("description")}
       />
 

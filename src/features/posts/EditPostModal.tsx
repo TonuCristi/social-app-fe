@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
-import Input from "../../ui/Input";
 import Button from "../../ui/Button";
+import Textarea from "../../ui/Textarea";
 
 import { PostT } from "../../lib/types";
 import { HiMiniXMark } from "react-icons/hi2";
@@ -17,6 +17,37 @@ const StyledEditPostModal = styled.div`
   background-color: var(--color-zinc-950);
   border-radius: 1.1rem;
   padding: 2.4rem;
+  width: 30%;
+
+  @media (width >= 1535px) {
+    & {
+      max-width: 50rem;
+    }
+  }
+
+  @media (width <= 1279px) {
+    & {
+      width: 40%;
+    }
+  }
+
+  @media (width <= 1023px) {
+    & {
+      width: 60%;
+    }
+  }
+
+  @media (width <= 767px) {
+    & {
+      width: 80%;
+    }
+  }
+
+  @media (width <= 639px) {
+    & {
+      width: 90%;
+    }
+  }
 `;
 
 const Container = styled.div`
@@ -24,6 +55,14 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+`;
+
+const StyledEditPostForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
 `;
 
 const Title = styled.h3`
@@ -45,16 +84,9 @@ const CloseIcon = styled(HiMiniXMark)`
   }
 `;
 
-const StyledEditPostForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-`;
-
 const ButtonWrapper = styled.div`
   margin-top: 1.2rem;
-  width: 100%;
+  width: 50%;
 `;
 
 type Inputs = {
@@ -73,7 +105,7 @@ export default function EditPostModal({
   setIsEditModalOpen,
 }: Props) {
   const { description } = post;
-  const { register, handleSubmit } = useForm<Inputs>({
+  const { register, handleSubmit, setFocus } = useForm<Inputs>({
     defaultValues: {
       description,
     },
@@ -81,6 +113,10 @@ export default function EditPostModal({
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     onUpdatePostDescription(data.description);
   };
+
+  useEffect(() => {
+    setFocus("description");
+  }, [setFocus]);
 
   return (
     <StyledEditPostModal>
@@ -92,8 +128,9 @@ export default function EditPostModal({
       </Container>
 
       <StyledEditPostForm onSubmit={handleSubmit(onSubmit)}>
-        <Input
-          variant="auth"
+        <Textarea
+          variant="editPost"
+          rows={4}
           placeholder="Description"
           {...register("description")}
         />

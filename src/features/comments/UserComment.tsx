@@ -8,6 +8,7 @@ import { Comment } from "../../lib/types";
 import { useUser } from "../../hooks/useUser";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { NavLink } from "react-router-dom";
+import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
 
 const StyledUserComment = styled.li`
   margin-right: 1.2rem;
@@ -22,8 +23,9 @@ const Container = styled.div`
   background-color: var(--color-zinc-800);
   border-radius: 1.1rem;
   padding: 1rem;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: auto min-content min-content;
+  align-items: center;
   gap: 1rem;
 `;
 
@@ -53,6 +55,32 @@ const CommentInteractions = styled.div`
   gap: 2.4rem;
 `;
 
+const ButtonWrapper = styled.div``;
+
+const EditIcon = styled(HiMiniPencilSquare)`
+  color: var(--color-zinc-100);
+  font-size: 2.4rem;
+  padding: 0.1rem;
+  border-radius: 100%;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-sky-500);
+  }
+`;
+
+const DeleteIcon = styled(HiMiniXMark)`
+  color: var(--color-zinc-100);
+  font-size: 2.4rem;
+  padding: 0.1rem;
+  border-radius: 100%;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-sky-500);
+  }
+`;
+
 const PostTime = styled.span`
   font-size: 1.4rem;
   color: var(--color-zinc-300);
@@ -66,11 +94,12 @@ const FormWrapper = styled.div`
 
 type Props = {
   comment: Comment;
+  onDeleteComment: (commentId: string) => void;
 };
 
-export default function UserComment({ comment }: Props) {
+export default function UserComment({ comment, onDeleteComment }: Props) {
   const [isResponseFormOpen, setIsResponseFormOpen] = useState<boolean>(false);
-  const { comment: commentContent, user_id, createdAt } = comment;
+  const { id, comment: commentContent, user_id, createdAt } = comment;
   const user = useUser(user_id);
 
   return (
@@ -81,6 +110,18 @@ export default function UserComment({ comment }: Props) {
         <ProfileLink to="/profile">
           <Name>{user?.name}</Name>
         </ProfileLink>
+
+        <ButtonWrapper>
+          <Button>
+            <EditIcon />
+          </Button>
+        </ButtonWrapper>
+
+        <ButtonWrapper>
+          <Button onClick={() => onDeleteComment(id)}>
+            <DeleteIcon />
+          </Button>
+        </ButtonWrapper>
         <CommentContent>{commentContent}</CommentContent>
       </Container>
 

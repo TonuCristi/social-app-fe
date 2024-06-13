@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import UploadAvatar from "./UploadAvatar";
 import Posts from "../posts/Posts";
-import UserPost from "../posts/UserPost";
+import UserPost from "../posts/Post";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";

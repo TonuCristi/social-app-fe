@@ -4,11 +4,11 @@ import styled from "styled-components";
 
 import Overlay from "../../ui/Overlay";
 import Button from "../../ui/Button";
-import Comments from "./Comments";
-import Likes from "./Likes";
+import Likes from "../likes/Likes";
 
 import { HiMiniChatBubbleOvalLeft, HiMiniHeart } from "react-icons/hi2";
 import { Comment, Like } from "../../lib/types";
+import Comments from "../comments/Comments";
 
 const StyledPostInteractions = styled.div`
   display: flex;
@@ -62,6 +62,7 @@ type Props = {
   onUnlikePost: () => void;
   comments: Comment[];
   onAddComment: (comment: string, commentId: string | null) => void;
+  onDeleteComment: (commentId: string) => void;
 };
 
 export default function PostInteractions({
@@ -71,6 +72,7 @@ export default function PostInteractions({
   onUnlikePost,
   comments,
   onAddComment,
+  onDeleteComment,
 }: Props) {
   const [isLikesListOpen, setIsLikesListOpen] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
@@ -121,6 +123,7 @@ export default function PostInteractions({
               setIsCommentsOpen={setIsCommentsOpen}
               comments={comments}
               onAddComment={onAddComment}
+              onDeleteComment={onDeleteComment}
             />
           </Overlay>,
           document.body

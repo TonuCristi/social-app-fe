@@ -62,11 +62,16 @@ export const PostApi = {
         user_id: userId,
         comment_id: commentId,
       })
-      .then(({ data }: AxiosResponse<CommentResponse[]>) => data);
+      .then(({ data }: AxiosResponse<CommentResponse>) => data);
   },
   getComments(postId: string) {
     return api
       .get(`${BASE_URL}/post/comments/${postId}`)
       .then(({ data }: AxiosResponse<CommentResponse[]>) => data);
+  },
+  deleteComment(id: string) {
+    return api
+      .delete(`${BASE_URL}/post/deleteComment/${id}`)
+      .then(({ data }: AxiosResponse<{ message: string }>) => data);
   },
 };

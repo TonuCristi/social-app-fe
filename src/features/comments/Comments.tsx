@@ -100,12 +100,14 @@ type Props = {
   setIsCommentsOpen: Dispatch<SetStateAction<boolean>>;
   comments: Comment[];
   onAddComment: (comment: string, commentId: string | null) => void;
+  onDeleteComment: (commentId: string) => void;
 };
 
 export default function Comments({
   setIsCommentsOpen,
   comments,
   onAddComment,
+  onDeleteComment,
 }: Props) {
   return (
     <StyledComments>
@@ -118,7 +120,11 @@ export default function Comments({
 
       <CommentsList>
         {comments.map((comment) => (
-          <UserComment key={comment.id} comment={comment} />
+          <UserComment
+            key={comment.id}
+            comment={comment}
+            onDeleteComment={onDeleteComment}
+          />
         ))}
       </CommentsList>
 

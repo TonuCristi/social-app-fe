@@ -8,7 +8,6 @@ type Variant =
   | "postComments"
   | "auth"
   | "post"
-  | "postEdit"
   | "comment"
   | "empty";
 
@@ -189,12 +188,6 @@ const variants = {
         padding: 0.8rem 1.4rem;
       }
     }
-  `,
-  postEdit: css`
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    align-self: flex-start;
   `,
   comment: css`
     font-size: 1.4rem;
