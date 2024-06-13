@@ -30,6 +30,17 @@ export function useComments(postId: string, userId: string) {
     });
   }
 
+  function handleEditComment(commentId: string, comment: string) {
+    PostApi.editComment(commentId, comment).then((res) => {
+      const comment = mapComment(res);
+      const editedComments = [
+        comment,
+        ...comments.filter((comment) => comment.id !== commentId),
+      ];
+      setComments(editedComments);
+    });
+  }
+
   useEffect(() => {
     PostApi.getComments(postId).then((res) => {
       const comments = mapComments(res).reverse();
@@ -38,5 +49,11 @@ export function useComments(postId: string, userId: string) {
     });
   }, [postId]);
 
-  return { handleAddComment, handleDeleteComment, comments, isCommentsLoading };
+  return {
+    handleAddComment,
+    handleDeleteComment,
+    handleEditComment,
+    comments,
+    isCommentsLoading,
+  };
 }

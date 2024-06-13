@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styled from "styled-components";
 
 import Avatar from "../../ui/Avatar";
 import Button from "../../ui/Button";
+import Textarea from "../../ui/Textarea";
 
 import { Comment } from "../../lib/types";
 import { useUser } from "../../hooks/useUser";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { NavLink } from "react-router-dom";
 import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
+import { useForm } from "react-hook-form";
 
 const StyledUserComment = styled.li`
   margin-right: 1.2rem;
@@ -24,7 +26,7 @@ const Container = styled.div`
   border-radius: 1.1rem;
   padding: 1rem;
   display: grid;
-  grid-template-columns: auto min-content min-content;
+  grid-template-columns: auto min-content min-content min-content min-content;
   align-items: center;
   gap: 1rem;
 `;
@@ -43,8 +45,17 @@ const Name = styled.h4`
   }
 `;
 
-const CommentContent = styled.p`
+const CommentContent = styled.pre`
   color: var(--color-zinc-300);
+  grid-row: 2;
+  grid-column: 1 / 6;
+  white-space: pre-wrap;
+  word-break: break-all;
+`;
+
+const TextareaWrapper = styled.div`
+  grid-row: 2;
+  grid-column: 1 / 6;
 `;
 
 const CommentInteractions = styled.div`
@@ -54,8 +65,6 @@ const CommentInteractions = styled.div`
   align-items: center;
   gap: 2.4rem;
 `;
-
-const ButtonWrapper = styled.div``;
 
 const EditIcon = styled(HiMiniPencilSquare)`
   color: var(--color-zinc-100);
@@ -95,12 +104,40 @@ const FormWrapper = styled.div`
 type Props = {
   comment: Comment;
   onDeleteComment: (commentId: string) => void;
+  onEditComment: (commentId: string, comment: string) => void;
 };
 
-export default function UserComment({ comment, onDeleteComment }: Props) {
+export default function UserComment({
+  comment,
+  onDeleteComment,
+  onEditComment,
+}: Props) {
   const [isResponseFormOpen, setIsResponseFormOpen] = useState<boolean>(false);
   const { id, comment: commentContent, user_id, createdAt } = comment;
   const user = useUser(user_id);
+  const { register, watch } = useForm({
+    defaultValues: {
+      comment: commentContent,
+    },
+  });
+  const commentRef = useRef<HTMLPreElement>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [rowsCount, setRowsCount] = useState<number>(0);
+
+  function handleEdit() {
+    setIsEditing(true);
+
+    if (!commentRef.current) return;
+    const rows = commentRef.current.textContent?.split("\n").length
+      ? commentRef.current.textContent?.split("\n").length
+      : 0;
+    setRowsCount(rows);
+  }
+
+  function handleSave() {
+    onEditComment(id, watch("comment"));
+    setIsEditing(false);
+  }
 
   return (
     <StyledUserComment>
@@ -111,18 +148,43 @@ export default function UserComment({ comment, onDeleteComment }: Props) {
           <Name>{user?.name}</Name>
         </ProfileLink>
 
-        <ButtonWrapper>
-          <Button>
-            <EditIcon />
+        {isEditing && (
+          <Button
+            variant="discardCommentEdit"
+            onClick={() => setIsEditing(false)}
+          >
+            Discard
           </Button>
-        </ButtonWrapper>
+        )}
+        {isEditing && (
+          <Button
+            variant="saveCommentEdit"
+            disabled={watch("comment") === commentContent}
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+        )}
 
-        <ButtonWrapper>
-          <Button onClick={() => onDeleteComment(id)}>
-            <DeleteIcon />
-          </Button>
-        </ButtonWrapper>
-        <CommentContent>{commentContent}</CommentContent>
+        <Button onClick={handleEdit}>
+          <EditIcon />
+        </Button>
+
+        <Button onClick={() => onDeleteComment(id)}>
+          <DeleteIcon />
+        </Button>
+
+        {isEditing ? (
+          <TextareaWrapper>
+            <Textarea
+              variant="comment"
+              rows={rowsCount}
+              {...register("comment")}
+            />
+          </TextareaWrapper>
+        ) : (
+          <CommentContent ref={commentRef}>{commentContent}</CommentContent>
+        )}
       </Container>
 
       <CommentInteractions>

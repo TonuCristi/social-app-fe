@@ -9,6 +9,8 @@ type Variant =
   | "auth"
   | "post"
   | "comment"
+  | "saveCommentEdit"
+  | "discardCommentEdit"
   | "empty";
 
 const variants = {
@@ -193,6 +195,25 @@ const variants = {
     font-size: 1.4rem;
     font-weight: 600;
     color: var(--color-zinc-300);
+  `,
+  saveCommentEdit: css`
+    background-color: var(--color-sky-500);
+    color: var(--color-zinc-100);
+    padding: 0.2rem 1rem;
+    border-radius: 1.5rem;
+    font-weight: 500;
+
+    &:disabled {
+      background-color: var(--color-sky-700);
+      cursor: not-allowed;
+    }
+  `,
+  discardCommentEdit: css`
+    background-color: var(--color-red-500);
+    color: var(--color-zinc-100);
+    padding: 0.2rem 1rem;
+    border-radius: 1.5rem;
+    font-weight: 500;
   `,
   empty: css`
     display: flex;

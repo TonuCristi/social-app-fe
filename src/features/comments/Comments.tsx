@@ -101,6 +101,7 @@ type Props = {
   comments: Comment[];
   onAddComment: (comment: string, commentId: string | null) => void;
   onDeleteComment: (commentId: string) => void;
+  onEditComment: (commentId: string, comment: string) => void;
 };
 
 export default function Comments({
@@ -108,6 +109,7 @@ export default function Comments({
   comments,
   onAddComment,
   onDeleteComment,
+  onEditComment,
 }: Props) {
   return (
     <StyledComments>
@@ -124,6 +126,7 @@ export default function Comments({
             key={comment.id}
             comment={comment}
             onDeleteComment={onDeleteComment}
+            onEditComment={onEditComment}
           />
         ))}
       </CommentsList>

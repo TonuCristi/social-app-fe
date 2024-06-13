@@ -74,4 +74,9 @@ export const PostApi = {
       .delete(`${BASE_URL}/post/deleteComment/${id}`)
       .then(({ data }: AxiosResponse<{ message: string }>) => data);
   },
+  editComment(id: string, comment: string) {
+    return api
+      .put(`${BASE_URL}/post/editComment/${id}`, { comment })
+      .then(({ data }: AxiosResponse<CommentResponse>) => data);
+  },
 };

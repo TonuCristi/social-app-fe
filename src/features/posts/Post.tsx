@@ -182,8 +182,13 @@ export default function Post({ post }: Props) {
   const { handleLikePost, handleUnlikePost, likes, isLikesLoading, isLiked } =
     useLikes(id, user.id);
 
-  const { handleAddComment, handleDeleteComment, comments, isCommentsLoading } =
-    useComments(id, user.id);
+  const {
+    handleAddComment,
+    handleDeleteComment,
+    handleEditComment,
+    comments,
+    isCommentsLoading,
+  } = useComments(id, user.id);
 
   function handleUpdatePostDescription(description: string) {
     PostApi.updatePostDescription(id, description).then((res) => {
@@ -260,6 +265,7 @@ export default function Post({ post }: Props) {
             comments={comments}
             onAddComment={handleAddComment}
             onDeleteComment={handleDeleteComment}
+            onEditComment={handleEditComment}
           />
         </PostInteractionsWrapper>
       </StyledPost>

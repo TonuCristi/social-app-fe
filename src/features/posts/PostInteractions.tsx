@@ -63,6 +63,7 @@ type Props = {
   comments: Comment[];
   onAddComment: (comment: string, commentId: string | null) => void;
   onDeleteComment: (commentId: string) => void;
+  onEditComment: (commentId: string, comment: string) => void;
 };
 
 export default function PostInteractions({
@@ -73,6 +74,7 @@ export default function PostInteractions({
   comments,
   onAddComment,
   onDeleteComment,
+  onEditComment,
 }: Props) {
   const [isLikesListOpen, setIsLikesListOpen] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
@@ -124,6 +126,7 @@ export default function PostInteractions({
               comments={comments}
               onAddComment={onAddComment}
               onDeleteComment={onDeleteComment}
+              onEditComment={onEditComment}
             />
           </Overlay>,
           document.body
