@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
@@ -22,7 +23,6 @@ import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { mapPost } from "../../utils/mapPost";
 import { useLikes } from "../likes/useLikes";
 import { useComments } from "../comments/useComments";
-import toast from "react-hot-toast";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
