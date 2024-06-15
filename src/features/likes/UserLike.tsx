@@ -2,9 +2,9 @@ import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
 import Avatar from "../../ui/Avatar";
+import LoadingLike from "./LoadingLike";
 
 import { useUser } from "../../hooks/useUser";
-import LoadingLike from "./LoadingLike";
 
 const ProfileLink = styled(NavLink)`
   display: flex;

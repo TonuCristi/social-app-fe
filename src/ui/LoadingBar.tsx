@@ -1,4 +1,4 @@
-import styled, { keyframes } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 
 type Variant = "sm" | "l";
 
@@ -12,14 +12,23 @@ const move = keyframes`
   }
 `;
 
+const variants = {
+  sm: css`
+    height: 2rem;
+  `,
+  l: css`
+    height: 4rem;
+  `,
+};
+
 const StyledLoadingBar = styled.div<{ $variant: Variant }>`
   width: 100%;
-  height: ${(props) => (props.$variant === "sm" ? "2rem" : "4rem")};
   background-color: var(--color-zinc-700);
   grid-column: 2;
   border-radius: 0.5rem;
   position: relative;
   overflow: hidden;
+  ${(props) => variants[props.$variant]}
 
   &::before {
     content: "";

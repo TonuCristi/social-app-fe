@@ -5,13 +5,13 @@ import { useForm } from "react-hook-form";
 import Avatar from "../../ui/Avatar";
 import Button from "../../ui/Button";
 import Textarea from "../../ui/Textarea";
+import LoadingComment from "./LoadingComment";
 
 import { Comment } from "../../lib/types";
 import { useUser } from "../../hooks/useUser";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { NavLink } from "react-router-dom";
 import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
-import LoadingComment from "./LoadingComment";
 
 const StyledUserComment = styled.li`
   margin-right: 1.2rem;
