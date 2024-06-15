@@ -9,6 +9,7 @@ import Likes from "../likes/Likes";
 import { HiMiniChatBubbleOvalLeft, HiMiniHeart } from "react-icons/hi2";
 import { Comment, Like } from "../../lib/types";
 import Comments from "../comments/Comments";
+import { formatNumber } from "../../utils/formatNumber";
 
 const StyledPostInteractions = styled.div`
   display: flex;
@@ -78,9 +79,6 @@ export default function PostInteractions({
 }: Props) {
   const [isLikesListOpen, setIsLikesListOpen] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
-  const likesCount = Intl.NumberFormat("en", { notation: "compact" }).format(
-    likes.length
-  );
 
   return (
     <>
@@ -92,14 +90,14 @@ export default function PostInteractions({
           <IconWrapper>
             <LikeIcon $isLiked={isLiked} />
           </IconWrapper>
-          <p>{likesCount}</p>
+          <p>{formatNumber(likes.length)}</p>
         </Button>
 
         <Button variant="postComments" onClick={() => setIsCommentsOpen(true)}>
           <IconWrapper>
             <CommentIcon />
           </IconWrapper>
-          <p>5.7K</p>
+          <p>{formatNumber(comments.length)}</p>
         </Button>
 
         <Button variant="postStats" onClick={() => setIsLikesListOpen(true)}>

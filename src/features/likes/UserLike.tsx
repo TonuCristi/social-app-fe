@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Avatar from "../../ui/Avatar";
 
 import { useUser } from "../../hooks/useUser";
+import LoadingLike from "./LoadingLike";
 
 const ProfileLink = styled(NavLink)`
   display: flex;
@@ -11,7 +12,7 @@ const ProfileLink = styled(NavLink)`
   gap: 1.4rem;
   text-decoration: none;
   padding: 0.8rem;
-  background-color: var(--color-zinc-700);
+  background-color: var(--color-zinc-800);
   border-radius: 1.1rem;
   color: var(--color-zinc-100);
   font-weight: 500;
@@ -35,7 +36,9 @@ type Props = {
 };
 
 export default function UserLike({ id }: Props) {
-  const user = useUser(id);
+  const { isLoading, user } = useUser(id);
+
+  if (isLoading) return <LoadingLike />;
 
   return (
     <ProfileLink to="/profile">

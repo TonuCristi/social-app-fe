@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import toast from "react-hot-toast";
 
@@ -13,10 +13,15 @@ import {
   loadMorePosts,
   selectPosts,
   loadError,
+  loadPosts,
 } from "../redux/postsSlice";
-import { PostRequestFile, PostResponse } from "../lib/types";
+import { PostRequestFile, PostResponse, PostT } from "../lib/types";
 import { PostApi } from "../api/PostApi";
 import { mapPost } from "../utils/mapPost";
+import { createPortal } from "react-dom";
+import Overlay from "../ui/Overlay";
+import EditPostModal from "../features/posts/EditPostModal";
+import ConfirmationModal from "../ui/ConfirmationModal";
 
 const PER_PAGE = 6;
 
@@ -34,6 +39,8 @@ export default function Feed() {
   const { isLoading, error, posts } = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
   const status = useRef<boolean>(false);
+  const [postToEdit, setPostToEdit] = useState<PostT | null>(null);
+  const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
@@ -43,6 +50,34 @@ export default function Feed() {
       const post = mapPost(res);
       dispatch(addPost(post));
       toast.success("Post added!");
+    });
+  }
+
+  function handleUpdatePostDescription(description: string) {
+    if (postToEdit === null) return;
+
+    PostApi.updatePostDescription(postToEdit.id, description).then((res) => {
+      const editedPost = mapPost(res);
+      const foundIndex = posts.findIndex((post) => post.id === editedPost.id);
+      const result = [
+        ...posts.slice(0, foundIndex),
+        editedPost,
+        ...posts.slice(foundIndex + 1, posts.length),
+      ];
+      dispatch(loadPosts(result));
+      setPostToEdit(null);
+      toast.success("Post edited!");
+    });
+  }
+
+  function handleDeletePost() {
+    if (postIdToDelete === null) return;
+
+    PostApi.deletePost(postIdToDelete).then(() => {
+      const result = posts.filter((post) => post.id !== postIdToDelete);
+      dispatch(loadPosts(result));
+      setPostIdToDelete(null);
+      toast.success("Post deleted!");
     });
   }
 
@@ -94,16 +129,45 @@ export default function Feed() {
   }, [dispatch, user.id, posts.length, isLoading]);
 
   return (
-    <StyledFeed>
-      <AddPostForm onCreatePost={handleCreatePost} />
+    <>
+      <StyledFeed>
+        <AddPostForm onCreatePost={handleCreatePost} />
 
-      <Posts variant="feed" isLoading={isLoading} error={error}>
-        {posts.map((post) => (
-          <Post key={post.id} post={post} />
-        ))}
-      </Posts>
+        <Posts variant="feed" isLoading={isLoading} error={error}>
+          {posts.map((post) => (
+            <Post
+              key={post.id}
+              post={post}
+              setPostToEdit={setPostToEdit}
+              setPostIdToDelete={setPostIdToDelete}
+            />
+          ))}
+        </Posts>
 
-      {posts.length > 0 && <div className="target" />}
-    </StyledFeed>
+        {posts.length > 0 && <div className="target" />}
+      </StyledFeed>
+
+      {postToEdit !== null &&
+        createPortal(
+          <Overlay>
+            <EditPostModal
+              post={postToEdit}
+              onUpdatePostDescription={handleUpdatePostDescription}
+              setPostToEdit={setPostToEdit}
+            />
+          </Overlay>,
+          document.body
+        )}
+
+      {postIdToDelete !== null &&
+        createPortal(
+          <ConfirmationModal
+            onConfirm={handleDeletePost}
+            onClose={() => setPostIdToDelete(null)}
+            question="Are you sure about deleting this post?"
+          />,
+          document.body
+        )}
+    </>
   );
 }

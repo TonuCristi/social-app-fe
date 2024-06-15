@@ -91,10 +91,11 @@ type Props = DetailedHTMLProps<
 > & {
   variant: Variant;
   rightIcon?: ReactNode;
+  onRightBtnClick?: () => void;
 };
 
 const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { type, placeholder, variant, onClick, rightIcon, ...props },
+  { type, placeholder, variant, onClick, onRightBtnClick, rightIcon, ...props },
   ref
 ) {
   return (
@@ -107,7 +108,16 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         {...props}
         onClick={onClick}
       />
-      {rightIcon && <Button>{rightIcon}</Button>}
+      {rightIcon && (
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            onRightBtnClick && onRightBtnClick();
+          }}
+        >
+          {rightIcon}
+        </Button>
+      )}
     </Container>
   );
 });

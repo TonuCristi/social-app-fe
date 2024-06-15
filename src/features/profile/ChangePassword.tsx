@@ -1,19 +1,20 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import Input from "../../ui/Input";
 import Button from "../../ui/Button";
 import Message from "../../ui/Message";
+import PasswordField from "./PasswordField";
 
 import { AuthApi } from "../../api/AuthApi";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 
 const fields = [
-  { name: "oldPassword", placeholder: "Old password" },
-  { name: "newPassword", placeholder: "New password" },
-  { name: "newPasswordRepeat", placeholder: "Repeat new password" },
+  { identifier: "oldPassword", placeholder: "Old password" },
+  { identifier: "newPassword", placeholder: "New password" },
+  { identifier: "newPasswordRepeat", placeholder: "Repeat new password" },
 ] as const;
 
 const StyledChangePassword = styled.div`
@@ -58,7 +59,7 @@ export default function ChangePassword() {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     AuthApi.changePassword(data, user.id)
       .then((res) => {
-        setMessage({ value: res.message, isSuccess: true });
+        toast.success(res.message);
         reset();
       })
       .catch((err) =>
@@ -71,12 +72,10 @@ export default function ChangePassword() {
       <Title>Change password</Title>
       <Form onSubmit={handleSubmit(onSubmit)}>
         {fields.map((field) => (
-          <Input
-            key={field.name}
-            variant="auth"
-            type="password"
+          <PasswordField
+            key={field.identifier}
             placeholder={field.placeholder}
-            {...register(field.name)}
+            {...register(field.identifier)}
           />
         ))}
 

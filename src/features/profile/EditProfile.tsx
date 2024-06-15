@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { createPortal } from "react-dom";
 
 import Message from "../../ui/Message";
-import ChangeField from "./ChangeField";
 import ConfirmationModal from "../../ui/ConfirmationModal";
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
@@ -14,6 +13,8 @@ import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
 import { AuthApi } from "../../api/AuthApi";
 import { mapUser } from "../../utils/mapUser";
 import { HiMiniPencilSquare } from "react-icons/hi2";
+import { capitalize } from "../../utils/capitalize";
+import toast from "react-hot-toast";
 
 const fields = [
   { identifier: "name", name: "username", type: "text" },
@@ -38,6 +39,13 @@ const Form = styled.form`
   flex-direction: column;
   align-items: center;
   gap: 1.2rem;
+`;
+
+const ChangeField = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
 `;
 
 const Textarea = styled.textarea`
@@ -103,7 +111,7 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          setMessage({ value: res.message, isSuccess: true });
+          toast.success(res.message);
         })
         .catch((err) => {
           setMessage({ value: err.response.data.error, isSuccess: false });
@@ -116,7 +124,7 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          setMessage({ value: res.message, isSuccess: true });
+          toast.success(res.message);
         })
         .catch((err) => {
           setMessage({ value: err.response.data.error, isSuccess: false });
@@ -129,7 +137,7 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          setMessage({ value: res.message, isSuccess: true });
+          toast.success(res.message);
         })
         .catch((err) => {
           setMessage({ value: err.response.data.error, isSuccess: false });
@@ -142,7 +150,7 @@ export default function EditProfile() {
         .then((res) => {
           const user = mapUser(res.user);
           dispatch(fetchUser(user));
-          setMessage({ value: res.message, isSuccess: true });
+          toast.success(res.message);
         })
         .catch((err) => {
           setMessage({ value: err.response.data.error, isSuccess: false });
@@ -164,7 +172,11 @@ export default function EditProfile() {
                   {...register("description")}
                 />
               ) : (
-                <Input variant="auth" {...register(field.identifier)} />
+                <Input
+                  variant="auth"
+                  placeholder={capitalize(field.name)}
+                  {...register(field.identifier)}
+                />
               )}
               <Button onClick={() => setCurrentField(field.identifier)}>
                 <IconWrapper>

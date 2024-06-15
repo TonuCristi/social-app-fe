@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import styled from "styled-components";
+import { useForm } from "react-hook-form";
 
 import Avatar from "../../ui/Avatar";
 import Button from "../../ui/Button";
@@ -10,7 +11,7 @@ import { useUser } from "../../hooks/useUser";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { NavLink } from "react-router-dom";
 import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
-import { useForm } from "react-hook-form";
+import LoadingComment from "./LoadingComment";
 
 const StyledUserComment = styled.li`
   margin-right: 1.2rem;
@@ -21,12 +22,13 @@ const StyledUserComment = styled.li`
   row-gap: 0.4rem;
 `;
 
-const Container = styled.div`
+const Container = styled.div<{ $isEditing: boolean }>`
   background-color: var(--color-zinc-800);
   border-radius: 1.1rem;
   padding: 1rem;
   display: grid;
-  grid-template-columns: auto min-content min-content min-content min-content;
+  grid-template-columns: auto min-content min-content ${(props) =>
+      props.$isEditing ? "min-content min-content" : ""};
   align-items: center;
   gap: 1rem;
 `;
@@ -45,17 +47,17 @@ const Name = styled.h4`
   }
 `;
 
-const CommentContent = styled.pre`
+const CommentContent = styled.pre<{ $isEditing: boolean }>`
   color: var(--color-zinc-300);
   grid-row: 2;
-  grid-column: 1 / 6;
+  grid-column: 1 / ${(props) => (props.$isEditing ? "6" : "3")};
   white-space: pre-wrap;
   word-break: break-all;
 `;
 
-const TextareaWrapper = styled.div`
+const TextareaWrapper = styled.div<{ $isEditing: boolean }>`
   grid-row: 2;
-  grid-column: 1 / 6;
+  grid-column: 1 / ${(props) => (props.$isEditing ? "6" : "3")};
 `;
 
 const CommentInteractions = styled.div`
@@ -114,7 +116,7 @@ export default function UserComment({
 }: Props) {
   const [isResponseFormOpen, setIsResponseFormOpen] = useState<boolean>(false);
   const { id, comment: commentContent, user_id, createdAt } = comment;
-  const user = useUser(user_id);
+  const { isLoading, user } = useUser(user_id);
   const { register, watch } = useForm({
     defaultValues: {
       comment: commentContent,
@@ -139,11 +141,13 @@ export default function UserComment({
     setIsEditing(false);
   }
 
+  if (isLoading) return <LoadingComment />;
+
   return (
     <StyledUserComment>
       <Avatar variant="post" name={user?.name} src={user?.avatar} />
 
-      <Container>
+      <Container $isEditing={isEditing}>
         <ProfileLink to="/profile">
           <Name>{user?.name}</Name>
         </ProfileLink>
@@ -175,7 +179,7 @@ export default function UserComment({
         </Button>
 
         {isEditing ? (
-          <TextareaWrapper>
+          <TextareaWrapper $isEditing={isEditing}>
             <Textarea
               variant="comment"
               rows={rowsCount}
@@ -183,7 +187,9 @@ export default function UserComment({
             />
           </TextareaWrapper>
         ) : (
-          <CommentContent ref={commentRef}>{commentContent}</CommentContent>
+          <CommentContent ref={commentRef} $isEditing={isEditing}>
+            {commentContent}
+          </CommentContent>
         )}
       </Container>
 

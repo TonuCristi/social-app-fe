@@ -1,28 +1,28 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
-import { createPortal } from "react-dom";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
 import PostImage from "./PostImage";
-import Overlay from "../../ui/Overlay";
-import EditPostModal from "./EditPostModal";
 import Button from "../../ui/Button";
-import ConfirmationModal from "../../ui/ConfirmationModal";
 import LoadingPost from "./LoadingPost";
 
-import { PostT } from "../../lib/types";
+import {
+  Comment,
+  CommentResponse,
+  Like,
+  LikeResponse,
+  PostT,
+} from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { PostApi } from "../../api/PostApi";
 import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { loadPosts, selectPosts } from "../../redux/postsSlice";
+import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { mapPost } from "../../utils/mapPost";
-import { useLikes } from "../likes/useLikes";
-import { useComments } from "../comments/useComments";
+import { mapLike } from "../../utils/mapLike";
+import { mapComment } from "../../utils/mapComment";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -169,51 +169,93 @@ const DeleteIcon = styled(HiMiniXMark)`
 
 type Props = {
   post: PostT;
+  setPostToEdit: Dispatch<SetStateAction<PostT | null>>;
+  setPostIdToDelete: Dispatch<SetStateAction<string | null>>;
 };
 
-export default function Post({ post }: Props) {
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-  const { posts } = useAppSelector(selectPosts);
+export default function Post({
+  post,
+  setPostToEdit,
+  setPostIdToDelete,
+}: Props) {
   const { user } = useAppSelector(selectCurrentUser);
-  const dispatch = useAppDispatch();
   const { id, description, image, createdAt, user_id } = post;
+  const [likes, setLikes] = useState<Like[]>([]);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const { handleLikePost, handleUnlikePost, likes, isLikesLoading, isLiked } =
-    useLikes(id, user.id);
+  const mapLikes = (likes: LikeResponse[]) =>
+    likes.map((like) => mapLike(like));
 
-  const {
-    handleAddComment,
-    handleDeleteComment,
-    handleEditComment,
-    comments,
-    isCommentsLoading,
-  } = useComments(id, user.id);
+  function handleLikePost() {
+    if (likes.find((like) => like.user_id === user.id)) return;
 
-  function handleUpdatePostDescription(description: string) {
-    PostApi.updatePostDescription(id, description).then((res) => {
-      const editedPost = mapPost(res);
-      const foundIndex = posts.findIndex((post) => post.id === editedPost.id);
-      const result = [
-        ...posts.slice(0, foundIndex),
-        editedPost,
-        ...posts.slice(foundIndex + 1, posts.length),
+    PostApi.likePost(id, user.id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+      setIsLiked(true);
+    });
+  }
+
+  function handleUnlikePost() {
+    const like = likes.find((like) => like.user_id === user.id);
+
+    if (!like) return;
+
+    PostApi.unlikePost(id, like.id).then((res) => {
+      const likes = mapLikes(res);
+      setLikes(likes);
+      setIsLiked(false);
+    });
+  }
+
+  const mapComments = (comments: CommentResponse[]) =>
+    comments.map((comment) => mapComment(comment));
+
+  function handleAddComment(comment: string, commentId: string | null) {
+    PostApi.addComment(id, user.id, commentId, comment).then((res) => {
+      const comment = mapComment(res);
+      setComments([comment, ...comments]);
+      toast.success("Comment added!");
+    });
+  }
+
+  function handleDeleteComment(commentId: string) {
+    PostApi.deleteComment(commentId).then(() => {
+      const filteredComments = comments.filter(
+        (comment) => comment.id !== commentId
+      );
+      setComments(filteredComments);
+      toast.success("Comment deleted!");
+    });
+  }
+
+  function handleEditComment(commentId: string, comment: string) {
+    PostApi.editComment(commentId, comment).then((res) => {
+      const comment = mapComment(res);
+      const editedComments = [
+        comment,
+        ...comments.filter((comment) => comment.id !== commentId),
       ];
-      dispatch(loadPosts(result));
-      setIsEditModalOpen(false);
-      toast.success("Post edited!");
+      setComments(editedComments);
     });
   }
 
-  function handleDeletePost() {
-    PostApi.deletePost(id).then(() => {
-      const result = posts.filter((post) => post.id !== id);
-      dispatch(loadPosts(result));
-      toast.success("Post deleted!");
-    });
-  }
+  useEffect(() => {
+    setIsLoading(true);
+    Promise.all([PostApi.getLikes(id), PostApi.getComments(id)]).then((res) => {
+      const likes = mapLikes(res[0]);
+      setLikes(likes);
+      if (likes.find((like) => like.user_id === user.id)) setIsLiked(true);
 
-  if (isLikesLoading || isCommentsLoading) {
+      const comments = mapComments(res[1]).reverse();
+      setComments(comments);
+      setIsLoading(false);
+    });
+  }, [id, user.id]);
+
+  if (isLoading) {
     return <LoadingPost />;
   }
 
@@ -235,7 +277,7 @@ export default function Post({ post }: Props) {
 
           {user.id === user_id && (
             <EditButtonWrapper>
-              <Button onClick={() => setIsEditModalOpen(true)}>
+              <Button onClick={() => setPostToEdit(post)}>
                 <EditIcon />
               </Button>
             </EditButtonWrapper>
@@ -243,7 +285,7 @@ export default function Post({ post }: Props) {
 
           {user.id === user_id && (
             <DeleteButtonWrapper>
-              <Button onClick={() => setIsDeleteModalOpen(true)}>
+              <Button onClick={() => setPostIdToDelete(id)}>
                 <DeleteIcon />
               </Button>
             </DeleteButtonWrapper>
@@ -269,28 +311,6 @@ export default function Post({ post }: Props) {
           />
         </PostInteractionsWrapper>
       </StyledPost>
-
-      {isEditModalOpen &&
-        createPortal(
-          <Overlay>
-            <EditPostModal
-              post={post}
-              onUpdatePostDescription={handleUpdatePostDescription}
-              setIsEditModalOpen={setIsEditModalOpen}
-            />
-          </Overlay>,
-          document.body
-        )}
-
-      {isDeleteModalOpen &&
-        createPortal(
-          <ConfirmationModal
-            onConfirm={handleDeletePost}
-            onClose={() => setIsDeleteModalOpen(false)}
-            question="Are you sure about deleting this post?"
-          />,
-          document.body
-        )}
     </>
   );
 }

@@ -1,4 +1,7 @@
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
+
+import LoadingProfile from "../../ui/LoadingProfile";
+import LoadingBar from "../../ui/LoadingBar";
 
 const StyledLoadingPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -44,56 +47,13 @@ const StyledLoadingPost = styled.div`
   }
 `;
 
-const Profile = styled.div`
-  width: 4rem;
-  height: 4rem;
-  background-color: var(--color-zinc-700);
-  border-radius: 100%;
-`;
-
-type Variant = "sm" | "l";
-
-const move = keyframes`
-  from {
-    left: 0;
-  }
-
-  to {
-    left: 100%
-  }
-`;
-
-const Bar = styled.div<{ $variant: Variant }>`
-  width: 100%;
-  height: ${(props) => (props.$variant === "sm" ? "2rem" : "4rem")};
-  background-color: var(--color-zinc-700);
-  grid-column: 2;
-  border-radius: 0.5rem;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    width: 2rem;
-    height: 100%;
-    background-color: var(--color-zinc-400);
-    border-radius: 100%;
-    box-shadow: 0 0 3rem 3rem var(--color-zinc-400);
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    animation: ${move} 0.5s linear infinite;
-  }
-`;
-
 export default function LoadingPost() {
   return (
     <StyledLoadingPost>
-      <Profile />
-      <Bar $variant="l" />
-      <Bar $variant="sm" />
-      <Bar $variant="sm" />
+      <LoadingProfile />
+      <LoadingBar variant="l" />
+      <LoadingBar variant="sm" />
+      <LoadingBar variant="sm" />
     </StyledLoadingPost>
   );
 }

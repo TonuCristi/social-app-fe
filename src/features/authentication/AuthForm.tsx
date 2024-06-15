@@ -112,7 +112,7 @@ export default function AuthForm({ onSignup, onLogin }: Props) {
     <Container>
       <Title>{isLogin ? "Login" : "Signup"}</Title>
       <StyledAuthForm onSubmit={handleSubmit(onSubmit)}>
-        {!isLogin && (
+        {isLogin || (
           <Input
             variant="auth"
             type="text"
@@ -120,19 +120,22 @@ export default function AuthForm({ onSignup, onLogin }: Props) {
             {...register("name")}
           />
         )}
+
         <Input
           variant="auth"
           type="text"
           placeholder="Email"
           {...register("email")}
         />
+
         <Input
           variant="auth"
           type="password"
           placeholder="Password"
           {...register("password")}
         />
-        {!isLogin && (
+
+        {isLogin || (
           <Input variant="auth" type="date" {...register("birth_date")} />
         )}
 

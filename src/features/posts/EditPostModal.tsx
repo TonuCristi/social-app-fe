@@ -96,13 +96,13 @@ type Inputs = {
 type Props = {
   post: PostT;
   onUpdatePostDescription: (description: string) => void;
-  setIsEditModalOpen: Dispatch<SetStateAction<boolean>>;
+  setPostToEdit: Dispatch<SetStateAction<PostT | null>>;
 };
 
 export default function EditPostModal({
   post,
   onUpdatePostDescription,
-  setIsEditModalOpen,
+  setPostToEdit,
 }: Props) {
   const { description } = post;
   const { register, handleSubmit, setFocus } = useForm<Inputs>({
@@ -122,7 +122,7 @@ export default function EditPostModal({
     <StyledEditPostModal>
       <Container>
         <Title>Edit post</Title>
-        <Button onClick={() => setIsEditModalOpen(false)}>
+        <Button onClick={() => setPostToEdit(null)}>
           <CloseIcon />
         </Button>
       </Container>
