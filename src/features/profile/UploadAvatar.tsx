@@ -64,7 +64,7 @@ const Icon = styled(HiMiniArrowPath)`
 
 export default function UploadAvatar() {
   const {
-    user: { id, avatar },
+    currentUser: { id, avatar },
   } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState<boolean>(false);

@@ -4,15 +4,15 @@ import { RootState } from "./store";
 import { User } from "../lib/types";
 
 type UserState = {
-  isLoading: boolean;
-  error: string;
-  user: User;
+  isLoadingCurrentUser: boolean;
+  errorCurrentUser: string;
+  currentUser: User;
 };
 
 const initialState: UserState = {
-  isLoading: true,
-  error: "",
-  user: {
+  isLoadingCurrentUser: true,
+  errorCurrentUser: "",
+  currentUser: {
     id: "",
     name: "",
     email: "",
@@ -29,19 +29,19 @@ export const currentUserSlice = createSlice({
   initialState,
   reducers: {
     fetchUser: (state, action: PayloadAction<User>) => {
-      state.isLoading = false;
-      state.error = "";
-      state.user = action.payload;
+      state.isLoadingCurrentUser = false;
+      state.errorCurrentUser = "";
+      state.currentUser = action.payload;
     },
     fetchError: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = action.payload;
-      state.user = initialState.user;
+      state.isLoadingCurrentUser = false;
+      state.errorCurrentUser = action.payload;
+      state.currentUser = initialState.currentUser;
     },
     removeUser: (state) => {
-      state.isLoading = false;
-      state.error = "";
-      state.user = {
+      state.isLoadingCurrentUser = false;
+      state.errorCurrentUser = "";
+      state.currentUser = {
         id: "",
         name: "",
         email: "",

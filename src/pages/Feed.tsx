@@ -5,6 +5,9 @@ import toast from "react-hot-toast";
 import Posts from "../features/posts/Posts";
 import AddPostForm from "../features/posts/AddPostForm";
 import Post from "../features/posts/Post";
+import Overlay from "../ui/Overlay";
+import EditPostModal from "../features/posts/EditPostModal";
+import ConfirmationModal from "../ui/ConfirmationModal";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
@@ -19,9 +22,7 @@ import { PostRequestFile, PostResponse, PostT } from "../lib/types";
 import { PostApi } from "../api/PostApi";
 import { mapPost } from "../utils/mapPost";
 import { createPortal } from "react-dom";
-import Overlay from "../ui/Overlay";
-import EditPostModal from "../features/posts/EditPostModal";
-import ConfirmationModal from "../ui/ConfirmationModal";
+import { loadUserPosts, selectUserPosts } from "../redux/userPostsSlice";
 
 const PER_PAGE = 6;
 
@@ -35,8 +36,9 @@ const StyledFeed = styled.div`
 `;
 
 export default function Feed() {
-  const { user } = useAppSelector(selectCurrentUser);
-  const { isLoading, error, posts } = useAppSelector(selectPosts);
+  const { currentUser } = useAppSelector(selectCurrentUser);
+  const { isLoadingPosts, errorPosts, posts } = useAppSelector(selectPosts);
+  const { userPosts } = useAppSelector(selectUserPosts);
   const dispatch = useAppDispatch();
   const status = useRef<boolean>(false);
   const [postToEdit, setPostToEdit] = useState<PostT | null>(null);
@@ -74,8 +76,12 @@ export default function Feed() {
     if (postIdToDelete === null) return;
 
     PostApi.deletePost(postIdToDelete).then(() => {
-      const result = posts.filter((post) => post.id !== postIdToDelete);
-      dispatch(loadPosts(result));
+      const resultPosts = posts.filter((post) => post.id !== postIdToDelete);
+      dispatch(loadPosts(resultPosts));
+      const resultUserPosts = userPosts.filter(
+        (post) => post.id !== postIdToDelete
+      );
+      dispatch(loadUserPosts(resultUserPosts));
       setPostIdToDelete(null);
       toast.success("Post deleted!");
     });
@@ -104,7 +110,7 @@ export default function Feed() {
       if (status.current) return;
 
       status.current = true;
-      PostApi.getPosts(user.id, PER_PAGE, posts.length)
+      PostApi.getPosts(currentUser.id, PER_PAGE, posts.length)
         .then((res) => {
           const posts = mapPosts(res);
           dispatch(loadMorePosts(posts));
@@ -126,14 +132,14 @@ export default function Feed() {
     observer.observe(target);
 
     return () => observer.unobserve(target);
-  }, [dispatch, user.id, posts.length, isLoading]);
+  }, [dispatch, currentUser.id, posts.length, isLoadingPosts]);
 
   return (
     <>
       <StyledFeed>
         <AddPostForm onCreatePost={handleCreatePost} />
 
-        <Posts variant="feed" isLoading={isLoading} error={error}>
+        <Posts variant="feed" isLoading={isLoadingPosts} error={errorPosts}>
           {posts.map((post) => (
             <Post
               key={post.id}

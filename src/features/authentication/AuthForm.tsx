@@ -99,14 +99,14 @@ type Props = {
 export default function AuthForm({ onSignup, onLogin }: Props) {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const { register, handleSubmit, reset } = useForm<AuthInputs>();
-  const { isLoading, error } = useAppSelector(selectAuth);
+  const { isLoadingAuth, errorAuth } = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
   const onSubmit: SubmitHandler<AuthInputs> = (data) => {
     if (!isLogin) onSignup({ ...data, description: "", avatar: "" });
     if (isLogin) onLogin(data);
   };
 
-  if (isLoading) return <Loader />;
+  if (isLoadingAuth) return <Loader />;
 
   return (
     <Container>
@@ -143,9 +143,9 @@ export default function AuthForm({ onSignup, onLogin }: Props) {
           <Button variant="auth">{isLogin ? "Login" : "Signup"}</Button>
         </ButtonWrapper>
 
-        {error && (
+        {errorAuth && (
           <MessageWrapper>
-            <Message variant="error">{error}</Message>
+            <Message variant="error">{errorAuth}</Message>
           </MessageWrapper>
         )}
       </StyledAuthForm>

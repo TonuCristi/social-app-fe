@@ -20,14 +20,13 @@ const links = [
 ];
 
 const StyledProfile = styled.div`
-  color: white;
+  color: var(--color-zinc-100);
   display: grid;
   grid-template-columns: 25fr 75fr;
   width: 75%;
   margin: 0 auto;
   border: 1px solid var(--color-zinc-500);
   border-top: none;
-  height: 100%;
 
   @media (width >= 1535px) {
     & {

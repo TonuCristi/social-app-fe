@@ -11,12 +11,13 @@ import { PostRequestFile } from "../../lib/types";
 import { HiMiniPhoto } from "react-icons/hi2";
 import { useAppSelector } from "../../redux/hooks";
 
-const StyledAddPostForm = styled.form`
+const StyledAddPostForm = styled.form<{ $rows: number }>`
   border: 1px solid var(--color-zinc-500);
   background-color: var(--color-zinc-950);
   width: 50%;
   padding: 1.6rem;
   display: flex;
+  align-items: ${(props) => (props.$rows > 1 ? "flex-start" : "center")};
   gap: 1.6rem;
   border-radius: 1.1rem;
 
@@ -69,8 +70,15 @@ const ProfileLink = styled(NavLink)`
 `;
 
 const Container = styled.div`
-  align-self: center;
+  grid-row: 2;
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  justify-self: end;
 `;
+
+const InputContainer = styled.div``;
 
 const FileInputLabel = styled.label`
   display: flex;
@@ -109,7 +117,7 @@ type Props = {
 };
 
 export default function AddPostForm({ onCreatePost }: Props) {
-  const { user } = useAppSelector(selectCurrentUser);
+  const { currentUser } = useAppSelector(selectCurrentUser);
   const { register, watch, handleSubmit, reset } = useForm<Inputs>({
     defaultValues: {
       description: "",
@@ -117,47 +125,56 @@ export default function AddPostForm({ onCreatePost }: Props) {
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    onCreatePost({ ...data, image: data.image[0], user_id: user.id });
+    onCreatePost({ ...data, image: data.image[0], user_id: currentUser.id });
     reset();
   };
 
   return (
-    <StyledAddPostForm onSubmit={handleSubmit(onSubmit)}>
+    <StyledAddPostForm
+      onSubmit={handleSubmit(onSubmit)}
+      $rows={watch("description").split("\n").length}
+    >
       <ProfileLink to="/profile">
-        <Avatar src={user.avatar} name={user.name} variant="postForm" />
+        <Avatar
+          src={currentUser.avatar}
+          name={currentUser.name}
+          variant="postForm"
+        />
       </ProfileLink>
 
       <Textarea
         variant="addPost"
-        rows={1}
-        placeholder={`What's happening, ${user.name}?`}
+        rows={watch("description").split("\n").length}
+        placeholder={`What's happening, ${currentUser.name}?`}
         {...register("description")}
       />
 
       <Container>
-        <FileInputLabel htmlFor="file">
-          <PhotoIcon />
-        </FileInputLabel>
-        <FileInput
-          type="file"
-          id="file"
-          accept="image/png, image/jpeg"
-          {...register("image")}
-        />
-      </Container>
+        <InputContainer>
+          <FileInputLabel htmlFor="file">
+            <PhotoIcon />
+          </FileInputLabel>
+          <FileInput
+            type="file"
+            id="file"
+            accept="image/png, image/jpeg"
+            {...register("image")}
+          />
+        </InputContainer>
 
-      <PostBtnWrapper>
-        <Button
-          variant="post"
-          disabled={
-            watch("description").length > 0 || watch("image")?.length > 0
-              ? false
-              : true
-          }
-        >
-          Post
-        </Button>
-      </PostBtnWrapper>
+        <PostBtnWrapper>
+          <Button
+            variant="post"
+            disabled={
+              watch("description").length > 0 || watch("image")?.length > 0
+                ? false
+                : true
+            }
+          >
+            Post
+          </Button>
+        </PostBtnWrapper>
+      </Container>
     </StyledAddPostForm>
   );
 }

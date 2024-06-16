@@ -25,6 +25,17 @@ const variants = {
     &::placeholder {
       color: var(--color-zinc-500);
     }
+
+    &::-webkit-scrollbar {
+      background-color: var(--color-zinc-700);
+      border-radius: 1.1rem;
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-zinc-100);
+      border-radius: 1.1rem;
+    }
   `,
   comment: css`
     background-color: var(--color-zinc-900);
@@ -36,6 +47,17 @@ const variants = {
 
     &::placeholder {
       color: var(--color-zinc-500);
+    }
+
+    &::-webkit-scrollbar {
+      background-color: var(--color-zinc-700);
+      border-radius: 1.1rem;
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-zinc-100);
+      border-radius: 1.1rem;
     }
   `,
 };

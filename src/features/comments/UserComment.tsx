@@ -12,6 +12,7 @@ import { useUser } from "../../hooks/useUser";
 import { getTimePassed } from "../../utils/getTimePassed";
 import { NavLink } from "react-router-dom";
 import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
+import AddCommentForm from "./AddCommentForm";
 
 const StyledUserComment = styled.li`
   margin-right: 1.2rem;
@@ -35,6 +36,10 @@ const Container = styled.div<{ $isEditing: boolean }>`
 
 const ProfileLink = styled(NavLink)`
   text-decoration: none;
+`;
+
+const ProfileLinkWrapper = styled.div`
+  justify-self: start;
 `;
 
 const Name = styled.h4`
@@ -105,14 +110,16 @@ const FormWrapper = styled.div`
 
 type Props = {
   comment: Comment;
-  onDeleteComment: (commentId: string) => void;
-  onEditComment: (commentId: string, comment: string) => void;
+  onDeleteComment: (id: string) => void;
+  onEditComment: (id: string, comment: string) => void;
+  onAddComment: (comment: string, commentId: string | null) => void;
 };
 
 export default function UserComment({
   comment,
   onDeleteComment,
   onEditComment,
+  onAddComment,
 }: Props) {
   const [isResponseFormOpen, setIsResponseFormOpen] = useState<boolean>(false);
   const { id, comment: commentContent, user_id, createdAt } = comment;
@@ -124,17 +131,6 @@ export default function UserComment({
   });
   const commentRef = useRef<HTMLPreElement>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [rowsCount, setRowsCount] = useState<number>(0);
-
-  function handleEdit() {
-    setIsEditing(true);
-
-    if (!commentRef.current) return;
-    const rows = commentRef.current.textContent?.split("\n").length
-      ? commentRef.current.textContent?.split("\n").length
-      : 0;
-    setRowsCount(rows);
-  }
 
   function handleSave() {
     onEditComment(id, watch("comment"));
@@ -145,12 +141,16 @@ export default function UserComment({
 
   return (
     <StyledUserComment>
-      <Avatar variant="post" name={user?.name} src={user?.avatar} />
+      <ProfileLink to={`/profile/${user?.id}`}>
+        <Avatar variant="post" name={user?.name} src={user?.avatar} />
+      </ProfileLink>
 
       <Container $isEditing={isEditing}>
-        <ProfileLink to="/profile">
-          <Name>{user?.name}</Name>
-        </ProfileLink>
+        <ProfileLinkWrapper>
+          <ProfileLink to={`/profile/${user?.id}`}>
+            <Name>{user?.name}</Name>
+          </ProfileLink>
+        </ProfileLinkWrapper>
 
         {isEditing && (
           <Button
@@ -170,7 +170,7 @@ export default function UserComment({
           </Button>
         )}
 
-        <Button onClick={handleEdit}>
+        <Button onClick={() => setIsEditing(true)}>
           <EditIcon />
         </Button>
 
@@ -182,7 +182,11 @@ export default function UserComment({
           <TextareaWrapper $isEditing={isEditing}>
             <Textarea
               variant="comment"
-              rows={rowsCount}
+              rows={
+                watch("comment").split("\n").length <= 4
+                  ? watch("comment").split("\n").length
+                  : 4
+              }
               {...register("comment")}
             />
           </TextareaWrapper>
@@ -200,7 +204,9 @@ export default function UserComment({
         </Button>
       </CommentInteractions>
       {isResponseFormOpen && (
-        <FormWrapper>{/* <AddCommentForm /> */}</FormWrapper>
+        <FormWrapper>
+          <AddCommentForm commentId={id} onAddComment={onAddComment} />
+        </FormWrapper>
       )}
     </StyledUserComment>
   );

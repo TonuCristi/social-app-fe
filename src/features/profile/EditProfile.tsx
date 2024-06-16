@@ -85,7 +85,7 @@ type Inputs = {
 
 export default function EditProfile() {
   const {
-    user: { id, name, email, birth_date, description },
+    currentUser: { id, name, email, birth_date, description },
   } = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const { register, watch } = useForm<Inputs>({

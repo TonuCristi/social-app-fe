@@ -3,14 +3,14 @@ import { PostT } from "../lib/types";
 import { RootState } from "./store";
 
 type PostsState = {
-  isLoading: boolean;
-  error: string;
+  isLoadingPosts: boolean;
+  errorPosts: string;
   posts: PostT[];
 };
 
 const initialState: PostsState = {
-  isLoading: true,
-  error: "",
+  isLoadingPosts: true,
+  errorPosts: "",
   posts: [],
 };
 
@@ -19,27 +19,27 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     loadPosts(state, action: PayloadAction<PostT[]>) {
-      state.isLoading = false;
-      state.error = "";
+      state.isLoadingPosts = false;
+      state.errorPosts = "";
       state.posts = action.payload;
     },
     loadMorePosts(state, action: PayloadAction<PostT[]>) {
-      state.isLoading = false;
-      state.error = "";
+      state.isLoadingPosts = false;
+      state.errorPosts = "";
       state.posts = [...state.posts, ...action.payload];
     },
     startLoad(state) {
-      state.isLoading = true;
-      state.error = "";
+      state.isLoadingPosts = true;
+      state.errorPosts = "";
     },
     addPost(state, action: PayloadAction<PostT>) {
-      state.isLoading = false;
+      state.isLoadingPosts = false;
       state.posts = [action.payload, ...state.posts];
-      state.error = "";
+      state.errorPosts = "";
     },
     loadError(state, action: PayloadAction<string>) {
-      state.isLoading = false;
-      state.error = action.payload;
+      state.isLoadingPosts = false;
+      state.errorPosts = action.payload;
     },
   },
 });

@@ -30,6 +30,7 @@ const AddCommentIcon = styled(HiMiniPaperAirplane)<{ $isActive: boolean }>`
 `;
 
 type Props = {
+  commentId?: string;
   onAddComment: (comment: string, commentId: string | null) => void;
 };
 
@@ -37,8 +38,8 @@ type Inputs = {
   comment: string;
 };
 
-export default function AddCommentForm({ onAddComment }: Props) {
-  const { user } = useAppSelector(selectCurrentUser);
+export default function AddCommentForm({ commentId, onAddComment }: Props) {
+  const { currentUser } = useAppSelector(selectCurrentUser);
   const { register, handleSubmit, watch, setFocus, reset } = useForm<Inputs>({
     defaultValues: {
       comment: "",
@@ -46,7 +47,7 @@ export default function AddCommentForm({ onAddComment }: Props) {
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    onAddComment(data.comment, null);
+    onAddComment(data.comment, commentId ? commentId : null);
     reset();
   };
 
@@ -56,7 +57,7 @@ export default function AddCommentForm({ onAddComment }: Props) {
 
   return (
     <StyledAddCommentForm onSubmit={handleSubmit(onSubmit)}>
-      <Avatar variant="post" name={user.name} src={user.avatar} />
+      <Avatar variant="post" name={currentUser.name} src={currentUser.avatar} />
       <Textarea
         variant="comment"
         rows={1}

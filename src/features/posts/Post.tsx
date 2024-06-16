@@ -178,7 +178,7 @@ export default function Post({
   setPostToEdit,
   setPostIdToDelete,
 }: Props) {
-  const { user } = useAppSelector(selectCurrentUser);
+  const { currentUser } = useAppSelector(selectCurrentUser);
   const { id, description, image, createdAt, user_id } = post;
   const [likes, setLikes] = useState<Like[]>([]);
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -189,9 +189,9 @@ export default function Post({
     likes.map((like) => mapLike(like));
 
   function handleLikePost() {
-    if (likes.find((like) => like.user_id === user.id)) return;
+    if (likes.find((like) => like.user_id === currentUser.id)) return;
 
-    PostApi.likePost(id, user.id).then((res) => {
+    PostApi.likePost(id, currentUser.id).then((res) => {
       const likes = mapLikes(res);
       setLikes(likes);
       setIsLiked(true);
@@ -199,7 +199,7 @@ export default function Post({
   }
 
   function handleUnlikePost() {
-    const like = likes.find((like) => like.user_id === user.id);
+    const like = likes.find((like) => like.user_id === currentUser.id);
 
     if (!like) return;
 
@@ -214,30 +214,34 @@ export default function Post({
     comments.map((comment) => mapComment(comment));
 
   function handleAddComment(comment: string, commentId: string | null) {
-    PostApi.addComment(id, user.id, commentId, comment).then((res) => {
+    PostApi.addComment(id, currentUser.id, commentId, comment).then((res) => {
       const comment = mapComment(res);
+      console.log(comment);
+      if (comment.comment_id) return;
       setComments([comment, ...comments]);
       toast.success("Comment added!");
     });
   }
 
-  function handleDeleteComment(commentId: string) {
-    PostApi.deleteComment(commentId).then(() => {
-      const filteredComments = comments.filter(
-        (comment) => comment.id !== commentId
-      );
-      setComments(filteredComments);
+  function handleDeleteComment(id: string) {
+    PostApi.deleteComment(id).then(() => {
+      setComments(comments.filter((comment) => comment.id !== id));
       toast.success("Comment deleted!");
     });
   }
 
-  function handleEditComment(commentId: string, comment: string) {
-    PostApi.editComment(commentId, comment).then((res) => {
+  function handleEditComment(id: string, comment: string) {
+    PostApi.editComment(id, comment).then((res) => {
       const comment = mapComment(res);
+      const commentInd = comments.findIndex((comm) => comm.id === comment.id);
+      const filteredComments = comments.filter((comment) => comment.id !== id);
+
       const editedComments = [
+        ...filteredComments.slice(0, commentInd),
         comment,
-        ...comments.filter((comment) => comment.id !== commentId),
+        ...filteredComments.slice(commentInd),
       ];
+
       setComments(editedComments);
     });
   }
@@ -247,13 +251,16 @@ export default function Post({
     Promise.all([PostApi.getLikes(id), PostApi.getComments(id)]).then((res) => {
       const likes = mapLikes(res[0]);
       setLikes(likes);
-      if (likes.find((like) => like.user_id === user.id)) setIsLiked(true);
+      if (likes.find((like) => like.user_id === currentUser.id))
+        setIsLiked(true);
 
-      const comments = mapComments(res[1]).reverse();
+      const comments = mapComments(res[1])
+        .reverse()
+        .filter((comment) => !comment.comment_id);
       setComments(comments);
       setIsLoading(false);
     });
-  }, [id, user.id]);
+  }, [id, currentUser.id]);
 
   if (isLoading) {
     return <LoadingPost />;
@@ -263,19 +270,23 @@ export default function Post({
     <>
       <StyledPost>
         <ProfileLink to="/profile">
-          <Avatar src={user.avatar} name={user.name} variant="post" />
+          <Avatar
+            src={currentUser.avatar}
+            name={currentUser.name}
+            variant="post"
+          />
         </ProfileLink>
 
         <Container>
           <Info>
             <ProfileLink to="/profile">
-              <Name>{user.name}</Name>
+              <Name>{currentUser.name}</Name>
             </ProfileLink>
 
             <PostTime>{getTimePassed(createdAt)}</PostTime>
           </Info>
 
-          {user.id === user_id && (
+          {currentUser.id === user_id && (
             <EditButtonWrapper>
               <Button onClick={() => setPostToEdit(post)}>
                 <EditIcon />
@@ -283,7 +294,7 @@ export default function Post({
             </EditButtonWrapper>
           )}
 
-          {user.id === user_id && (
+          {currentUser.id === user_id && (
             <DeleteButtonWrapper>
               <Button onClick={() => setPostIdToDelete(id)}>
                 <DeleteIcon />

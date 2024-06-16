@@ -48,7 +48,7 @@ type Inputs = {
 
 export default function ChangePassword() {
   const { register, handleSubmit, reset } = useForm<Inputs>();
-  const { user } = useAppSelector(selectCurrentUser);
+  const { currentUser } = useAppSelector(selectCurrentUser);
   const [message, setMessage] = useState<{ value: string; isSuccess: boolean }>(
     {
       value: "",
@@ -57,7 +57,7 @@ export default function ChangePassword() {
   );
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    AuthApi.changePassword(data, user.id)
+    AuthApi.changePassword(data, currentUser.id)
       .then((res) => {
         toast.success(res.message);
         reset();

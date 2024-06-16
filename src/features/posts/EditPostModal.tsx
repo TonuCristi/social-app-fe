@@ -105,7 +105,7 @@ export default function EditPostModal({
   setPostToEdit,
 }: Props) {
   const { description } = post;
-  const { register, handleSubmit, setFocus } = useForm<Inputs>({
+  const { register, handleSubmit, setFocus, watch } = useForm<Inputs>({
     defaultValues: {
       description,
     },
@@ -130,7 +130,11 @@ export default function EditPostModal({
       <StyledEditPostForm onSubmit={handleSubmit(onSubmit)}>
         <Textarea
           variant="editPost"
-          rows={4}
+          rows={
+            watch("description").split("\n").length <= 4
+              ? watch("description").split("\n").length
+              : 4
+          }
           placeholder="Description"
           {...register("description")}
         />

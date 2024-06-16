@@ -26,7 +26,8 @@ const Container = styled.div`
 `;
 
 export default function RootLayout() {
-  const { isLoading, error, user } = useAppSelector(selectCurrentUser);
+  const { isLoadingCurrentUser, errorCurrentUser, currentUser } =
+    useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const location = useLocation();
 
@@ -35,14 +36,14 @@ export default function RootLayout() {
 
   const getPosts = useCallback(
     function getPosts(perPage: number, offset: number) {
-      PostApi.getPosts(user.id, perPage, offset)
+      PostApi.getPosts(currentUser.id, perPage, offset)
         .then((res) => {
           const posts = mapPosts(res);
           dispatch(loadPosts(posts));
         })
         .catch((err) => dispatch(loadError(err.response.data.error)));
     },
-    [user.id, dispatch]
+    [currentUser.id, dispatch]
   );
 
   function handleRefetch() {
@@ -58,19 +59,19 @@ export default function RootLayout() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!user.id) return;
+    if (!currentUser.id) return;
 
     getPosts(PER_PAGE, 0);
-  }, [user.id, getPosts]);
+  }, [currentUser.id, getPosts]);
 
-  if (isLoading)
+  if (isLoadingCurrentUser)
     return (
       <LoaderWrapper>
         <Loader />
       </LoaderWrapper>
     );
 
-  if (error) return <div>Something went wrong...</div>;
+  if (errorCurrentUser) return <div>Something went wrong...</div>;
 
   return (
     <StyledRootLayout>

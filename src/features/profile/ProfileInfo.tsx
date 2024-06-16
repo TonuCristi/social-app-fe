@@ -1,13 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
 import styled from "styled-components";
 
 import UploadAvatar from "./UploadAvatar";
 import Posts from "../posts/Posts";
-import UserPost from "../posts/Post";
+import Overlay from "../../ui/Overlay";
+import EditPostModal from "../posts/EditPostModal";
+import ConfirmationModal from "../../ui/ConfirmationModal";
+import Post from "../posts/Post";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { PostResponse } from "../../lib/types";
+import { PostResponse, PostT } from "../../lib/types";
 import { mapPost } from "../../utils/mapPost";
 import { PostApi } from "../../api/PostApi";
 import {
@@ -16,6 +21,7 @@ import {
   loadUserPosts,
   selectUserPosts,
 } from "../../redux/userPostsSlice";
+import { loadPosts, selectPosts } from "../../redux/postsSlice";
 
 const PER_PAGE = 6;
 
@@ -98,15 +104,52 @@ const Description = styled.p`
 
 export default function ProfileInfo() {
   const {
-    user: { id, name, email, description, birth_date, createdAt },
+    currentUser: { id, name, email, description, birth_date, createdAt },
   } = useAppSelector(selectCurrentUser);
-
-  const { isLoading, error, posts } = useAppSelector(selectUserPosts);
+  const { isLoadingUserPosts, errorUserPosts, userPosts } =
+    useAppSelector(selectUserPosts);
+  const { posts } = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
   const status = useRef<boolean>(false);
+  const [postToEdit, setPostToEdit] = useState<PostT | null>(null);
+  const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
+
+  function handleUpdatePostDescription(description: string) {
+    if (postToEdit === null) return;
+
+    PostApi.updatePostDescription(postToEdit.id, description).then((res) => {
+      const editedPost = mapPost(res);
+      const foundIndex = userPosts.findIndex(
+        (post) => post.id === editedPost.id
+      );
+      const result = [
+        ...userPosts.slice(0, foundIndex),
+        editedPost,
+        ...userPosts.slice(foundIndex + 1, userPosts.length),
+      ];
+      dispatch(loadUserPosts(result));
+      setPostToEdit(null);
+      toast.success("Post edited!");
+    });
+  }
+
+  function handleDeletePost() {
+    if (postIdToDelete === null) return;
+
+    PostApi.deletePost(postIdToDelete).then(() => {
+      const resultUserPosts = userPosts.filter(
+        (post) => post.id !== postIdToDelete
+      );
+      dispatch(loadUserPosts(resultUserPosts));
+      const resultPosts = posts.filter((post) => post.id !== postIdToDelete);
+      dispatch(loadPosts(resultPosts));
+      setPostIdToDelete(null);
+      toast.success("Post deleted!");
+    });
+  }
 
   useEffect(() => {
     PostApi.getPosts(id, PER_PAGE, 0)
@@ -132,7 +175,7 @@ export default function ProfileInfo() {
       if (status.current) return;
 
       status.current = true;
-      PostApi.getPosts(id, PER_PAGE, posts.length)
+      PostApi.getPosts(id, PER_PAGE, userPosts.length)
         .then((res) => {
           const posts = mapPosts(res);
           dispatch(loadMoreUserPosts(posts));
@@ -154,45 +197,78 @@ export default function ProfileInfo() {
     observer.observe(target);
 
     return () => observer.unobserve(target);
-  }, [dispatch, id, posts.length, isLoading]);
+  }, [dispatch, id, userPosts.length, isLoadingUserPosts]);
 
   return (
-    <StyledProfileInfo>
-      <Container>
-        <UploadAvatar />
+    <>
+      <StyledProfileInfo>
+        <Container>
+          <UploadAvatar />
 
-        <Info>
-          <Name>{name}</Name>
-          {birth_date && (
+          <Info>
+            <Name>{name}</Name>
+            {birth_date && (
+              <Field>
+                <FieldName>Birthday:</FieldName>
+                {new Date(birth_date).toLocaleDateString()}
+              </Field>
+            )}
             <Field>
-              <FieldName>Birthday:</FieldName>
-              {new Date(birth_date).toLocaleDateString()}
+              <FieldName>Email:</FieldName> {email}
             </Field>
-          )}
-          <Field>
-            <FieldName>Email:</FieldName> {email}
-          </Field>
-          <Field>
-            <FieldName>Joined:</FieldName>
-            {new Date(createdAt).toLocaleDateString()}
-          </Field>
-        </Info>
-      </Container>
+            <Field>
+              <FieldName>Joined:</FieldName>
+              {new Date(createdAt).toLocaleDateString()}
+            </Field>
+          </Info>
+        </Container>
 
-      {description && (
-        <Description>
-          <FieldName>Description:</FieldName>
-          {description}
-        </Description>
-      )}
+        {description && (
+          <Description>
+            <FieldName>Description:</FieldName>
+            {description}
+          </Description>
+        )}
 
-      <Posts variant="profile" isLoading={isLoading} error={error}>
-        {posts.map((post) => (
-          <UserPost key={post.id} post={post} />
-        ))}
-      </Posts>
+        <Posts
+          variant="profile"
+          isLoading={isLoadingUserPosts}
+          error={errorUserPosts}
+        >
+          {userPosts.map((post) => (
+            <Post
+              key={post.id}
+              post={post}
+              setPostToEdit={setPostToEdit}
+              setPostIdToDelete={setPostIdToDelete}
+            />
+          ))}
+        </Posts>
 
-      {posts.length > 0 && <div className="target" />}
-    </StyledProfileInfo>
+        {userPosts.length > 0 && <div className="target" />}
+      </StyledProfileInfo>
+
+      {postToEdit !== null &&
+        createPortal(
+          <Overlay>
+            <EditPostModal
+              post={postToEdit}
+              onUpdatePostDescription={handleUpdatePostDescription}
+              setPostToEdit={setPostToEdit}
+            />
+          </Overlay>,
+          document.body
+        )}
+
+      {postIdToDelete !== null &&
+        createPortal(
+          <ConfirmationModal
+            onConfirm={handleDeletePost}
+            onClose={() => setPostIdToDelete(null)}
+            question="Are you sure about deleting this post?"
+          />,
+          document.body
+        )}
+    </>
   );
 }

@@ -3,14 +3,14 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 
 type AuthState = {
-  isLoading: boolean;
-  error: string;
+  isLoadingAuth: boolean;
+  errorAuth: string;
   token: string | null;
 };
 
 const initialState: AuthState = {
-  isLoading: false,
-  error: "",
+  isLoadingAuth: false,
+  errorAuth: "",
   token: localStorage.getItem("token"),
 };
 
@@ -19,16 +19,16 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     loadToken: (state) => {
-      state.isLoading = true;
-      state.error = "";
+      state.isLoadingAuth = true;
+      state.errorAuth = "";
     },
     loadAuthError: (state, action: PayloadAction<string>) => {
-      state.error = action.payload;
-      state.isLoading = false;
+      state.errorAuth = action.payload;
+      state.isLoadingAuth = false;
     },
     addToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
-      state.isLoading = false;
+      state.isLoadingAuth = false;
     },
     removeToken: (state) => {
       state.token = "";

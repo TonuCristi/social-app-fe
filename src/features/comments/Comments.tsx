@@ -100,8 +100,8 @@ type Props = {
   setIsCommentsOpen: Dispatch<SetStateAction<boolean>>;
   comments: Comment[];
   onAddComment: (comment: string, commentId: string | null) => void;
-  onDeleteComment: (commentId: string) => void;
-  onEditComment: (commentId: string, comment: string) => void;
+  onDeleteComment: (id: string) => void;
+  onEditComment: (id: string, comment: string) => void;
 };
 
 export default function Comments({
@@ -127,6 +127,7 @@ export default function Comments({
             comment={comment}
             onDeleteComment={onDeleteComment}
             onEditComment={onEditComment}
+            onAddComment={onAddComment}
           />
         ))}
       </CommentsList>

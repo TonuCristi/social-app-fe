@@ -3,15 +3,15 @@ import { PostT } from "../lib/types";
 import { RootState } from "./store";
 
 type UserPostsState = {
-  isLoading: boolean;
-  error: string;
-  posts: PostT[];
+  isLoadingUserPosts: boolean;
+  errorUserPosts: string;
+  userPosts: PostT[];
 };
 
 const initialState: UserPostsState = {
-  isLoading: true,
-  error: "",
-  posts: [],
+  isLoadingUserPosts: true,
+  errorUserPosts: "",
+  userPosts: [],
 };
 
 const userPostsSlice = createSlice({
@@ -19,27 +19,27 @@ const userPostsSlice = createSlice({
   initialState,
   reducers: {
     loadUserPosts(state, action: PayloadAction<PostT[]>) {
-      state.isLoading = false;
-      state.error = "";
-      state.posts = action.payload;
+      state.isLoadingUserPosts = false;
+      state.errorUserPosts = "";
+      state.userPosts = action.payload;
     },
     loadMoreUserPosts(state, action: PayloadAction<PostT[]>) {
-      state.isLoading = false;
-      state.error = "";
-      state.posts = [...state.posts, ...action.payload];
+      state.isLoadingUserPosts = false;
+      state.errorUserPosts = "";
+      state.userPosts = [...state.userPosts, ...action.payload];
     },
     startUserPostsLoad(state) {
-      state.isLoading = true;
-      state.error = "";
+      state.isLoadingUserPosts = true;
+      state.errorUserPosts = "";
     },
     addUserPost(state, action: PayloadAction<PostT>) {
-      state.isLoading = false;
-      state.posts = [action.payload, ...state.posts];
-      state.error = "";
+      state.isLoadingUserPosts = false;
+      state.userPosts = [action.payload, ...state.userPosts];
+      state.errorUserPosts = "";
     },
     loadUserPostsError(state, action: PayloadAction<string>) {
-      state.isLoading = false;
-      state.error = action.payload;
+      state.isLoadingUserPosts = false;
+      state.errorUserPosts = action.payload;
     },
   },
 });

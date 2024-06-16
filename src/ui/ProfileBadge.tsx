@@ -92,7 +92,7 @@ export default function ProfileBadge() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { logout } = useLogout();
   const {
-    user: { name, avatar },
+    currentUser: { name, avatar },
   } = useAppSelector(selectCurrentUser);
   const containerRef = useRef<HTMLDivElement>(null);
   useClickOutside(containerRef, () => setIsOpen(false));
