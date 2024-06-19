@@ -17,13 +17,9 @@ const Icon = styled(HiFire)`
   color: var(--color-sky-400);
 `;
 
-type Props = {
-  onClick: () => void;
-};
-
-export default function Logo({ onClick }: Props) {
+export default function Logo() {
   return (
-    <StyledLogo onClick={onClick}>
+    <StyledLogo>
       <Icon />
     </StyledLogo>
   );

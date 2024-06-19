@@ -112,11 +112,7 @@ const BurgerMenuIcon = styled(HiMiniBars3)`
   stroke-width: 0.1rem;
 `;
 
-type Props = {
-  onRefetch: () => void;
-};
-
-export default function Navbar({ onRefetch }: Props) {
+export default function Navbar() {
   const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
   const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
 
@@ -124,7 +120,7 @@ export default function Navbar({ onRefetch }: Props) {
     <StyledNavbar>
       <Container>
         <HomeLink to="/">
-          <Logo onClick={onRefetch} />
+          <Logo />
         </HomeLink>
         <Search />
 

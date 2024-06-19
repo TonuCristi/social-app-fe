@@ -5,6 +5,7 @@ import Avatar from "../../ui/Avatar";
 import LoadingLike from "./LoadingLike";
 
 import { useUser } from "../../hooks/useUser";
+import { Like } from "../../lib/types";
 
 const ProfileLink = styled(NavLink)`
   display: flex;
@@ -32,16 +33,18 @@ const ProfileLink = styled(NavLink)`
 `;
 
 type Props = {
-  id: string;
+  like: Like;
 };
 
-export default function UserLike({ id }: Props) {
-  const { isLoading, user } = useUser(id);
+export default function UserLike({ like }: Props) {
+  const { isLoading, user } = useUser(like.user_id);
 
   if (isLoading) return <LoadingLike />;
 
   return (
-    <ProfileLink to="/profile">
+    <ProfileLink
+      to={user?.id === like.user_id ? "/profile" : `/profile/${user?.id}`}
+    >
       <Avatar variant="post" src={user?.avatar} name={user?.name} />
       {user?.name}
     </ProfileLink>

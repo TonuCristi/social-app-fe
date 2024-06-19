@@ -1,12 +1,13 @@
-import { Dispatch, SetStateAction } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 
 import Button from "../../ui/Button";
-import UserComment from "./UserComment";
 import AddCommentForm from "./AddCommentForm";
+import UserComment from "./UserComment";
 
 import { HiMiniXMark } from "react-icons/hi2";
-import { Comment } from "../../lib/types";
+import { CommentResponse, PostT } from "../../lib/types";
+import { PostContext } from "../posts/PostContext";
 
 const StyledComments = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -61,20 +62,6 @@ const Title = styled.h3`
   color: var(--color-zinc-100);
 `;
 
-const CloseIcon = styled(HiMiniXMark)`
-  font-size: 3.2rem;
-  color: var(--color-zinc-100);
-  background-color: var(--color-zinc-700);
-  padding: 0.4rem;
-  border-radius: 100%;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: var(--color-zinc-800);
-  }
-`;
-
 const CommentsList = styled.ul`
   list-style: none;
   color: var(--color-zinc-100);
@@ -96,21 +83,44 @@ const CommentsList = styled.ul`
   }
 `;
 
+const CloseIcon = styled(HiMiniXMark)`
+  font-size: 3.2rem;
+  color: var(--color-zinc-100);
+  background-color: var(--color-zinc-700);
+  padding: 0.4rem;
+  border-radius: 100%;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-zinc-800);
+  }
+`;
+
 type Props = {
-  setIsCommentsOpen: Dispatch<SetStateAction<boolean>>;
-  comments: Comment[];
-  onAddComment: (comment: string, commentId: string | null) => void;
-  onDeleteComment: (id: string) => void;
-  onEditComment: (id: string, comment: string) => void;
+  post: PostT;
+  onAddComment: (
+    postId: string,
+    comment: string,
+    commentId: string | null,
+    cb: (res: CommentResponse) => void
+  ) => void;
+  onDeleteComment: (id: string, cb: () => void) => void;
+  onEditComment: (
+    id: string,
+    comment: string,
+    cb: (res: CommentResponse) => void
+  ) => void;
 };
 
 export default function Comments({
-  setIsCommentsOpen,
-  comments,
+  post,
   onAddComment,
   onDeleteComment,
   onEditComment,
 }: Props) {
+  const { comments, setIsCommentsOpen } = useContext(PostContext);
+
   return (
     <StyledComments>
       <Container>
@@ -125,14 +135,14 @@ export default function Comments({
           <UserComment
             key={comment.id}
             comment={comment}
+            onAddComment={onAddComment}
             onDeleteComment={onDeleteComment}
             onEditComment={onEditComment}
-            onAddComment={onAddComment}
           />
         ))}
       </CommentsList>
 
-      <AddCommentForm onAddComment={onAddComment} />
+      <AddCommentForm post={post} onAddComment={onAddComment} />
     </StyledComments>
   );
 }

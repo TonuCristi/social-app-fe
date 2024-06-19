@@ -1,12 +1,12 @@
-import { Dispatch, SetStateAction, useRef } from "react";
+import { useContext, useRef } from "react";
 import styled from "styled-components";
 
 import Button from "../../ui/Button";
+import { PostContext } from "../posts/PostContext";
+import UserLike from "./UserLike";
 
 import { HiMiniXMark } from "react-icons/hi2";
 import { useClickOutside } from "../../hooks/useClickOutside";
-import { Like } from "../../lib/types";
-import UserLike from "./UserLike";
 
 const StyledLikes = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -97,20 +97,16 @@ const LikesList = styled.ul`
   }
 `;
 
-type Props = {
-  setIsLikesListOpen: Dispatch<SetStateAction<boolean>>;
-  likes: Like[];
-};
-
-export default function Likes({ setIsLikesListOpen, likes }: Props) {
+export default function Likes() {
+  const { likes, setIsLikesOpen } = useContext(PostContext);
   const containerRef = useRef(null);
-  useClickOutside(containerRef, () => setIsLikesListOpen(false));
+  useClickOutside(containerRef, () => setIsLikesOpen(false));
 
   return (
     <StyledLikes ref={containerRef}>
       <Container>
         <Title>Likes</Title>
-        <Button onClick={() => setIsLikesListOpen(false)}>
+        <Button onClick={() => setIsLikesOpen(false)}>
           <CloseIcon />
         </Button>
       </Container>
@@ -118,7 +114,7 @@ export default function Likes({ setIsLikesListOpen, likes }: Props) {
       <LikesList>
         {likes.map((like) => (
           <li key={like.id}>
-            <UserLike id={like.user_id} />
+            <UserLike like={like} />
           </li>
         ))}
       </LikesList>

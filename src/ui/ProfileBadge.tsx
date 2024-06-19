@@ -92,7 +92,7 @@ export default function ProfileBadge() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { logout } = useLogout();
   const {
-    currentUser: { name, avatar },
+    currentUser: { id, name, avatar },
   } = useAppSelector(selectCurrentUser);
   const containerRef = useRef<HTMLDivElement>(null);
   useClickOutside(containerRef, () => setIsOpen(false));
@@ -106,7 +106,7 @@ export default function ProfileBadge() {
       </Button>
 
       <Dropdown $isOpen={isOpen}>
-        <DropdownLink to="/profile" onClick={() => setIsOpen(false)}>
+        <DropdownLink to={`/profile/${id}`} onClick={() => setIsOpen(false)}>
           <DropdownItem>Profile</DropdownItem>
         </DropdownLink>
 

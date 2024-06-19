@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
 
@@ -6,13 +6,15 @@ import Avatar from "../../ui/Avatar";
 import Button from "../../ui/Button";
 import Textarea from "../../ui/Textarea";
 import LoadingComment from "./LoadingComment";
+import ProfileLink from "../../ui/ProfileLink";
 
-import { Comment } from "../../lib/types";
+import { Comment, CommentResponse } from "../../lib/types";
 import { useUser } from "../../hooks/useUser";
 import { getTimePassed } from "../../utils/getTimePassed";
-import { NavLink } from "react-router-dom";
 import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
-import AddCommentForm from "./AddCommentForm";
+import { PostContext } from "../posts/PostContext";
+import { useAppSelector } from "../../redux/hooks";
+import { selectCurrentUser } from "../../redux/currentUserSlice";
 
 const StyledUserComment = styled.li`
   margin-right: 1.2rem;
@@ -32,10 +34,6 @@ const Container = styled.div<{ $isEditing: boolean }>`
       props.$isEditing ? "min-content min-content" : ""};
   align-items: center;
   gap: 1rem;
-`;
-
-const ProfileLink = styled(NavLink)`
-  text-decoration: none;
 `;
 
 const ProfileLinkWrapper = styled.div`
@@ -65,14 +63,6 @@ const TextareaWrapper = styled.div<{ $isEditing: boolean }>`
   grid-column: 1 / ${(props) => (props.$isEditing ? "6" : "3")};
 `;
 
-const CommentInteractions = styled.div`
-  grid-row: 2;
-  grid-column: 2;
-  display: flex;
-  align-items: center;
-  gap: 2.4rem;
-`;
-
 const EditIcon = styled(HiMiniPencilSquare)`
   color: var(--color-zinc-100);
   font-size: 2.4rem;
@@ -98,32 +88,36 @@ const DeleteIcon = styled(HiMiniXMark)`
 `;
 
 const PostTime = styled.span`
+  grid-row: 2;
+  grid-column: 2;
   font-size: 1.4rem;
   color: var(--color-zinc-300);
 `;
 
-const FormWrapper = styled.div`
-  grid-row: 3;
-  grid-column: 2;
-  margin-top: 0.8rem;
-`;
-
 type Props = {
   comment: Comment;
-  onDeleteComment: (id: string) => void;
-  onEditComment: (id: string, comment: string) => void;
-  onAddComment: (comment: string, commentId: string | null) => void;
+  onAddComment: (
+    postId: string,
+    comment: string,
+    commentId: string | null,
+    cb: (res: CommentResponse) => void
+  ) => void;
+  onDeleteComment: (id: string, cb: () => void) => void;
+  onEditComment: (
+    id: string,
+    comment: string,
+    cb: (res: CommentResponse) => void
+  ) => void;
 };
 
 export default function UserComment({
   comment,
   onDeleteComment,
   onEditComment,
-  onAddComment,
 }: Props) {
-  const [isResponseFormOpen, setIsResponseFormOpen] = useState<boolean>(false);
   const { id, comment: commentContent, user_id, createdAt } = comment;
   const { isLoading, user } = useUser(user_id);
+  const { currentUser } = useAppSelector(selectCurrentUser);
   const { register, watch } = useForm({
     defaultValues: {
       comment: commentContent,
@@ -131,9 +125,10 @@ export default function UserComment({
   });
   const commentRef = useRef<HTMLPreElement>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const { editComment, deleteComment } = useContext(PostContext);
 
   function handleSave() {
-    onEditComment(id, watch("comment"));
+    onEditComment(id, watch("comment"), (res) => editComment(id, res));
     setIsEditing(false);
   }
 
@@ -170,13 +165,17 @@ export default function UserComment({
           </Button>
         )}
 
-        <Button onClick={() => setIsEditing(true)}>
-          <EditIcon />
-        </Button>
+        {currentUser.id === user_id && (
+          <Button onClick={() => setIsEditing(true)}>
+            <EditIcon />
+          </Button>
+        )}
 
-        <Button onClick={() => onDeleteComment(id)}>
-          <DeleteIcon />
-        </Button>
+        {currentUser.id === user_id && (
+          <Button onClick={() => onDeleteComment(id, () => deleteComment(id))}>
+            <DeleteIcon />
+          </Button>
+        )}
 
         {isEditing ? (
           <TextareaWrapper $isEditing={isEditing}>
@@ -197,17 +196,7 @@ export default function UserComment({
         )}
       </Container>
 
-      <CommentInteractions>
-        <PostTime>{getTimePassed(createdAt)}</PostTime>
-        <Button variant="comment" onClick={() => setIsResponseFormOpen(true)}>
-          Respond
-        </Button>
-      </CommentInteractions>
-      {isResponseFormOpen && (
-        <FormWrapper>
-          <AddCommentForm commentId={id} onAddComment={onAddComment} />
-        </FormWrapper>
-      )}
+      <PostTime>{getTimePassed(createdAt)}</PostTime>
     </StyledUserComment>
   );
 }

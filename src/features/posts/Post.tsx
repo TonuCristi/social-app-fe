@@ -1,28 +1,29 @@
 import styled from "styled-components";
-import { NavLink } from "react-router-dom";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { Dispatch, SetStateAction, useContext, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 import PostInteractions from "./PostInteractions";
 import Avatar from "../../ui/Avatar";
 import PostImage from "./PostImage";
 import Button from "../../ui/Button";
 import LoadingPost from "./LoadingPost";
+import ProfileLink from "../../ui/ProfileLink";
+import Overlay from "../../ui/Overlay";
+import Likes from "../likes/Likes";
+import Comments from "../comments/Comments";
 
 import {
-  Comment,
   CommentResponse,
   Like,
   LikeResponse,
   PostT,
+  User,
 } from "../../lib/types";
 import { getTimePassed } from "../../utils/getTimePassed";
-import { PostApi } from "../../api/PostApi";
 import { HiMiniPencilSquare, HiMiniXMark } from "react-icons/hi2";
-import { useAppSelector } from "../../redux/hooks";
-import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { mapLike } from "../../utils/mapLike";
-import { mapComment } from "../../utils/mapComment";
+import { mapLikes } from "../../utils/mapLikes";
+import { mapComments } from "../../utils/mapComments";
+import { PostContext } from "./PostContext";
 
 const StyledPost = styled.div`
   border: 1px solid var(--color-zinc-500);
@@ -84,10 +85,6 @@ const Info = styled.div`
       align-self: center;
     }
   }
-`;
-
-const ProfileLink = styled(NavLink)`
-  text-decoration: none;
 `;
 
 const Name = styled.h4`
@@ -168,99 +165,80 @@ const DeleteIcon = styled(HiMiniXMark)`
 `;
 
 type Props = {
+  user: User | undefined;
   post: PostT;
-  setPostToEdit: Dispatch<SetStateAction<PostT | null>>;
-  setPostIdToDelete: Dispatch<SetStateAction<string | null>>;
+  setPostToEdit?: Dispatch<SetStateAction<PostT | null>>;
+  setPostIdToDelete?: Dispatch<SetStateAction<string | null>>;
+  onLikePost: (
+    postId: string,
+    likes: Like[],
+    cb: (res: LikeResponse) => void
+  ) => void;
+  onUnlikePost: (likes: Like[], cb: (res: string) => void) => void;
+  onAddComment: (
+    postId: string,
+    comment: string,
+    commentId: string | null,
+    cb: (res: CommentResponse) => void
+  ) => void;
+  onDeleteComment: (id: string, cb: () => void) => void;
+  onEditComment: (
+    id: string,
+    comment: string,
+    cb: (res: CommentResponse) => void
+  ) => void;
+  getFeedback: (
+    postId: string,
+    cb: (res: [LikeResponse[], CommentResponse[]]) => void
+  ) => void;
 };
 
 export default function Post({
+  user,
   post,
   setPostToEdit,
   setPostIdToDelete,
+  onLikePost,
+  onUnlikePost,
+  onAddComment,
+  onDeleteComment,
+  onEditComment,
+  getFeedback,
 }: Props) {
-  const { currentUser } = useAppSelector(selectCurrentUser);
   const { id, description, image, createdAt, user_id } = post;
-  const [likes, setLikes] = useState<Like[]>([]);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const mapLikes = (likes: LikeResponse[]) =>
-    likes.map((like) => mapLike(like));
-
-  function handleLikePost() {
-    if (likes.find((like) => like.user_id === currentUser.id)) return;
-
-    PostApi.likePost(id, currentUser.id).then((res) => {
-      const likes = mapLikes(res);
-      setLikes(likes);
-      setIsLiked(true);
-    });
-  }
-
-  function handleUnlikePost() {
-    const like = likes.find((like) => like.user_id === currentUser.id);
-
-    if (!like) return;
-
-    PostApi.unlikePost(id, like.id).then((res) => {
-      const likes = mapLikes(res);
-      setLikes(likes);
-      setIsLiked(false);
-    });
-  }
-
-  const mapComments = (comments: CommentResponse[]) =>
-    comments.map((comment) => mapComment(comment));
-
-  function handleAddComment(comment: string, commentId: string | null) {
-    PostApi.addComment(id, currentUser.id, commentId, comment).then((res) => {
-      const comment = mapComment(res);
-      console.log(comment);
-      if (comment.comment_id) return;
-      setComments([comment, ...comments]);
-      toast.success("Comment added!");
-    });
-  }
-
-  function handleDeleteComment(id: string) {
-    PostApi.deleteComment(id).then(() => {
-      setComments(comments.filter((comment) => comment.id !== id));
-      toast.success("Comment deleted!");
-    });
-  }
-
-  function handleEditComment(id: string, comment: string) {
-    PostApi.editComment(id, comment).then((res) => {
-      const comment = mapComment(res);
-      const commentInd = comments.findIndex((comm) => comm.id === comment.id);
-      const filteredComments = comments.filter((comment) => comment.id !== id);
-
-      const editedComments = [
-        ...filteredComments.slice(0, commentInd),
-        comment,
-        ...filteredComments.slice(commentInd),
-      ];
-
-      setComments(editedComments);
-    });
-  }
+  const {
+    likes,
+    isLoading,
+    isCommentsOpen,
+    isLikesOpen,
+    setLikes,
+    setIsLiked,
+    setComments,
+    setIsLoading,
+    likePost,
+    unlikePost,
+  } = useContext(PostContext);
 
   useEffect(() => {
-    setIsLoading(true);
-    Promise.all([PostApi.getLikes(id), PostApi.getComments(id)]).then((res) => {
+    getFeedback(id, (res) => {
       const likes = mapLikes(res[0]);
       setLikes(likes);
-      if (likes.find((like) => like.user_id === currentUser.id))
-        setIsLiked(true);
-
+      if (likes.find((like) => like.user_id === user?.id)) setIsLiked(true);
       const comments = mapComments(res[1])
         .reverse()
         .filter((comment) => !comment.comment_id);
       setComments(comments);
       setIsLoading(false);
     });
-  }, [id, currentUser.id]);
+  }, [
+    getFeedback,
+    setLikes,
+    setIsLiked,
+    setComments,
+    setIsLoading,
+    id,
+    user?.id,
+  ]);
 
   if (isLoading) {
     return <LoadingPost />;
@@ -269,34 +247,38 @@ export default function Post({
   return (
     <>
       <StyledPost>
-        <ProfileLink to="/profile">
-          <Avatar
-            src={currentUser.avatar}
-            name={currentUser.name}
-            variant="post"
-          />
+        <ProfileLink to={`/profile/${user?.id}`}>
+          <Avatar src={user?.avatar} name={user?.name} variant="post" />
         </ProfileLink>
 
         <Container>
           <Info>
-            <ProfileLink to="/profile">
-              <Name>{currentUser.name}</Name>
+            <ProfileLink to={`/profile/${user?.id}`}>
+              <Name>{user?.name}</Name>
             </ProfileLink>
 
             <PostTime>{getTimePassed(createdAt)}</PostTime>
           </Info>
 
-          {currentUser.id === user_id && (
+          {user?.id === user_id && (
             <EditButtonWrapper>
-              <Button onClick={() => setPostToEdit(post)}>
+              <Button
+                onClick={() =>
+                  setPostToEdit !== undefined && setPostToEdit(post)
+                }
+              >
                 <EditIcon />
               </Button>
             </EditButtonWrapper>
           )}
 
-          {currentUser.id === user_id && (
+          {user?.id === user_id && (
             <DeleteButtonWrapper>
-              <Button onClick={() => setPostIdToDelete(id)}>
+              <Button
+                onClick={() =>
+                  setPostIdToDelete !== undefined && setPostIdToDelete(id)
+                }
+              >
                 <DeleteIcon />
               </Button>
             </DeleteButtonWrapper>
@@ -311,17 +293,32 @@ export default function Post({
 
         <PostInteractionsWrapper>
           <PostInteractions
-            likes={likes}
-            isLiked={isLiked}
-            onLikePost={handleLikePost}
-            onUnlikePost={handleUnlikePost}
-            comments={comments}
-            onAddComment={handleAddComment}
-            onDeleteComment={handleDeleteComment}
-            onEditComment={handleEditComment}
+            onLikePost={() => onLikePost(id, likes, likePost)}
+            onUnlikePost={() => onUnlikePost(likes, unlikePost)}
           />
         </PostInteractionsWrapper>
       </StyledPost>
+
+      {isLikesOpen &&
+        createPortal(
+          <Overlay>
+            <Likes />
+          </Overlay>,
+          document.body
+        )}
+
+      {isCommentsOpen &&
+        createPortal(
+          <Overlay>
+            <Comments
+              post={post}
+              onAddComment={onAddComment}
+              onDeleteComment={onDeleteComment}
+              onEditComment={onEditComment}
+            />
+          </Overlay>,
+          document.body
+        )}
     </>
   );
 }

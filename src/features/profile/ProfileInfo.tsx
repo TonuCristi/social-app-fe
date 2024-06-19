@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
 
 import UploadAvatar from "./UploadAvatar";
 import Posts from "../posts/Posts";
@@ -9,10 +10,17 @@ import Overlay from "../../ui/Overlay";
 import EditPostModal from "../posts/EditPostModal";
 import ConfirmationModal from "../../ui/ConfirmationModal";
 import Post from "../posts/Post";
+import Loader from "../../ui/Loader";
+import LoaderWrapper from "../../ui/LoaderWrapper";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { selectCurrentUser } from "../../redux/currentUserSlice";
-import { PostResponse, PostT } from "../../lib/types";
+import {
+  CommentResponse,
+  Like,
+  LikeResponse,
+  PostResponse,
+  PostT,
+} from "../../lib/types";
 import { mapPost } from "../../utils/mapPost";
 import { PostApi } from "../../api/PostApi";
 import {
@@ -22,6 +30,9 @@ import {
   selectUserPosts,
 } from "../../redux/userPostsSlice";
 import { loadPosts, selectPosts } from "../../redux/postsSlice";
+import PostProvider from "../posts/PostContext";
+import { useUser } from "../../hooks/useUser";
+import { selectCurrentUser } from "../../redux/currentUserSlice";
 
 const PER_PAGE = 6;
 
@@ -103,16 +114,16 @@ const Description = styled.p`
 `;
 
 export default function ProfileInfo() {
-  const {
-    currentUser: { id, name, email, description, birth_date, createdAt },
-  } = useAppSelector(selectCurrentUser);
+  const params = useParams();
+  const { isLoading, user } = useUser(params.userId);
   const { isLoadingUserPosts, errorUserPosts, userPosts } =
     useAppSelector(selectUserPosts);
+  const { currentUser } = useAppSelector(selectCurrentUser);
   const { posts } = useAppSelector(selectPosts);
   const dispatch = useAppDispatch();
-  const status = useRef<boolean>(false);
   const [postToEdit, setPostToEdit] = useState<PostT | null>(null);
   const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
+  const status = useRef<boolean>(false);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
@@ -151,18 +162,55 @@ export default function ProfileInfo() {
     });
   }
 
-  useEffect(() => {
-    PostApi.getPosts(id, PER_PAGE, 0)
-      .then((res) => {
-        const posts = mapPosts(res);
-        dispatch(loadUserPosts(posts));
-      })
-      .catch((err) => dispatch(loadUserPostsError(err.response.data.error)));
+  function handleLikePost(
+    postId: string,
+    likes: Like[],
+    cb: (res: LikeResponse) => void
+  ) {
+    if (likes.find((like) => like.user_id === currentUser.id)) return;
 
-    return () => {
-      dispatch(loadUserPosts([]));
-    };
-  }, [id, dispatch]);
+    PostApi.likePost(postId, currentUser.id).then((res) => cb(res));
+  }
+
+  function handleUnlikePost(likes: Like[], cb: (res: string) => void) {
+    const like = likes.find((like) => like.user_id === currentUser.id);
+
+    if (!like) return;
+
+    PostApi.unlikePost(like.id).then((res) => cb(res));
+  }
+
+  function handleAddComment(
+    postId: string,
+    comment: string,
+    commentId: string | null,
+    cb: (res: CommentResponse) => void
+  ) {
+    PostApi.addComment(postId, currentUser.id, commentId, comment).then((res) =>
+      cb(res)
+    );
+  }
+
+  function handleDeleteComment(id: string, cb: () => void) {
+    PostApi.deleteComment(id).then(cb);
+  }
+
+  function handleEditComment(
+    id: string,
+    comment: string,
+    cb: (res: CommentResponse) => void
+  ) {
+    PostApi.editComment(id, comment).then((res) => cb(res));
+  }
+
+  function getFeedback(
+    postId: string,
+    cb: (res: [LikeResponse[], CommentResponse[]]) => void
+  ) {
+    Promise.all([PostApi.getLikes(postId), PostApi.getComments(postId)]).then(
+      (res) => cb(res)
+    );
+  }
 
   useEffect(() => {
     const options = {
@@ -172,10 +220,11 @@ export default function ProfileInfo() {
     };
 
     function fetchData() {
+      if (!user) return;
       if (status.current) return;
 
       status.current = true;
-      PostApi.getPosts(id, PER_PAGE, userPosts.length)
+      PostApi.getUserPosts(user.id, PER_PAGE, userPosts.length)
         .then((res) => {
           const posts = mapPosts(res);
           dispatch(loadMoreUserPosts(posts));
@@ -197,36 +246,44 @@ export default function ProfileInfo() {
     observer.observe(target);
 
     return () => observer.unobserve(target);
-  }, [dispatch, id, userPosts.length, isLoadingUserPosts]);
+  }, [dispatch, user, userPosts.length, isLoadingUserPosts]);
+
+  if (isLoading)
+    return (
+      <LoaderWrapper>
+        <Loader />
+      </LoaderWrapper>
+    );
 
   return (
     <>
       <StyledProfileInfo>
         <Container>
-          <UploadAvatar />
+          <UploadAvatar user={user} />
 
           <Info>
-            <Name>{name}</Name>
-            {birth_date && (
+            <Name>{user?.name}</Name>
+            {user?.birth_date && (
               <Field>
                 <FieldName>Birthday:</FieldName>
-                {new Date(birth_date).toLocaleDateString()}
+                {new Date(user?.birth_date).toLocaleDateString()}
               </Field>
             )}
             <Field>
-              <FieldName>Email:</FieldName> {email}
+              <FieldName>Email:</FieldName> {user?.email}
             </Field>
             <Field>
               <FieldName>Joined:</FieldName>
-              {new Date(createdAt).toLocaleDateString()}
+              {user?.createdAt &&
+                new Date(user?.createdAt).toLocaleDateString()}
             </Field>
           </Info>
         </Container>
 
-        {description && (
+        {user?.description && (
           <Description>
             <FieldName>Description:</FieldName>
-            {description}
+            {user?.description}
           </Description>
         )}
 
@@ -236,12 +293,20 @@ export default function ProfileInfo() {
           error={errorUserPosts}
         >
           {userPosts.map((post) => (
-            <Post
-              key={post.id}
-              post={post}
-              setPostToEdit={setPostToEdit}
-              setPostIdToDelete={setPostIdToDelete}
-            />
+            <PostProvider key={post.id}>
+              <Post
+                user={user}
+                post={post}
+                setPostToEdit={setPostToEdit}
+                setPostIdToDelete={setPostIdToDelete}
+                onLikePost={handleLikePost}
+                onUnlikePost={handleUnlikePost}
+                onAddComment={handleAddComment}
+                onDeleteComment={handleDeleteComment}
+                onEditComment={handleEditComment}
+                getFeedback={getFeedback}
+              />
+            </PostProvider>
           ))}
         </Posts>
 

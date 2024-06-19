@@ -10,7 +10,7 @@ import {
 const BASE_URL = "/posts";
 
 export const PostApi = {
-  getPosts(userId: string, perPage: number, offset: number) {
+  getUserPosts(userId: string, perPage: number, offset: number) {
     return api
       .get(`${BASE_URL}/${userId}?perPage=${perPage}&offset=${offset}`)
       .then(({ data }: AxiosResponse<PostResponse[]>) => data);
@@ -38,12 +38,12 @@ export const PostApi = {
   likePost(postId: string, userId: string) {
     return api
       .post(`${BASE_URL}/post/like/${postId}`, { user_id: userId })
-      .then(({ data }: AxiosResponse<LikeResponse[]>) => data);
+      .then(({ data }: AxiosResponse<LikeResponse>) => data);
   },
-  unlikePost(postId: string, likeId: string) {
+  unlikePost(likeId: string) {
     return api
-      .post(`${BASE_URL}/post/unlike/${postId}`, { like_id: likeId })
-      .then(({ data }: AxiosResponse<LikeResponse[]>) => data);
+      .post(`${BASE_URL}/post/unlike`, { like_id: likeId })
+      .then(({ data }: AxiosResponse<string>) => data);
   },
   getLikes(postId: string) {
     return api

@@ -1,7 +1,16 @@
-import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import Navlink from "../ui/Navlink";
+
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { selectCurrentUser } from "../redux/currentUserSlice";
+import { PostApi } from "../api/PostApi";
+import { mapPosts } from "../utils/mapPosts";
+import { loadUserPosts, loadUserPostsError } from "../redux/userPostsSlice";
+
+const PER_PAGE = 6;
 
 const links = [
   {
@@ -10,39 +19,40 @@ const links = [
     text: "Your profile",
   },
   {
-    to: "/changePassword",
+    to: "changePassword",
     text: "Change password",
   },
   {
-    to: "/editProfile",
+    to: "editProfile",
     text: "Edit profile",
   },
 ];
 
-const StyledProfile = styled.div`
+const StyledProfile = styled.div<{ $isCurrentUser: boolean }>`
   color: var(--color-zinc-100);
-  display: grid;
+  display: ${(props) => (props.$isCurrentUser ? "grid" : "flex")};
   grid-template-columns: 25fr 75fr;
-  width: 75%;
+  width: ${(props) => (props.$isCurrentUser ? "75%" : "60%")};
   margin: 0 auto;
   border: 1px solid var(--color-zinc-500);
   border-top: none;
 
   @media (width >= 1535px) {
     & {
-      max-width: 120rem;
+      max-width: ${(props) => (props.$isCurrentUser ? "120rem" : "80rem")};
     }
   }
 
   @media (width <= 1279px) {
     & {
-      width: 85%;
+      width: ${(props) => (props.$isCurrentUser ? "85%" : "60%")};
     }
   }
 
   @media (width <= 1023px) {
     & {
       grid-template-columns: 1fr;
+      width: ${(props) => !props.$isCurrentUser && "75%"};
     }
   }
 
@@ -131,8 +141,9 @@ const NavItem = styled.li<{ $isActive: boolean }>`
   }
 `;
 
-const Container = styled.div`
+const Container = styled.div<{ $isCurrentUser: boolean }>`
   padding: 2.4rem;
+  margin: ${(props) => (props.$isCurrentUser ? "initial" : "0 auto")};
 
   @media (width <= 1023px) {
     & {
@@ -142,20 +153,47 @@ const Container = styled.div`
 `;
 
 export default function Profile() {
-  return (
-    <StyledProfile>
-      <ProfileNav>
-        <Title>Profile</Title>
-        <NavLinks>
-          {links.map(({ to, end, text }) => (
-            <Navlink key={to} to={`/profile${to}`} end={end}>
-              {({ isActive }) => <NavItem $isActive={isActive}>{text}</NavItem>}
-            </Navlink>
-          ))}
-        </NavLinks>
-      </ProfileNav>
+  const { currentUser } = useAppSelector(selectCurrentUser);
+  const params = useParams();
+  const dispatch = useAppDispatch();
 
-      <Container>
+  useEffect(() => {
+    if (!params.userId) return;
+
+    PostApi.getUserPosts(params.userId, PER_PAGE, 0)
+      .then((res) => {
+        const posts = mapPosts(res);
+        dispatch(loadUserPosts(posts));
+      })
+      .catch((err) => dispatch(loadUserPostsError(err.response.data.error)));
+
+    return () => {
+      dispatch(loadUserPosts([]));
+    };
+  }, [dispatch, params.userId]);
+
+  return (
+    <StyledProfile $isCurrentUser={currentUser.id === params.userId}>
+      {currentUser.id === params.userId && (
+        <ProfileNav>
+          <Title>Profile</Title>
+          <NavLinks>
+            {links.map(({ to, end, text }) => (
+              <Navlink
+                key={to}
+                to={`/profile/${currentUser.id}/${to}`}
+                end={end}
+              >
+                {({ isActive }) => (
+                  <NavItem $isActive={isActive}>{text}</NavItem>
+                )}
+              </Navlink>
+            ))}
+          </NavLinks>
+        </ProfileNav>
+      )}
+
+      <Container $isCurrentUser={currentUser.id === params.userId}>
         <Outlet />
       </Container>
     </StyledProfile>

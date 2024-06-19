@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -9,6 +9,8 @@ import Textarea from "../../ui/Textarea";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
 import { HiMiniPaperAirplane } from "react-icons/hi2";
+import { CommentResponse, PostT } from "../../lib/types";
+import { PostContext } from "../posts/PostContext";
 
 const StyledAddCommentForm = styled.form`
   display: flex;
@@ -30,24 +32,37 @@ const AddCommentIcon = styled(HiMiniPaperAirplane)<{ $isActive: boolean }>`
 `;
 
 type Props = {
+  post: PostT;
   commentId?: string;
-  onAddComment: (comment: string, commentId: string | null) => void;
+  onAddComment: (
+    postId: string,
+    comment: string,
+    commentId: string | null,
+    cb: (res: CommentResponse) => void
+  ) => void;
 };
 
 type Inputs = {
   comment: string;
 };
 
-export default function AddCommentForm({ commentId, onAddComment }: Props) {
+export default function AddCommentForm({
+  post,
+  commentId,
+  onAddComment,
+}: Props) {
   const { currentUser } = useAppSelector(selectCurrentUser);
   const { register, handleSubmit, watch, setFocus, reset } = useForm<Inputs>({
     defaultValues: {
       comment: "",
     },
   });
+  const { addComment } = useContext(PostContext);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    onAddComment(data.comment, commentId ? commentId : null);
+    onAddComment(post.id, data.comment, commentId ? commentId : null, (res) =>
+      addComment(res)
+    );
     reset();
   };
 
@@ -60,7 +75,11 @@ export default function AddCommentForm({ commentId, onAddComment }: Props) {
       <Avatar variant="post" name={currentUser.name} src={currentUser.avatar} />
       <Textarea
         variant="comment"
-        rows={1}
+        rows={
+          watch("comment").split("\n").length <= 4
+            ? watch("comment").split("\n").length
+            : 4
+        }
         placeholder="Write a comment..."
         {...register("comment")}
       />

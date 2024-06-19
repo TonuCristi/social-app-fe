@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import toast from "react-hot-toast";
+import { createPortal } from "react-dom";
 
 import Posts from "../features/posts/Posts";
 import AddPostForm from "../features/posts/AddPostForm";
@@ -8,6 +9,7 @@ import Post from "../features/posts/Post";
 import Overlay from "../ui/Overlay";
 import EditPostModal from "../features/posts/EditPostModal";
 import ConfirmationModal from "../ui/ConfirmationModal";
+import PostProvider from "../features/posts/PostContext";
 
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
@@ -18,11 +20,17 @@ import {
   loadError,
   loadPosts,
 } from "../redux/postsSlice";
-import { PostRequestFile, PostResponse, PostT } from "../lib/types";
+import {
+  CommentResponse,
+  Like,
+  LikeResponse,
+  PostRequestFile,
+  PostT,
+} from "../lib/types";
 import { PostApi } from "../api/PostApi";
 import { mapPost } from "../utils/mapPost";
-import { createPortal } from "react-dom";
 import { loadUserPosts, selectUserPosts } from "../redux/userPostsSlice";
+import { mapPosts } from "../utils/mapPosts";
 
 const PER_PAGE = 6;
 
@@ -43,9 +51,6 @@ export default function Feed() {
   const status = useRef<boolean>(false);
   const [postToEdit, setPostToEdit] = useState<PostT | null>(null);
   const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
-
-  const mapPosts = (posts: PostResponse[]) =>
-    posts.map((post) => mapPost(post));
 
   function handleCreatePost(post: PostRequestFile) {
     PostApi.createPost({ ...post, image: "" }).then((res) => {
@@ -87,6 +92,56 @@ export default function Feed() {
     });
   }
 
+  function handleLikePost(
+    postId: string,
+    likes: Like[],
+    cb: (res: LikeResponse) => void
+  ) {
+    if (likes.find((like) => like.user_id === currentUser.id)) return;
+
+    PostApi.likePost(postId, currentUser.id).then((res) => cb(res));
+  }
+
+  function handleUnlikePost(likes: Like[], cb: (res: string) => void) {
+    const like = likes.find((like) => like.user_id === currentUser.id);
+
+    if (!like) return;
+
+    PostApi.unlikePost(like.id).then((res) => cb(res));
+  }
+
+  function handleAddComment(
+    postId: string,
+    comment: string,
+    commentId: string | null,
+    cb: (res: CommentResponse) => void
+  ) {
+    PostApi.addComment(postId, currentUser.id, commentId, comment).then((res) =>
+      cb(res)
+    );
+  }
+
+  function handleDeleteComment(id: string, cb: () => void) {
+    PostApi.deleteComment(id).then(cb);
+  }
+
+  function handleEditComment(
+    id: string,
+    comment: string,
+    cb: (res: CommentResponse) => void
+  ) {
+    PostApi.editComment(id, comment).then((res) => cb(res));
+  }
+
+  function getFeedback(
+    postId: string,
+    cb: (res: [LikeResponse[], CommentResponse[]]) => void
+  ) {
+    Promise.all([PostApi.getLikes(postId), PostApi.getComments(postId)]).then(
+      (res) => cb(res)
+    );
+  }
+
   useEffect(() => {
     const scroll = sessionStorage.getItem("scroll");
 
@@ -110,7 +165,7 @@ export default function Feed() {
       if (status.current) return;
 
       status.current = true;
-      PostApi.getPosts(currentUser.id, PER_PAGE, posts.length)
+      PostApi.getUserPosts(currentUser.id, PER_PAGE, posts.length)
         .then((res) => {
           const posts = mapPosts(res);
           dispatch(loadMorePosts(posts));
@@ -141,12 +196,20 @@ export default function Feed() {
 
         <Posts variant="feed" isLoading={isLoadingPosts} error={errorPosts}>
           {posts.map((post) => (
-            <Post
-              key={post.id}
-              post={post}
-              setPostToEdit={setPostToEdit}
-              setPostIdToDelete={setPostIdToDelete}
-            />
+            <PostProvider key={post.id}>
+              <Post
+                user={currentUser}
+                post={post}
+                setPostToEdit={setPostToEdit}
+                setPostIdToDelete={setPostIdToDelete}
+                onLikePost={handleLikePost}
+                onUnlikePost={handleUnlikePost}
+                onAddComment={handleAddComment}
+                onDeleteComment={handleDeleteComment}
+                onEditComment={handleEditComment}
+                getFeedback={getFeedback}
+              />
+            </PostProvider>
           ))}
         </Posts>
 

@@ -1,15 +1,11 @@
-import { useState } from "react";
-import { createPortal } from "react-dom";
+import { useContext } from "react";
 import styled from "styled-components";
 
-import Overlay from "../../ui/Overlay";
 import Button from "../../ui/Button";
-import Likes from "../likes/Likes";
 
 import { HiMiniChatBubbleOvalLeft, HiMiniHeart } from "react-icons/hi2";
-import { Comment, Like } from "../../lib/types";
-import Comments from "../comments/Comments";
 import { formatNumber } from "../../utils/formatNumber";
+import { PostContext } from "./PostContext";
 
 const StyledPostInteractions = styled.div`
   display: flex;
@@ -57,28 +53,13 @@ const LikesIcon = styled(HiMiniHeart)`
 `;
 
 type Props = {
-  likes: Like[];
-  isLiked: boolean;
   onLikePost: () => void;
   onUnlikePost: () => void;
-  comments: Comment[];
-  onAddComment: (comment: string, commentId: string | null) => void;
-  onDeleteComment: (commentId: string) => void;
-  onEditComment: (commentId: string, comment: string) => void;
 };
 
-export default function PostInteractions({
-  likes,
-  isLiked,
-  onLikePost,
-  onUnlikePost,
-  comments,
-  onAddComment,
-  onDeleteComment,
-  onEditComment,
-}: Props) {
-  const [isLikesListOpen, setIsLikesListOpen] = useState<boolean>(false);
-  const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
+export default function PostInteractions({ onLikePost, onUnlikePost }: Props) {
+  const { likes, isLiked, comments, setIsCommentsOpen, setIsLikesOpen } =
+    useContext(PostContext);
 
   return (
     <>
@@ -100,35 +81,13 @@ export default function PostInteractions({
           <p>{formatNumber(comments.length)}</p>
         </Button>
 
-        <Button variant="postStats" onClick={() => setIsLikesListOpen(true)}>
+        <Button variant="postStats" onClick={() => setIsLikesOpen(true)}>
           <IconWrapper>
             <LikesIcon />
           </IconWrapper>
           Likes
         </Button>
       </StyledPostInteractions>
-
-      {isLikesListOpen &&
-        createPortal(
-          <Overlay>
-            <Likes setIsLikesListOpen={setIsLikesListOpen} likes={likes} />
-          </Overlay>,
-          document.body
-        )}
-
-      {isCommentsOpen &&
-        createPortal(
-          <Overlay>
-            <Comments
-              setIsCommentsOpen={setIsCommentsOpen}
-              comments={comments}
-              onAddComment={onAddComment}
-              onDeleteComment={onDeleteComment}
-              onEditComment={onEditComment}
-            />
-          </Overlay>,
-          document.body
-        )}
     </>
   );
 }

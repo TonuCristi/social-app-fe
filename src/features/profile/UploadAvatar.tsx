@@ -5,8 +5,8 @@ import { useState } from "react";
 import Avatar from "../../ui/Avatar";
 import UploadAvatarModal from "./UploadAvatarModal";
 
-import { fetchUser, selectCurrentUser } from "../../redux/currentUserSlice";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { fetchUser } from "../../redux/currentUserSlice";
+import { useAppDispatch } from "../../redux/hooks";
 import { HiMiniArrowPath } from "react-icons/hi2";
 import {
   deleteObject,
@@ -17,6 +17,7 @@ import {
 import { fb } from "../../config/firebase";
 import { AuthApi } from "../../api/AuthApi";
 import { mapUser } from "../../utils/mapUser";
+import { User } from "../../lib/types";
 
 const Button = styled.button`
   border: 5px solid var(--color-sky-500);
@@ -62,10 +63,11 @@ const Icon = styled(HiMiniArrowPath)`
   transition: all 0.2s;
 `;
 
-export default function UploadAvatar() {
-  const {
-    currentUser: { id, avatar },
-  } = useAppSelector(selectCurrentUser);
+type Props = {
+  user: User | undefined;
+};
+
+export default function UploadAvatar({ user }: Props) {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -78,6 +80,8 @@ export default function UploadAvatar() {
   });
 
   async function handleUpload(file: Blob | null, image: string | undefined) {
+    if (!user) return;
+
     if (!image) {
       return setMessage({
         value: "You should upload a photo!",
@@ -95,9 +99,11 @@ export default function UploadAvatar() {
     setIsLoading(true);
 
     // Delete the current avatar
-    if (avatar) {
-      const deleteImgType = new URL(avatar).pathname.split(".").reverse()[0];
-      const avatarRef = ref(fb, `avatars/${id}.${deleteImgType}`);
+    if (user.avatar) {
+      const deleteImgType = new URL(user.avatar).pathname
+        .split(".")
+        .reverse()[0];
+      const avatarRef = ref(fb, `avatars/${user.id}.${deleteImgType}`);
 
       await deleteObject(avatarRef).catch(() => {
         setMessage({ value: "Something went wrong!", isSuccess: false });
@@ -107,7 +113,7 @@ export default function UploadAvatar() {
 
     // Upload new avatar
     const imgType = file.type.split("/")[1];
-    const storageRef = ref(fb, `avatars/${id}.${imgType}`);
+    const storageRef = ref(fb, `avatars/${user.id}.${imgType}`);
     const uploadAvatar = uploadBytesResumable(storageRef, file, {
       contentType: `image/${imgType}`,
     });
@@ -121,7 +127,7 @@ export default function UploadAvatar() {
       },
       () => {
         getDownloadURL(uploadAvatar.snapshot.ref).then((downloadURL) => {
-          AuthApi.changeAvatar(downloadURL, id)
+          AuthApi.changeAvatar(downloadURL, user.id)
             .then((res) => {
               const user = mapUser(res.user);
               dispatch(fetchUser(user));
@@ -146,7 +152,7 @@ export default function UploadAvatar() {
           setIsOpen(true);
         }}
       >
-        <Avatar src={avatar} variant="profile" />
+        <Avatar src={user?.avatar} variant="profile" />
         <Icon />
       </Button>
 

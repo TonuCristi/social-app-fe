@@ -12,7 +12,6 @@ import ProfileInfo from "./features/profile/ProfileInfo";
 import ChangePassword from "./features/profile/ChangePassword";
 import EditProfile from "./features/profile/EditProfile";
 import Feed from "./pages/Feed";
-import ForeignProfileInfo from "./features/profile/ForeignProfileInfo";
 
 import GlobalStyle from "./styles/GlobalStyle";
 
@@ -35,26 +34,22 @@ const router = createBrowserRouter([
         element: <Friends />,
       },
       {
-        path: "/profile",
+        path: "/profile/:userId",
         element: <Profile />,
         children: [
           {
-            path: "/profile",
+            index: true,
             element: <ProfileInfo />,
           },
           {
-            path: "/profile/changePassword",
+            path: "/profile/:userId/changePassword",
             element: <ChangePassword />,
           },
           {
-            path: "/profile/editProfile",
+            path: "/profile/:userId/editProfile",
             element: <EditProfile />,
           },
         ],
-      },
-      {
-        path: "/profile/:userId",
-        element: <ForeignProfileInfo />,
       },
       {
         path: "/messages",

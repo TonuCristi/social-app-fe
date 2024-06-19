@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
-import { useCallback, useEffect } from "react";
+import { Outlet, ScrollRestoration } from "react-router-dom";
+import { useEffect } from "react";
 
 import Navbar from "./Navbar";
 import Loader from "./Loader";
@@ -12,8 +12,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { mapUser } from "../utils/mapUser";
 import { loadError, loadPosts } from "../redux/postsSlice";
 import { PostApi } from "../api/PostApi";
-import { PostResponse } from "../lib/types";
-import { mapPost } from "../utils/mapPost";
+import { mapPosts } from "../utils/mapPosts";
 
 const PER_PAGE = 6;
 
@@ -29,28 +28,6 @@ export default function RootLayout() {
   const { isLoadingCurrentUser, errorCurrentUser, currentUser } =
     useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
-  const location = useLocation();
-
-  const mapPosts = (posts: PostResponse[]) =>
-    posts.map((post) => mapPost(post));
-
-  const getPosts = useCallback(
-    function getPosts(perPage: number, offset: number) {
-      PostApi.getPosts(currentUser.id, perPage, offset)
-        .then((res) => {
-          const posts = mapPosts(res);
-          dispatch(loadPosts(posts));
-        })
-        .catch((err) => dispatch(loadError(err.response.data.error)));
-    },
-    [currentUser.id, dispatch]
-  );
-
-  function handleRefetch() {
-    if (location.pathname === "/") {
-      getPosts(PER_PAGE, 0);
-    }
-  }
 
   useEffect(() => {
     AuthApi.getUser()
@@ -61,8 +38,17 @@ export default function RootLayout() {
   useEffect(() => {
     if (!currentUser.id) return;
 
+    function getPosts(perPage: number, offset: number) {
+      PostApi.getUserPosts(currentUser.id, perPage, offset)
+        .then((res) => {
+          const posts = mapPosts(res);
+          dispatch(loadPosts(posts));
+        })
+        .catch((err) => dispatch(loadError(err.response.data.error)));
+    }
+
     getPosts(PER_PAGE, 0);
-  }, [currentUser.id, getPosts]);
+  }, [currentUser.id, dispatch]);
 
   if (isLoadingCurrentUser)
     return (
@@ -76,7 +62,7 @@ export default function RootLayout() {
   return (
     <StyledRootLayout>
       <Container>
-        <Navbar onRefetch={handleRefetch} />
+        <Navbar />
 
         <main>
           <Outlet />
