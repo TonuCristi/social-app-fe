@@ -11,6 +11,8 @@ import ProfileLink from "../../ui/ProfileLink";
 import Overlay from "../../ui/Overlay";
 import Likes from "../likes/Likes";
 import Comments from "../comments/Comments";
+import UserComment from "../comments/UserComment";
+import ConfirmationModal from "../../ui/ConfirmationModal";
 
 import {
   CommentResponse,
@@ -181,7 +183,7 @@ type Props = {
     commentId: string | null,
     cb: (res: CommentResponse) => void
   ) => void;
-  onDeleteComment: (id: string, cb: () => void) => void;
+  onDeleteComment: (id: string | null, cb: () => void) => void;
   onEditComment: (
     id: string,
     comment: string,
@@ -208,15 +210,19 @@ export default function Post({
   const { id, description, image, createdAt, user_id } = post;
   const {
     likes,
+    comments,
     isLoading,
     isCommentsOpen,
     isLikesOpen,
+    commentIdToDelete,
     setLikes,
     setIsLiked,
     setComments,
     setIsLoading,
+    setCommentIdToDelete,
     likePost,
     unlikePost,
+    deleteComment,
   } = useContext(PostContext);
 
   useEffect(() => {
@@ -310,11 +316,31 @@ export default function Post({
       {isCommentsOpen &&
         createPortal(
           <Overlay>
-            <Comments
-              post={post}
-              onAddComment={onAddComment}
-              onDeleteComment={onDeleteComment}
-              onEditComment={onEditComment}
+            <Comments post={post} onAddComment={onAddComment}>
+              {comments.map((comment) => (
+                <UserComment
+                  key={comment.id}
+                  comment={comment}
+                  onAddComment={onAddComment}
+                  onEditComment={onEditComment}
+                />
+              ))}
+            </Comments>
+          </Overlay>,
+          document.body
+        )}
+
+      {commentIdToDelete &&
+        createPortal(
+          <Overlay>
+            <ConfirmationModal
+              onConfirm={() =>
+                onDeleteComment(commentIdToDelete, () =>
+                  deleteComment(commentIdToDelete)
+                )
+              }
+              onClose={() => setCommentIdToDelete(null)}
+              question="Are you sure about deleting this comment?"
             />
           </Overlay>,
           document.body

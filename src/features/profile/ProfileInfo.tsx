@@ -20,6 +20,7 @@ import {
   LikeResponse,
   PostResponse,
   PostT,
+  User,
 } from "../../lib/types";
 import { mapPost } from "../../utils/mapPost";
 import { PostApi } from "../../api/PostApi";
@@ -31,8 +32,9 @@ import {
 } from "../../redux/userPostsSlice";
 import { loadPosts, selectPosts } from "../../redux/postsSlice";
 import PostProvider from "../posts/PostContext";
-import { useUser } from "../../hooks/useUser";
 import { selectCurrentUser } from "../../redux/currentUserSlice";
+import { AuthApi } from "../../api/AuthApi";
+import { mapUser } from "../../utils/mapUser";
 
 const PER_PAGE = 6;
 
@@ -115,7 +117,6 @@ const Description = styled.p`
 
 export default function ProfileInfo() {
   const params = useParams();
-  const { isLoading, user } = useUser(params.userId);
   const { isLoadingUserPosts, errorUserPosts, userPosts } =
     useAppSelector(selectUserPosts);
   const { currentUser } = useAppSelector(selectCurrentUser);
@@ -124,6 +125,8 @@ export default function ProfileInfo() {
   const [postToEdit, setPostToEdit] = useState<PostT | null>(null);
   const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
   const status = useRef<boolean>(false);
+  const [user, setUser] = useState<User>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const mapPosts = (posts: PostResponse[]) =>
     posts.map((post) => mapPost(post));
@@ -191,7 +194,9 @@ export default function ProfileInfo() {
     );
   }
 
-  function handleDeleteComment(id: string, cb: () => void) {
+  function handleDeleteComment(id: string | null, cb: () => void) {
+    if (!id) return;
+
     PostApi.deleteComment(id).then(cb);
   }
 
@@ -211,6 +216,26 @@ export default function ProfileInfo() {
       (res) => cb(res)
     );
   }
+
+  useEffect(() => {
+    if (!params.userId) return;
+
+    Promise.all([
+      AuthApi.getUserById(params.userId),
+      PostApi.getUserPosts(params.userId, PER_PAGE, 0),
+    ]).then((res) => {
+      const user = mapUser(res[0]);
+      setUser(user);
+
+      const posts = mapPosts(res[1]);
+      dispatch(loadUserPosts(posts));
+      setIsLoading(false);
+    });
+
+    return () => {
+      dispatch(loadUserPosts([]));
+    };
+  }, [dispatch, params.userId]);
 
   useEffect(() => {
     const options = {
@@ -246,7 +271,7 @@ export default function ProfileInfo() {
     observer.observe(target);
 
     return () => observer.unobserve(target);
-  }, [dispatch, user, userPosts.length, isLoadingUserPosts]);
+  }, [dispatch, userPosts.length, isLoadingUserPosts, user]);
 
   if (isLoading)
     return (

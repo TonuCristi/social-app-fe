@@ -102,7 +102,6 @@ type Props = {
     commentId: string | null,
     cb: (res: CommentResponse) => void
   ) => void;
-  onDeleteComment: (id: string, cb: () => void) => void;
   onEditComment: (
     id: string,
     comment: string,
@@ -110,11 +109,7 @@ type Props = {
   ) => void;
 };
 
-export default function UserComment({
-  comment,
-  onDeleteComment,
-  onEditComment,
-}: Props) {
+export default function UserComment({ comment, onEditComment }: Props) {
   const { id, comment: commentContent, user_id, createdAt } = comment;
   const { isLoading, user } = useUser(user_id);
   const { currentUser } = useAppSelector(selectCurrentUser);
@@ -125,12 +120,13 @@ export default function UserComment({
   });
   const commentRef = useRef<HTMLPreElement>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const { editComment, deleteComment } = useContext(PostContext);
+  const { editComment, setCommentIdToDelete } = useContext(PostContext);
 
-  function handleSave() {
-    onEditComment(id, watch("comment"), (res) => editComment(id, res));
-    setIsEditing(false);
-  }
+  const handleSave = () =>
+    onEditComment(id, watch("comment"), (res) => {
+      editComment(id, res);
+      setIsEditing(false);
+    });
 
   if (isLoading) return <LoadingComment />;
 
@@ -172,7 +168,7 @@ export default function UserComment({
         )}
 
         {currentUser.id === user_id && (
-          <Button onClick={() => onDeleteComment(id, () => deleteComment(id))}>
+          <Button onClick={() => setCommentIdToDelete(id)}>
             <DeleteIcon />
           </Button>
         )}

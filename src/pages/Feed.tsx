@@ -121,7 +121,9 @@ export default function Feed() {
     );
   }
 
-  function handleDeleteComment(id: string, cb: () => void) {
+  function handleDeleteComment(id: string | null, cb: () => void) {
+    if (!id) return;
+
     PostApi.deleteComment(id).then(cb);
   }
 

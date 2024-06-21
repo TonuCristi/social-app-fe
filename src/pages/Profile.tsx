@@ -1,16 +1,10 @@
-import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import Navlink from "../ui/Navlink";
 
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 import { selectCurrentUser } from "../redux/currentUserSlice";
-import { PostApi } from "../api/PostApi";
-import { mapPosts } from "../utils/mapPosts";
-import { loadUserPosts, loadUserPostsError } from "../redux/userPostsSlice";
-
-const PER_PAGE = 6;
 
 const links = [
   {
@@ -155,22 +149,6 @@ const Container = styled.div<{ $isCurrentUser: boolean }>`
 export default function Profile() {
   const { currentUser } = useAppSelector(selectCurrentUser);
   const params = useParams();
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (!params.userId) return;
-
-    PostApi.getUserPosts(params.userId, PER_PAGE, 0)
-      .then((res) => {
-        const posts = mapPosts(res);
-        dispatch(loadUserPosts(posts));
-      })
-      .catch((err) => dispatch(loadUserPostsError(err.response.data.error)));
-
-    return () => {
-      dispatch(loadUserPosts([]));
-    };
-  }, [dispatch, params.userId]);
 
   return (
     <StyledProfile $isCurrentUser={currentUser.id === params.userId}>

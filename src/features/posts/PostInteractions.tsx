@@ -6,6 +6,8 @@ import Button from "../../ui/Button";
 import { HiMiniChatBubbleOvalLeft, HiMiniHeart } from "react-icons/hi2";
 import { formatNumber } from "../../utils/formatNumber";
 import { PostContext } from "./PostContext";
+import { useAppSelector } from "../../redux/hooks";
+import { selectCurrentUser } from "../../redux/currentUserSlice";
 
 const StyledPostInteractions = styled.div`
   display: flex;
@@ -60,34 +62,36 @@ type Props = {
 export default function PostInteractions({ onLikePost, onUnlikePost }: Props) {
   const { likes, isLiked, comments, setIsCommentsOpen, setIsLikesOpen } =
     useContext(PostContext);
+  const { currentUser } = useAppSelector(selectCurrentUser);
+
+  const checkLike = () =>
+    isLiked || !likes.findIndex((like) => like.user_id === currentUser.id);
 
   return (
-    <>
-      <StyledPostInteractions>
-        <Button
-          variant="postLike"
-          onClick={isLiked ? onUnlikePost : onLikePost}
-        >
-          <IconWrapper>
-            <LikeIcon $isLiked={isLiked} />
-          </IconWrapper>
-          <p>{formatNumber(likes.length)}</p>
-        </Button>
+    <StyledPostInteractions>
+      <Button
+        variant="postLike"
+        onClick={checkLike() ? onUnlikePost : onLikePost}
+      >
+        <IconWrapper>
+          <LikeIcon $isLiked={checkLike()} />
+        </IconWrapper>
+        <p>{formatNumber(likes.length)}</p>
+      </Button>
 
-        <Button variant="postComments" onClick={() => setIsCommentsOpen(true)}>
-          <IconWrapper>
-            <CommentIcon />
-          </IconWrapper>
-          <p>{formatNumber(comments.length)}</p>
-        </Button>
+      <Button variant="postComments" onClick={() => setIsCommentsOpen(true)}>
+        <IconWrapper>
+          <CommentIcon />
+        </IconWrapper>
+        <p>{formatNumber(comments.length)}</p>
+      </Button>
 
-        <Button variant="postStats" onClick={() => setIsLikesOpen(true)}>
-          <IconWrapper>
-            <LikesIcon />
-          </IconWrapper>
-          Likes
-        </Button>
-      </StyledPostInteractions>
-    </>
+      <Button variant="postStats" onClick={() => setIsLikesOpen(true)}>
+        <IconWrapper>
+          <LikesIcon />
+        </IconWrapper>
+        Likes
+      </Button>
+    </StyledPostInteractions>
   );
 }

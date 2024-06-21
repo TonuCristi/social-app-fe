@@ -1,9 +1,8 @@
-import { useContext } from "react";
+import { ReactNode, useContext } from "react";
 import styled from "styled-components";
 
 import Button from "../../ui/Button";
 import AddCommentForm from "./AddCommentForm";
-import UserComment from "./UserComment";
 
 import { HiMiniXMark } from "react-icons/hi2";
 import { CommentResponse, PostT } from "../../lib/types";
@@ -105,21 +104,11 @@ type Props = {
     commentId: string | null,
     cb: (res: CommentResponse) => void
   ) => void;
-  onDeleteComment: (id: string, cb: () => void) => void;
-  onEditComment: (
-    id: string,
-    comment: string,
-    cb: (res: CommentResponse) => void
-  ) => void;
+  children: ReactNode;
 };
 
-export default function Comments({
-  post,
-  onAddComment,
-  onDeleteComment,
-  onEditComment,
-}: Props) {
-  const { comments, setIsCommentsOpen } = useContext(PostContext);
+export default function Comments({ post, onAddComment, children }: Props) {
+  const { setIsCommentsOpen } = useContext(PostContext);
 
   return (
     <StyledComments>
@@ -130,17 +119,7 @@ export default function Comments({
         </Button>
       </Container>
 
-      <CommentsList>
-        {comments.map((comment) => (
-          <UserComment
-            key={comment.id}
-            comment={comment}
-            onAddComment={onAddComment}
-            onDeleteComment={onDeleteComment}
-            onEditComment={onEditComment}
-          />
-        ))}
-      </CommentsList>
+      <CommentsList>{children}</CommentsList>
 
       <AddCommentForm post={post} onAddComment={onAddComment} />
     </StyledComments>

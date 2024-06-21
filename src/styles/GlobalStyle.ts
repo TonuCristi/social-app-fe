@@ -14,7 +14,7 @@ const GlobalStyle = createGlobalStyle`
         --color-zinc-800: rgb(39, 39, 42);
         --color-zinc-900: rgb(24, 24, 27);
         --color-zinc-950: rgb(9, 9, 11);
-        --color-zinc-blur-950: rgb(9, 9, 11, 0.8);
+        --color-zinc-blur-950: rgb(9, 9, 11, 0.3);
 
         /* Sky */
         --color-sky-50: rgb(240, 249, 255);

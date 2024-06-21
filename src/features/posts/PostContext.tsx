@@ -18,16 +18,18 @@ type PostContext = {
   isLoading: boolean;
   isCommentsOpen: boolean;
   isLikesOpen: boolean;
+  commentIdToDelete: string | null;
   setLikes: Dispatch<SetStateAction<Like[]>>;
   setIsLiked: Dispatch<SetStateAction<boolean>>;
   setComments: Dispatch<SetStateAction<Comment[]>>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   setIsCommentsOpen: Dispatch<SetStateAction<boolean>>;
   setIsLikesOpen: Dispatch<SetStateAction<boolean>>;
+  setCommentIdToDelete: Dispatch<SetStateAction<string | null>>;
   likePost: (res: LikeResponse) => void;
   unlikePost: (res: string) => void;
   addComment: (res: CommentResponse) => void;
-  deleteComment: (id: string) => void;
+  deleteComment: (id: string | null) => void;
   editComment: (id: string, res: CommentResponse) => void;
 };
 
@@ -38,12 +40,14 @@ export const PostContext = createContext<PostContext>({
   isLoading: true,
   isCommentsOpen: false,
   isLikesOpen: false,
+  commentIdToDelete: null,
   setLikes: () => undefined,
   setIsLiked: () => undefined,
   setComments: () => undefined,
   setIsLoading: () => undefined,
   setIsCommentsOpen: () => undefined,
   setIsLikesOpen: () => undefined,
+  setCommentIdToDelete: () => undefined,
   likePost: () => undefined,
   unlikePost: () => undefined,
   addComment: () => undefined,
@@ -62,6 +66,9 @@ export default function PostProvider({ children }: Props) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
   const [isLikesOpen, setIsLikesOpen] = useState<boolean>(false);
+  const [commentIdToDelete, setCommentIdToDelete] = useState<string | null>(
+    null
+  );
 
   const likePost = (res: LikeResponse) => {
     const like = mapLike(res);
@@ -82,8 +89,9 @@ export default function PostProvider({ children }: Props) {
     toast.success("Comment added!");
   };
 
-  const deleteComment = (id: string) => {
+  const deleteComment = (id: string | null) => {
     setComments(comments.filter((comment) => comment.id !== id));
+    setCommentIdToDelete(null);
     toast.success("Comment deleted!");
   };
 
@@ -110,12 +118,14 @@ export default function PostProvider({ children }: Props) {
         isLoading,
         isCommentsOpen,
         isLikesOpen,
+        commentIdToDelete,
         setLikes,
         setIsLiked,
         setComments,
         setIsLoading,
         setIsCommentsOpen,
         setIsLikesOpen,
+        setCommentIdToDelete,
         likePost,
         unlikePost,
         addComment,
